@@ -1,0 +1,109 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+:root {
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  font-weight: 400;
+  color-scheme: dark;
+  color: #ffffff;
+  background-color: #050510;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #050510;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+@layer base {
+  body {
+    @apply bg-dark-bg text-white antialiased;
+    background-image: 
+      radial-gradient(circle at 50% 0%, rgba(112, 0, 255, 0.2) 0%, transparent 60%),
+      radial-gradient(circle at 0% 50%, rgba(0, 240, 255, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 100% 50%, rgba(255, 0, 85, 0.15) 0%, transparent 50%);
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-dark-card/60 backdrop-blur-2xl border border-white/10 shadow-xl rounded-2xl transition-all duration-500 ease-out;
+  }
+  
+  .glass-panel:hover {
+    @apply border-primary/40 shadow-[0_0_40px_rgba(0,240,255,0.15)] bg-dark-card/80;
+    transform: translateY(-2px);
+  }
+
+  .glass-button {
+    @apply px-6 py-3 rounded-xl font-bold transition-all duration-300 relative overflow-hidden cursor-pointer;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  }
+
+  .glass-button:hover {
+    @apply border-primary/60 text-primary shadow-[0_0_25px_rgba(0,240,255,0.4)];
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
+    transform: translateY(-2px) scale(1.02);
+  }
+
+  .glass-button:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  .glass-input {
+    @apply bg-dark-card/40 border border-white/10 rounded-xl px-4 py-3 outline-none transition-all duration-300 text-white placeholder-gray-400 focus:border-primary/60 focus:bg-dark-card/60 focus:shadow-[0_0_20px_rgba(0,240,255,0.15)];
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-[#050510];
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full hover:bg-primary/60 transition-colors cursor-pointer;
+}
+
+/* Text Selection */
+::selection {
+  @apply bg-primary/40 text-white;
+}
+
+/* Smooth Page Transitions */
+.page-transition-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.page-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 400ms, transform 400ms;
+}
+.page-transition-exit {
+  opacity: 1;
+}
+.page-transition-exit-active {
+  opacity: 0;
+  transition: opacity 300ms;
+}

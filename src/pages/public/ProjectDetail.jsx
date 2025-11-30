@@ -1,0 +1,330 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { MapPin, Check, ArrowLeft, Building, Ruler, Calendar } from 'lucide-react';
+import Button from '../../components/shared/Button';
+import Badge from '../../components/shared/Badge';
+import Card from '../../components/shared/Card';
+import ContactForm from '../../components/public/ContactForm';
+import LiquidBackground from '../../components/shared/LiquidBackground';
+import { api } from '../../utils/api';
+
+const ProjectDetail = () => {
+  const { id } = useParams();
+  const [project, setProject] = useState(null);
+  const [units, setUnits] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [activeImage, setActiveImage] = useState(0);
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [selectedUnit, setSelectedUnit] = useState(null);
+
+  useEffect(() => {
+    setLoading(true);
+    api.getProjectById(id).then(data => {
+      setProject(data);
+      return api.getUnitsByProject(id);
+    }).then(unitsData => {
+      setUnits(unitsData);
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setLoading(false);
+    });
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen pt-24 flex justify-center items-center relative">
+        <LiquidBackground />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (!project) {
+    return (
+      <div className="min-h-screen pt-24 flex flex-col justify-center items-center relative">
+        <LiquidBackground />
+        <h2 className="text-2xl font-bold text-white mb-4">Project Not Found</h2>
+        <Link to="/projects">
+          <Button>Back to Projects</Button>
+        </Link>
+      </div>
+    );
+  }
+
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  };
+
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="min-h-screen pt-24 pb-12 relative"
+    >
+      <LiquidBackground />
+      
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
+        {/* Breadcrumb */}
+        <div className="mb-6">
+          <Link to="/projects" className="inline-flex items-center text-gray-400 hover:text-primary transition-colors">
+            <ArrowLeft size={16} className="mr-2" /> Back to Projects
+          </Link>
+        </div>
+
+        {/* Header Section */}
+        <motion.div 
+          initial="hidden"
+          animate="visible"
+          variants={fadeInUp}
+          className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4"
+        >
+          <div>
+            <h1 className="text-3xl md:text-5xl font-bold font-heading text-white mb-2">
+              {project.name}
+            </h1>
+            <div className="flex items-center text-gray-400">
+              <MapPin size={18} className="mr-2 text-primary" />
+              {project.address}
+            </div>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="text-right">
+              <p className="text-sm text-gray-400">Starting from</p>
+              <p className="text-2xl font-bold text-primary">
+                ${(project.priceRange.min / 1000).toFixed(0)}k
+              </p>
+            </div>
+            <Badge variant={project.status === 'active' ? 'success' : 'warning'} className="text-lg px-4 py-1">
+              {project.status === 'active' ? 'Selling Fast' : 'Upcoming'}
+            </Badge>
+          </div>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Main Content */}
+          <div className="lg:col-span-2 space-y-8">
+            {/* Gallery */}
+            <motion.div 
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-4"
+            >
+              <div className="h-[400px] md:h-[500px] rounded-2xl overflow-hidden glass-panel border-0">
+                <img 
+                  src={project.images[activeImage]} 
+                  alt={project.name} 
+                  className="w-full h-full object-cover transition-all duration-500"
+                />
+              </div>
+              <div className="flex gap-4 overflow-x-auto pb-2">
+                {project.images.map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveImage(index)}
+                    className={`flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden border-2 transition-all ${
+                      activeImage === index ? 'border-primary shadow-[0_0_15px_rgba(0,240,255,0.5)]' : 'border-transparent opacity-70 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={img} alt={`View ${index + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Overview */}
+            <motion.section 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeInUp}
+              className="glass-panel p-8"
+            >
+              <h2 className="text-2xl font-bold font-heading text-white mb-4">Overview</h2>
+              <p className="text-gray-300 leading-relaxed mb-6">
+                {project.description}
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-lg bg-primary/10 text-primary">
+                    <Building size={24} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400">Type</p>
+                    <p className="font-bold text-white capitalize">{project.type}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-lg bg-secondary/10 text-secondary">
+                    <Ruler size={24} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400">Units</p>
+                    <p className="font-bold text-white">{project.stats.totalUnits}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-lg bg-accent/10 text-accent">
+                    <Calendar size={24} />
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400">Completion</p>
+                    <p className="font-bold text-white">2025</p>
+                  </div>
+                </div>
+              </div>
+            </motion.section>
+
+            {/* Amenities */}
+            <motion.section 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeInUp}
+              className="glass-panel p-8"
+            >
+              <h2 className="text-2xl font-bold font-heading text-white mb-6">Amenities</h2>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {project.amenities.map((amenity, index) => (
+                  <div key={index} className="flex items-center gap-3 text-gray-300">
+                    <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center text-green-400">
+                      <Check size={14} />
+                    </div>
+                    {amenity}
+                  </div>
+                ))}
+              </div>
+            </motion.section>
+
+            {/* Available Units */}
+            <motion.section 
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={staggerContainer}
+            >
+              <h2 className="text-2xl font-bold font-heading text-white mb-6">Available Units</h2>
+              <div className="space-y-4">
+                {units.map((unit) => (
+                  <motion.div 
+                    key={unit.id}
+                    variants={fadeInUp}
+                    className="glass-panel p-6 flex flex-col md:flex-row items-center justify-between gap-4 hover:bg-white/5 transition-colors"
+                  >
+                    <div className="flex items-center gap-4 w-full md:w-auto">
+                      <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
+                        <img src={unit.images[0]} alt={unit.number} className="w-full h-full object-cover" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg text-white">Unit {unit.number}</h3>
+                        <p className="text-gray-400 text-sm mb-1">{unit.features.bedrooms} Bed • {unit.features.bathrooms} Bath • {unit.area_m2} m²</p>
+                        <Badge variant={unit.status === 'available' ? 'success' : 'neutral'}>
+                          {unit.status}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end gap-2 w-full md:w-auto">
+                      <span className="text-2xl font-bold text-primary">${unit.price.toLocaleString()}</span>
+                      <div className="flex gap-2 w-full md:w-auto">
+                        <Link to={`/units/${unit.id}`} className="flex-1">
+                          <Button variant="outline" size="sm" className="w-full">View 3D</Button>
+                        </Link>
+                        <Button 
+                          size="sm" 
+                          className="flex-1 shadow-[0_0_10px_rgba(0,240,255,0.3)]"
+                          onClick={() => {
+                            setSelectedUnit(unit);
+                            setIsContactOpen(true);
+                          }}
+                        >
+                          Enquire
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.section>
+          </div>
+
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-24 space-y-6">
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+              >
+                <Card className="p-6">
+                  <h3 className="text-xl font-bold text-white mb-4">Interested?</h3>
+                  <p className="text-gray-400 mb-6">
+                    Schedule a visit or request more information about {project.name}.
+                  </p>
+                  <Button 
+                    className="w-full mb-3 shadow-[0_0_15px_rgba(0,240,255,0.3)]" 
+                    size="lg"
+                    onClick={() => {
+                      setSelectedUnit(null);
+                      setIsContactOpen(true);
+                    }}
+                  >
+                    Contact Agent
+                  </Button>
+                  <Button variant="outline" className="w-full">
+                    Download Brochure
+                  </Button>
+                </Card>
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+              >
+                <Card className="p-6">
+                  <h3 className="text-lg font-bold text-white mb-4">Agent</h3>
+                  <div className="flex items-center gap-4 mb-4">
+                    <div className="w-12 h-12 rounded-full bg-gray-700 overflow-hidden">
+                      <img src="https://i.pravatar.cc/150?u=agent" alt="Agent" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-white">Sarah Johnson</p>
+                      <p className="text-sm text-gray-400">Senior Property Consultant</p>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="sm" className="w-full">View Profile</Button>
+                </Card>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <ContactForm 
+        isOpen={isContactOpen} 
+        onClose={() => {
+          setIsContactOpen(false);
+          setSelectedUnit(null);
+        }}
+        project={project}
+        unit={selectedUnit}
+      />
+    </motion.div>
+  ); 
+};
+
+export default ProjectDetail;
