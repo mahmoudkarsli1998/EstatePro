@@ -90,7 +90,12 @@ const Dashboard = () => {
         </div>
         <div className="flex gap-2">
            <button className="px-4 py-2 bg-dark-card border border-white/10 rounded-lg text-sm text-gray-300 hover:bg-white/5 transition-colors">Last 7 Days</button>
-           <button className="px-4 py-2 bg-primary text-white rounded-lg text-sm shadow-[0_0_15px_rgba(0,240,255,0.3)]">Export Report</button>
+           <button 
+             onClick={() => alert('Report exported successfully!')}
+             className="px-4 py-2 bg-primary text-white rounded-lg text-sm shadow-[0_0_15px_rgba(0,240,255,0.3)] hover:shadow-[0_0_25px_rgba(0,240,255,0.5)] transition-shadow"
+           >
+             Export Report
+           </button>
         </div>
       </div>
 
@@ -182,7 +187,12 @@ const Dashboard = () => {
                   <p className="text-sm text-white font-medium">New lead registered for Sunset Towers</p>
                   <p className="text-xs text-gray-400">2 hours ago</p>
                 </div>
-                <button className="text-xs text-primary hover:text-white transition-colors">View</button>
+                <button 
+                  onClick={() => alert('Viewing activity details...')}
+                  className="text-xs text-primary hover:text-white transition-colors"
+                >
+                  View
+                </button>
               </div>
             ))}
           </div>

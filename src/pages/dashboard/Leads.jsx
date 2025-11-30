@@ -20,7 +20,7 @@ const Leads = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">Leads</h1>
-        <Button>Export CSV</Button>
+        <Button onClick={() => alert('Leads exported to CSV!')}>Export CSV</Button>
       </div>
 
       <div className="bg-dark-card border border-white/10 rounded-xl shadow-sm overflow-hidden">
@@ -67,7 +67,7 @@ const Leads = () => {
                     {new Date(lead.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4">
-                    <Button size="sm" variant="outline">View Details</Button>
+                    <Button size="sm" variant="outline" onClick={() => alert(`Viewing details for ${lead.name}`)}>View Details</Button>
                   </td>
                 </tr>
               ))}

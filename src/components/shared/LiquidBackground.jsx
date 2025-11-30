@@ -27,6 +27,8 @@ const AnimatedSphere = () => {
   );
 };
 
+import FloatingShapes from '../public/FloatingShapes';
+
 const LiquidBackground = () => {
   return (
     <div className="fixed inset-0 -z-10 opacity-30 pointer-events-none">
@@ -35,6 +37,7 @@ const LiquidBackground = () => {
         <directionalLight position={[10, 10, 5]} intensity={1} color="#00F0FF" />
         <pointLight position={[-10, -10, -5]} intensity={1} color="#FF0055" />
         <AnimatedSphere />
+        <FloatingShapes />
       </Canvas>
       <div className="absolute inset-0 bg-[#050510]/80 backdrop-blur-[2px]"></div>
     </div>

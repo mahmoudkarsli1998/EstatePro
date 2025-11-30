@@ -20,7 +20,7 @@ const Users = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">Users</h1>
-        <Button>
+        <Button onClick={() => alert('Invite user modal would open here')}>
           <Plus size={20} className="mr-2" /> Invite User
         </Button>
       </div>
@@ -62,8 +62,18 @@ const Users = () => {
                   <td className="px-6 py-4 text-sm text-gray-400">
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4">
-                    <Button size="sm" variant="ghost">Edit</Button>
+                  <td className="px-6 py-4 flex gap-2">
+                    <Button size="sm" variant="ghost" onClick={() => alert(`Editing user: ${user.fullName}`)}>Edit</Button>
+                    <button 
+                      className="text-red-500 hover:text-red-400 text-sm font-medium transition-colors"
+                      onClick={() => {
+                        if(window.confirm(`Are you sure you want to delete ${user.fullName}?`)) {
+                          alert('User deleted!');
+                        }
+                      }}
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
