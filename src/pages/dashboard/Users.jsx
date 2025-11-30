@@ -66,9 +66,15 @@ const Users = () => {
                     <Button size="sm" variant="ghost" onClick={() => alert(`Editing user: ${user.fullName}`)}>Edit</Button>
                     <button 
                       className="text-red-500 hover:text-red-400 text-sm font-medium transition-colors"
-                      onClick={() => {
+                      onClick={async () => {
                         if(window.confirm(`Are you sure you want to delete ${user.fullName}?`)) {
-                          alert('User deleted!');
+                          try {
+                            await api.deleteUser(user.id);
+                            setUsers(users.filter(u => u.id !== user.id));
+                          } catch (error) {
+                            console.error('Error deleting user:', error);
+                            alert('Failed to delete user');
+                          }
                         }
                       }}
                     >

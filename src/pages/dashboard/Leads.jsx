@@ -66,8 +66,24 @@ const Leads = () => {
                   <td className="px-6 py-4 text-sm text-gray-400">
                     {new Date(lead.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4">
-                    <Button size="sm" variant="outline" onClick={() => alert(`Viewing details for ${lead.name}`)}>View Details</Button>
+                  <td className="px-6 py-4 flex gap-2">
+                    <Button size="sm" variant="outline" onClick={() => alert(`Viewing details for ${lead.name}`)}>View</Button>
+                    <button 
+                      className="text-red-500 hover:text-red-400 text-sm font-medium transition-colors"
+                      onClick={async () => {
+                        if(window.confirm(`Are you sure you want to delete lead ${lead.name}?`)) {
+                          try {
+                            await api.deleteLead(lead.id);
+                            setLeads(leads.filter(l => l.id !== lead.id));
+                          } catch (error) {
+                            console.error('Error deleting lead:', error);
+                            alert('Failed to delete lead');
+                          }
+                        }
+                      }}
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}

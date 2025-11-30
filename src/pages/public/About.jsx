@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import LiquidBackground from '../../components/shared/LiquidBackground';
+import FloatingGeometry from '../../components/shared/FloatingGeometry';
 import { Shield, Users, Globe, Award } from 'lucide-react';
 
 const About = () => {
@@ -12,6 +13,7 @@ const About = () => {
   return (
     <div className="min-h-screen relative pt-24 pb-12 overflow-hidden">
       <LiquidBackground />
+      <FloatingGeometry className="opacity-50" />
       
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <motion.div 

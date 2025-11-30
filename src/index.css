@@ -5,22 +5,46 @@
   font-family: var(--font-sans);
   line-height: 1.5;
   font-weight: 400;
-  color-scheme: dark;
-  color: #ffffff;
-  background-color: #050510;
+  
+  /* Light Mode Variables - Soft Glass Aesthetic */
+  --bg-primary: #f8f9fa; /* Softer white */
+  --bg-card: rgba(255, 255, 255, 0.65); /* More transparent but softer */
+  --text-primary: #2d3748; /* Dark gray instead of black */
+  --text-secondary: #718096;
+  --border-color: rgba(0, 0, 0, 0.06); /* Very subtle border */
+  --primary-color: #00F0FF;
+  
+  color-scheme: light;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+.dark {
+  /* Dark Mode Variables */
+  --bg-primary: #050510;
+  --bg-card: rgba(20, 20, 35, 0.6);
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --border-color: rgba(255, 255, 255, 0.1);
+  
+  color-scheme: dark;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+}
+
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #050510;
-  color: #ffffff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   overflow-x: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -30,23 +54,42 @@ h1, h2, h3, h4, h5, h6 {
 
 @layer base {
   body {
-    @apply bg-dark-bg text-white antialiased;
+    @apply antialiased;
+  }
+  
+  .dark body {
     background-image: 
       radial-gradient(circle at 50% 0%, rgba(112, 0, 255, 0.2) 0%, transparent 60%),
       radial-gradient(circle at 0% 50%, rgba(0, 240, 255, 0.15) 0%, transparent 50%),
       radial-gradient(circle at 100% 50%, rgba(255, 0, 85, 0.15) 0%, transparent 50%);
     background-attachment: fixed;
   }
+  
+  /* Light mode background - Subtle & Clean */
+  body:not(.dark) {
+    background-image: 
+      radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.03) 0%, transparent 70%),
+      radial-gradient(circle at 0% 50%, rgba(112, 0, 255, 0.03) 0%, transparent 60%);
+    background-attachment: fixed;
+  }
 }
 
 @layer components {
   .glass-panel {
-    @apply bg-dark-card/60 backdrop-blur-2xl border border-white/10 shadow-xl rounded-2xl transition-all duration-500 ease-out;
+    @apply backdrop-blur-xl shadow-lg rounded-2xl transition-all duration-500 ease-out;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
   }
   
   .glass-panel:hover {
-    @apply border-primary/40 shadow-[0_0_40px_rgba(0,240,255,0.15)] bg-dark-card/80;
+    @apply shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)];
     transform: translateY(-2px);
+    border-color: rgba(0, 240, 255, 0.3);
+  }
+  
+  .dark .glass-panel:hover {
+    @apply shadow-[0_0_40px_rgba(0,240,255,0.15)];
+    border-color: rgba(0, 240, 255, 0.4);
   }
 
   .glass-button {
@@ -68,7 +111,14 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   .glass-input {
-    @apply bg-dark-card/40 border border-white/10 rounded-xl px-4 py-3 outline-none transition-all duration-300 text-white placeholder-gray-400 focus:border-primary/60 focus:bg-dark-card/60 focus:shadow-[0_0_20px_rgba(0,240,255,0.15)];
+    @apply rounded-xl px-4 py-3 outline-none transition-all duration-300 placeholder-gray-400 focus:shadow-[0_0_20px_rgba(0,240,255,0.15)];
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+  }
+  
+  .glass-input:focus {
+    border-color: rgba(0, 240, 255, 0.6);
   }
 }
 

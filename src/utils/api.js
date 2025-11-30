@@ -26,6 +26,16 @@ export const api = {
       }, 1000);
     });
   },
+
+  deleteProject: (id) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const index = projects.findIndex(p => p.id === parseInt(id));
+        if (index > -1) projects.splice(index, 1);
+        resolve({ success: true });
+      }, 800);
+    });
+  },
   
   // Units
   getUnits: (projectId) => {
@@ -70,6 +80,26 @@ export const api = {
     });
   },
 
+  updateLead: (id, data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const lead = leads.find(l => l.id === parseInt(id));
+        if (lead) Object.assign(lead, data);
+        resolve(lead);
+      }, 600);
+    });
+  },
+
+  deleteLead: (id) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const index = leads.findIndex(l => l.id === parseInt(id));
+        if (index > -1) leads.splice(index, 1);
+        resolve({ success: true });
+      }, 600);
+    });
+  },
+
   // Developers
   getDevelopers: () => {
     return new Promise((resolve) => {
@@ -88,6 +118,26 @@ export const api = {
   getUsers: () => {
     return new Promise((resolve) => {
       setTimeout(() => resolve(users), 500);
+    });
+  },
+
+  updateUser: (id, data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const user = users.find(u => u.id === parseInt(id));
+        if (user) Object.assign(user, data);
+        resolve(user);
+      }, 600);
+    });
+  },
+
+  deleteUser: (id) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const index = users.findIndex(u => u.id === parseInt(id));
+        if (index > -1) users.splice(index, 1);
+        resolve({ success: true });
+      }, 600);
     });
   },
 

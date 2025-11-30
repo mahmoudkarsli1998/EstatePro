@@ -1,6 +1,8 @@
 import React from 'react';
 import { Bell, Search, User } from 'lucide-react';
 
+import ThemeToggle from '../shared/ThemeToggle';
+
 const Header = () => {
   return (
     <header className="h-16 bg-dark-card/80 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-6 sticky top-0 z-40">
@@ -16,6 +18,7 @@ const Header = () => {
       </div>
 
       <div className="flex items-center space-x-4">
+        <ThemeToggle />
         <button className="relative p-2 text-gray-400 hover:bg-white/10 rounded-full transition-colors">
           <Bell size={20} />
           <span className="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full shadow-[0_0_10px_#FF0055]"></span>

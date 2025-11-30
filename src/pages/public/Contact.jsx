@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import LiquidBackground from '../../components/shared/LiquidBackground';
+import FloatingGeometry from '../../components/shared/FloatingGeometry';
 import ContactForm from '../../components/public/ContactForm'; // Reusing the component but adapting layout
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
 
@@ -8,6 +9,7 @@ const Contact = () => {
   return (
     <div className="min-h-screen relative pt-24 pb-12 overflow-hidden">
       <LiquidBackground />
+      <FloatingGeometry className="opacity-50" />
       
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <motion.div 

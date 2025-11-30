@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Hero3D from '../../components/public/Hero3D';
 import FeaturedProjects from '../../components/public/FeaturedProjects';
@@ -7,8 +7,11 @@ import LiquidBackground from '../../components/shared/LiquidBackground';
 import { Shield, Zap, Globe, ArrowRight } from 'lucide-react';
 import Button from '../../components/shared/Button';
 import { Link } from 'react-router-dom';
+import DemoModal from '../../components/public/DemoModal';
 
 const Home = () => {
+  const [isDemoOpen, setIsDemoOpen] = useState(false);
+
   const fadeInUp = {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
@@ -24,9 +27,18 @@ const Home = () => {
     }
   };
 
+  const handleDemo = () => {
+    setIsDemoOpen(true);
+  };
+
+  const handleLearnMore = () => {
+    alert("Redirecting to detailed documentation... (Mock Action)");
+  };
+
   return (
     <div className="min-h-screen relative overflow-hidden">
       <LiquidBackground />
+      <DemoModal isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
       
       {/* Hero Section */}
       <section className="relative h-screen flex items-center pt-20">
@@ -49,7 +61,8 @@ const Home = () => {
               <Link to="/projects">
                 <Button size="lg" className="shadow-[0_0_30px_rgba(0,240,255,0.4)]">Explore Projects</Button>
               </Link>
-              <Button variant="outline" size="lg">View Demo</Button>
+              <Button variant="outline" size="lg" onClick={handleDemo}>View Demo</Button>
+              <Button variant="ghost" size="lg" onClick={handleLearnMore}>Learn More</Button>
             </motion.div>
             
             <motion.div variants={fadeInUp} className="mt-12 flex items-center gap-8">

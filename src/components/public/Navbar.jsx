@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Search, User } from 'lucide-react';
 import Button from '../shared/Button';
+import ThemeToggle from '../shared/ThemeToggle';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -19,6 +20,8 @@ const Navbar = () => {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Projects', path: '/projects' },
+    { name: 'Locations', path: '/locations' },
+    { name: 'Design Studio', path: '/design' },
     { name: 'About Us', path: '/about' },
     { name: 'Contact', path: '/contact' },
   ];
@@ -60,6 +63,7 @@ const Navbar = () => {
 
         {/* Actions */}
         <div className="hidden md:flex items-center space-x-4">
+          <ThemeToggle />
           <button className="p-2 text-gray-300 hover:text-primary transition-colors">
             <Search size={20} />
           </button>

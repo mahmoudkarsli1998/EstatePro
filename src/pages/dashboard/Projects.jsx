@@ -109,10 +109,26 @@ const Projects = () => {
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex space-x-2">
-                      <button className="p-1 text-blue-600 hover:bg-blue-50 rounded">
+                      <button 
+                        className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                        onClick={() => alert(`Edit project: ${project.name}`)}
+                      >
                         <Edit size={18} />
                       </button>
-                      <button className="p-1 text-red-600 hover:bg-red-50 rounded">
+                      <button 
+                        className="p-1 text-red-600 hover:bg-red-50 rounded"
+                        onClick={async () => {
+                          if(window.confirm(`Are you sure you want to delete ${project.name}?`)) {
+                            try {
+                              await api.deleteProject(project.id);
+                              setProjects(projects.filter(p => p.id !== project.id));
+                            } catch (error) {
+                              console.error('Error deleting project:', error);
+                              alert('Failed to delete project');
+                            }
+                          }
+                        }}
+                      >
                         <Trash size={18} />
                       </button>
                     </div>

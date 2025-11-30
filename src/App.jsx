@@ -9,6 +9,8 @@ import ProjectDetail from './pages/public/ProjectDetail';
 import UnitDetail from './pages/public/UnitDetail';
 import About from './pages/public/About';
 import Contact from './pages/public/Contact';
+import Locations from './pages/public/Locations';
+import DesignStudio from './pages/public/DesignStudio';
 import Login from './pages/dashboard/Login';
 import Dashboard from './pages/dashboard/Dashboard';
 import Projects from './pages/dashboard/Projects';
@@ -16,13 +18,16 @@ import Units from './pages/dashboard/Units';
 import Leads from './pages/dashboard/Leads';
 import Users from './pages/dashboard/Users';
 import Reports from './pages/dashboard/Reports';
+import { ThemeProvider } from './context/ThemeContext';
+import Particles from './components/shared/Particles';
 import Preloader from './components/shared/Preloader';
 
 function App() {
   const [loading, setLoading] = useState(true);
 
   return (
-    <>
+    <ThemeProvider>
+      <Particles />
       <AnimatePresence mode="wait">
         {loading && <Preloader onComplete={() => setLoading(false)} />}
       </AnimatePresence>
@@ -38,6 +43,8 @@ function App() {
               <Route path="/units/:id" element={<UnitDetail />} />
               <Route path="/about" element={<About />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/locations" element={<Locations />} />
+              <Route path="/design" element={<DesignStudio />} />
             </Route>
 
             {/* Dashboard Routes */}
@@ -53,7 +60,7 @@ function App() {
           </Routes>
         </Router>
       )}
-    </>
+    </ThemeProvider>
   );
 }
 

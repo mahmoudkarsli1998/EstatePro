@@ -22,9 +22,9 @@ export default {
           hover: '#cc0044',
         },
         dark: {
-          bg: '#050510', // Deep Space
-          card: 'rgba(20, 20, 35, 0.4)', // More transparent for glass effect
-          border: 'rgba(255, 255, 255, 0.1)',
+          bg: 'var(--bg-primary)',
+          card: 'var(--bg-card)',
+          border: 'var(--border-color)',
         }
       },
       fontFamily: {
