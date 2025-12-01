@@ -5,6 +5,8 @@ import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import { api } from '../../utils/api';
 
+import LoginBackground3D from '../../components/dashboard/LoginBackground3D';
+
 const Login = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -32,10 +34,8 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-900 overflow-hidden relative">
-      {/* Animated Background */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-[-50%] left-[-50%] w-[200%] h-[200%] bg-gradient-to-br from-gray-900 via-blue-900/20 to-gray-900 animate-spin-slow" style={{ animationDuration: '20s' }}></div>
-      </div>
+      {/* 3D Animated Background */}
+      <LoginBackground3D />
 
       <motion.div 
         initial={{ opacity: 0, y: 20 }}

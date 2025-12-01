@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Users, Building, Home, DollarSign, TrendingUp, Plus, UserPlus, FileText } from 'lucide-react';
+import { Users, Building, Home, DollarSign, TrendingUp, Plus, UserPlus, FileText, Box, LayoutGrid } from 'lucide-react';
 import { api } from '../../utils/api';
 import StatCard from '../../components/dashboard/widgets/StatCard';
 import SalesChart from '../../components/dashboard/widgets/SalesChart';
 import TrafficChart from '../../components/dashboard/widgets/TrafficChart';
 import ActivityFeed from '../../components/dashboard/widgets/ActivityFeed';
+import Dashboard3D from '../../components/dashboard/Dashboard3D';
 
 const Dashboard = () => {
+  const [viewMode, setViewMode] = useState('2D'); // '2D' or '3D'
   const [stats, setStats] = useState({
     totalProjects: 0,
     totalUnits: 0,
@@ -41,6 +43,23 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
+  // Mock data for 3D Dashboard
+  const salesData = [
+    { name: 'Jan', value: 4000 },
+    { name: 'Feb', value: 3000 },
+    { name: 'Mar', value: 2000 },
+    { name: 'Apr', value: 2780 },
+    { name: 'May', value: 1890 },
+    { name: 'Jun', value: 2390 },
+  ];
+
+  const leadsData = [
+    { name: 'Social', value: 35 },
+    { name: 'Direct', value: 25 },
+    { name: 'Referral', value: 20 },
+    { name: 'Organic', value: 20 },
+  ];
+
   return (
     <div className="space-y-8">
       {/* Header Section */}
@@ -50,9 +69,21 @@ const Dashboard = () => {
           <p className="text-gray-400">Welcome back, here's what's happening today.</p>
         </div>
         <div className="flex gap-3">
-           <button className="px-4 py-2 bg-dark-card border border-white/10 rounded-lg text-sm text-gray-300 hover:bg-white/5 transition-colors">
-             Last 7 Days
-           </button>
+           <div className="bg-dark-card border border-white/10 rounded-lg p-1 flex">
+             <button 
+               onClick={() => setViewMode('2D')}
+               className={`px-3 py-1.5 rounded-md text-sm flex items-center gap-2 transition-all ${viewMode === '2D' ? 'bg-primary text-black font-bold shadow-lg' : 'text-gray-400 hover:text-white'}`}
+             >
+               <LayoutGrid size={16} /> 2D
+             </button>
+             <button 
+               onClick={() => setViewMode('3D')}
+               className={`px-3 py-1.5 rounded-md text-sm flex items-center gap-2 transition-all ${viewMode === '3D' ? 'bg-primary text-black font-bold shadow-lg' : 'text-gray-400 hover:text-white'}`}
+             >
+               <Box size={16} /> 3D
+             </button>
+           </div>
+           
            <button 
              onClick={() => alert('Report exported successfully!')}
              className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold shadow-[0_0_15px_rgba(0,240,255,0.3)] hover:shadow-[0_0_25px_rgba(0,240,255,0.5)] transition-shadow"
@@ -99,14 +130,18 @@ const Dashboard = () => {
       </div>
 
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[500px]">
-        <div className="lg:col-span-2 h-full">
-          <SalesChart />
+      {viewMode === '3D' ? (
+        <Dashboard3D salesData={salesData} leadsData={leadsData} />
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[500px]">
+          <div className="lg:col-span-2 h-full">
+            <SalesChart />
+          </div>
+          <div className="h-full">
+            <TrafficChart />
+          </div>
         </div>
-        <div className="h-full">
-          <TrafficChart />
-        </div>
-      </div>
+      )}
 
       {/* Bottom Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
