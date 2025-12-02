@@ -1,17 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
+/* Import Google Fonts */
+
 :root {
-  font-family: var(--font-sans);
-  line-height: 1.5;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  line-height: 1.6; /* Increased for better readability */
   font-weight: 400;
   
   /* Light Mode Variables - Soft Glass Aesthetic */
-  --bg-primary: #f8f9fa; /* Softer white */
-  --bg-card: rgba(255, 255, 255, 0.65); /* More transparent but softer */
-  --text-primary: #2d3748; /* Dark gray instead of black */
-  --text-secondary: #718096;
-  --border-color: rgba(0, 0, 0, 0.06); /* Very subtle border */
+  --bg-primary: #f8fafc; /* Lighter, cleaner background */
+  --bg-card: rgba(255, 255, 255, 0.95); /* High opacity for readability */
+  --text-primary: #0f172a; /* Deep slate for high contrast */
+  --text-secondary: #475569; /* Readable gray */
+  --border-color: rgba(148, 163, 184, 0.2);
   --primary-color: #00F0FF;
   
   color-scheme: light;
@@ -26,11 +29,11 @@
 
 .dark {
   /* Dark Mode Variables */
-  --bg-primary: #050510;
-  --bg-card: rgba(20, 20, 35, 0.6);
-  --text-primary: #ffffff;
-  --text-secondary: #a0a0a0;
-  --border-color: rgba(255, 255, 255, 0.1);
+  --bg-primary: #020617; /* Deep rich blue-black */
+  --bg-card: rgba(15, 23, 42, 0.7); /* Slightly more opaque for readability */
+  --text-primary: #f8fafc; /* Crisp white */
+  --text-secondary: #94a3b8; /* Lighter gray for better contrast on dark */
+  --border-color: rgba(255, 255, 255, 0.08);
   
   color-scheme: dark;
   color: var(--text-primary);
@@ -45,11 +48,13 @@ body {
   color: var(--text-primary);
   overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
+  scroll-behavior: smooth;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Outfit', sans-serif;
-  letter-spacing: -0.02em;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: -0.03em; /* Tighter tracking for headings */
+  line-height: 1.2;
 }
 
 @layer base {
@@ -68,28 +73,43 @@ h1, h2, h3, h4, h5, h6 {
   /* Light mode background - Subtle & Clean */
   body:not(.dark) {
     background-image: 
-      radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.03) 0%, transparent 70%),
-      radial-gradient(circle at 0% 50%, rgba(112, 0, 255, 0.03) 0%, transparent 60%);
+      radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.02) 0%, transparent 70%),
+      radial-gradient(circle at 0% 50%, rgba(112, 0, 255, 0.02) 0%, transparent 60%);
     background-attachment: fixed;
   }
 }
 
 @layer components {
   .glass-panel {
-    @apply backdrop-blur-xl shadow-lg rounded-2xl transition-all duration-500 ease-out;
-    background-color: var(--bg-card);
+    @apply backdrop-blur-xl rounded-2xl transition-all duration-500 ease-out relative;
+    background: linear-gradient(145deg, var(--bg-card), rgba(255, 255, 255, 0.05));
     border: 1px solid var(--border-color);
+    box-shadow: 
+      0 4px 24px -1px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
   
   .glass-panel:hover {
-    @apply shadow-[0_10px_40px_-10px_rgba(0,0,0,0.1)];
-    transform: translateY(-2px);
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 
+      0 20px 40px -5px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
     border-color: rgba(0, 240, 255, 0.3);
   }
   
+  .dark .glass-panel {
+    box-shadow: 
+      0 4px 24px -1px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+
   .dark .glass-panel:hover {
     @apply shadow-[0_0_40px_rgba(0,240,255,0.15)];
     border-color: rgba(0, 240, 255, 0.4);
+    box-shadow: 
+      0 20px 40px -5px rgba(0, 0, 0, 0.4),
+      0 0 20px rgba(0, 240, 255, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
   .glass-button {
@@ -97,7 +117,9 @@ h1, h2, h3, h4, h5, h6 {
     background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    box-shadow: 
+      0 4px 15px rgba(0,0,0,0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
   }
 
   .glass-button:hover {

@@ -7,20 +7,35 @@ import { api } from '../../utils/api';
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [inviteData, setInviteData] = useState({ email: '', fullName: '', role: 'agent' });
 
   useEffect(() => {
+    loadUsers();
+  }, []);
+
+  const loadUsers = () => {
     setLoading(true);
     api.getUsers().then(data => {
       setUsers(data);
       setLoading(false);
     });
-  }, []);
+  };
+
+  const handleInvite = async (e) => {
+    e.preventDefault();
+    await api.inviteUser(inviteData);
+    setIsInviteModalOpen(false);
+    loadUsers();
+    setInviteData({ email: '', fullName: '', role: 'agent' });
+    alert(`Invitation sent to ${inviteData.email}`);
+  };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">Users</h1>
-        <Button onClick={() => alert('Invite user modal would open here')}>
+        <Button onClick={() => setIsInviteModalOpen(true)}>
           <Plus size={20} className="mr-2" /> Invite User
         </Button>
       </div>
@@ -87,6 +102,53 @@ const Users = () => {
           </table>
         </div>
       </div>
+
+      {/* Invite User Modal */}
+      {isInviteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-dark-card border border-white/10 rounded-xl p-6 w-full max-w-md">
+            <h2 className="text-xl font-bold text-white mb-4">Invite New User</h2>
+            <form onSubmit={handleInvite} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Full Name</label>
+                <input 
+                  type="text" 
+                  className="w-full px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary"
+                  value={inviteData.fullName}
+                  onChange={(e) => setInviteData({...inviteData, fullName: e.target.value})}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Email Address</label>
+                <input 
+                  type="email" 
+                  className="w-full px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary"
+                  value={inviteData.email}
+                  onChange={(e) => setInviteData({...inviteData, email: e.target.value})}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-400 mb-1">Role</label>
+                <select 
+                  className="w-full px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary"
+                  value={inviteData.role}
+                  onChange={(e) => setInviteData({...inviteData, role: e.target.value})}
+                >
+                  <option value="agent">Agent</option>
+                  <option value="manager">Manager</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+              <div className="flex justify-end pt-4 space-x-3">
+                <Button type="button" variant="ghost" onClick={() => setIsInviteModalOpen(false)}>Cancel</Button>
+                <Button type="submit">Send Invitation</Button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -5,7 +5,7 @@ import { User, Home, DollarSign, Bell } from 'lucide-react';
 const activities = [
   { id: 1, type: 'sale', user: 'John Doe', action: 'purchased', target: 'Sunset Villa #4', time: '2 min ago', icon: DollarSign, color: 'text-green-400', bg: 'bg-green-500/10' },
   { id: 2, type: 'new_user', user: 'Sarah Smith', action: 'joined', target: 'the platform', time: '15 min ago', icon: User, color: 'text-blue-400', bg: 'bg-blue-500/10' },
-  { id: 3, type: 'listing', user: 'Admin', action: 'listed', target: 'Downtown Loft', time: '1 hour ago', icon: Home, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+  { id: 3, type: 'listing', user: 'Admin', action: 'listed', target: 'Downtown Loft', time: '1 hour ago', icon: Home, color: 'text-blue-400', bg: 'bg-blue-500/10' },
   { id: 4, type: 'alert', user: 'System', action: 'reported', target: 'Server Load High', time: '3 hours ago', icon: Bell, color: 'text-yellow-400', bg: 'bg-yellow-500/10' },
   { id: 5, type: 'sale', user: 'Mike Ross', action: 'reserved', target: 'Ocean View Apt', time: '5 hours ago', icon: DollarSign, color: 'text-green-400', bg: 'bg-green-500/10' },
 ];

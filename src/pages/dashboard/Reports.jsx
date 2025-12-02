@@ -27,7 +27,7 @@ const Reports = () => {
       <div className="mb-8 flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-bold font-heading text-white mb-2">Analytics & Reports</h1>
-          <p className="text-gray-400">Detailed insights into platform performance.</p>
+          <p className="text-gray-300">Detailed insights into platform performance.</p>
         </div>
         <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm shadow-[0_0_15px_rgba(0,240,255,0.3)] hover:bg-primary/90 transition-colors">
           <Download size={16} /> Export PDF
@@ -38,7 +38,7 @@ const Reports = () => {
         <Card className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-bold text-white">Revenue Growth</h3>
-            <div className="flex items-center gap-2 text-sm text-gray-400">
+            <div className="flex items-center gap-2 text-sm text-gray-300">
               <Calendar size={14} /> Last 6 Months
             </div>
           </div>
@@ -46,8 +46,8 @@ const Reports = () => {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={monthlyRevenue}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#333" vertical={false} />
-                <XAxis dataKey="name" stroke="#666" tick={{fill: '#9ca3af'}} />
-                <YAxis stroke="#666" tick={{fill: '#9ca3af'}} />
+                <XAxis dataKey="name" stroke="#94a3b8" tick={{fill: '#cbd5e1'}} />
+                <YAxis stroke="#94a3b8" tick={{fill: '#cbd5e1'}} />
                 <Tooltip 
                   contentStyle={{ backgroundColor: '#050510', borderColor: '#333', color: '#fff' }}
                   itemStyle={{ color: '#00F0FF' }}
@@ -115,7 +115,7 @@ const Reports = () => {
                 { metric: 'Avg. Session Duration', value: '4m 30s', target: '5m 00s', status: 'Behind', trend: '-10%' },
                 { metric: 'Bounce Rate', value: '42%', target: '40%', status: 'At Risk', trend: '+2%' },
               ].map((row, i) => (
-                <tr key={i} className="hover:bg-white/5 transition-colors">
+                <tr key={i} className="hover:bg-primary/5 transition-colors border-b border-white/5 last:border-0">
                   <td className="px-6 py-4 font-medium text-white">{row.metric}</td>
                   <td className="px-6 py-4 text-gray-300">{row.value}</td>
                   <td className="px-6 py-4 text-gray-400">{row.target}</td>

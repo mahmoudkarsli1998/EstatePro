@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MapPin, Check, ArrowLeft, Building, Ruler, Calendar } from 'lucide-react';
+import Modal from '../../components/shared/Modal';
 import Button from '../../components/shared/Button';
 import Badge from '../../components/shared/Badge';
 import Card from '../../components/shared/Card';
@@ -17,12 +18,28 @@ const ProjectDetail = () => {
   const [activeImage, setActiveImage] = useState(0);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState(null);
+  const [selectedAgent, setSelectedAgent] = useState(null);
+
+  const mockAgent = {
+    name: "Sarah Johnson",
+    role: "Senior Property Consultant",
+    email: "sarah.j@estatepro.com",
+    phone: "+1 (555) 123-4567",
+    avatar: "https://i.pravatar.cc/150?u=agent",
+    stats: {
+      sales: "$12.5M",
+      listings: 8,
+      rating: 4.9
+    }
+  };
+
+
 
   useEffect(() => {
     setLoading(true);
     api.getProjectById(id).then(data => {
       setProject(data);
-      return api.getUnitsByProject(id);
+      return api.getUnits(id);
     }).then(unitsData => {
       setUnits(unitsData);
       setLoading(false);
@@ -298,15 +315,22 @@ const ProjectDetail = () => {
                 <Card className="p-6">
                   <h3 className="text-lg font-bold text-white mb-4">Agent</h3>
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-gray-700 overflow-hidden">
-                      <img src="https://i.pravatar.cc/150?u=agent" alt="Agent" />
+                    <div className="w-12 h-12 rounded-full bg-gray-700 overflow-hidden border border-white/10">
+                      <img src={mockAgent.avatar} alt="Agent" />
                     </div>
                     <div>
-                      <p className="font-bold text-white">Sarah Johnson</p>
-                      <p className="text-sm text-gray-400">Senior Property Consultant</p>
+                      <p className="font-bold text-white">{mockAgent.name}</p>
+                      <p className="text-sm text-gray-400">{mockAgent.role}</p>
                     </div>
                   </div>
-                  <Button variant="ghost" size="sm" className="w-full">View Profile</Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="w-full hover:bg-primary/10 hover:text-primary"
+                    onClick={() => setSelectedAgent(mockAgent)}
+                  >
+                    View Profile
+                  </Button>
                 </Card>
               </motion.div>
             </div>
@@ -323,6 +347,59 @@ const ProjectDetail = () => {
         project={project}
         unit={selectedUnit}
       />
+
+      {/* Agent Profile Modal */}
+      {selectedAgent && (
+        <Modal
+          isOpen={!!selectedAgent}
+          onClose={() => setSelectedAgent(null)}
+          title="Agent Profile"
+          maxWidth="max-w-2xl"
+        >
+          <div className="space-y-6">
+            <div className="flex items-start gap-6">
+              <div className="w-24 h-24 rounded-full bg-gray-800 overflow-hidden border-2 border-primary/50 shrink-0">
+                <img src={selectedAgent.avatar} alt={selectedAgent.name} className="w-full h-full object-cover" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-1">{selectedAgent.name}</h2>
+                <p className="text-primary font-medium mb-3">{selectedAgent.role}</p>
+                <div className="space-y-1 text-sm text-gray-300">
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-500">Email:</span> {selectedAgent.email}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-gray-500">Phone:</span> {selectedAgent.phone}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
+                <div className="text-2xl font-bold text-white mb-1">{selectedAgent.stats.sales}</div>
+                <div className="text-xs text-gray-400 uppercase tracking-wider">Total Sales</div>
+              </div>
+              <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
+                <div className="text-2xl font-bold text-white mb-1">{selectedAgent.stats.listings}</div>
+                <div className="text-xs text-gray-400 uppercase tracking-wider">Active Listings</div>
+              </div>
+              <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
+                <div className="text-2xl font-bold text-white mb-1">{selectedAgent.stats.rating}</div>
+                <div className="text-xs text-gray-400 uppercase tracking-wider">Rating</div>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-lg font-bold text-white mb-3">About</h3>
+              <p className="text-gray-300 leading-relaxed text-sm">
+                {selectedAgent.name} is a dedicated real estate professional with over 5 years of experience in the luxury market. 
+                Specializing in high-end residential properties, they have a proven track record of closing complex deals and ensuring client satisfaction.
+              </p>
+            </div>
+          </div>
+        </Modal>
+      )}
     </motion.div>
   ); 
 };

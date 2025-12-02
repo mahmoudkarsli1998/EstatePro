@@ -14,8 +14,8 @@ export default {
           light: 'rgba(0, 240, 255, 0.1)',
         },
         secondary: {
-          DEFAULT: '#7000FF', // Electric Purple
-          hover: '#5a00cc',
+          DEFAULT: '#8B5CF6', // Violet 500 - Much more readable than #7000FF
+          hover: '#7C3AED',
         },
         accent: {
           DEFAULT: '#FF0055', // Neon Pink
@@ -28,8 +28,8 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
-        heading: ['Outfit', 'sans-serif'],
+        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+        heading: ['"Space Grotesk"', 'sans-serif'],
       },
       animation: {
         'float': 'float 6s ease-in-out infinite',

@@ -214,6 +214,22 @@ export const projects = [
   }
 ];
 
+// Blocks
+export const blocks = [
+  { id: 1, projectId: 1, name: "Block A", phaseId: 1 },
+  { id: 2, projectId: 1, name: "Block B", phaseId: 1 },
+  { id: 3, projectId: 2, name: "Villas Phase 1", phaseId: 3 },
+  { id: 4, projectId: 3, name: "Tower A", phaseId: 4 },
+  { id: 5, projectId: 3, name: "Tower B", phaseId: 5 },
+  { id: 6, projectId: 4, name: "Green Block", phaseId: 6 },
+  { id: 7, projectId: 5, name: "Main Tower", phaseId: 7 },
+  { id: 8, projectId: 6, name: "Lake View Block", phaseId: 8 },
+  { id: 9, projectId: 7, name: "Desert Block", phaseId: 9 },
+  { id: 10, projectId: 8, name: "Alpine Lodge", phaseId: 10 },
+  { id: 11, projectId: 9, name: "Harbor View", phaseId: 11 },
+  { id: 12, projectId: 10, name: "Royal Wing", phaseId: 12 }
+];
+
 // 20+ units distributed across projects
 export const units = [
   // Project 1: Sunset Towers

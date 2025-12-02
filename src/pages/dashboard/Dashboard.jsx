@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { Users, Building, Home, DollarSign, TrendingUp, Plus, UserPlus, FileText, Box, LayoutGrid } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { api } from '../../utils/api';
 import StatCard from '../../components/dashboard/widgets/StatCard';
-import SalesChart from '../../components/dashboard/widgets/SalesChart';
-import TrafficChart from '../../components/dashboard/widgets/TrafficChart';
 import ActivityFeed from '../../components/dashboard/widgets/ActivityFeed';
 import Dashboard3D from '../../components/dashboard/Dashboard3D';
 
@@ -43,25 +42,37 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  // Mock data for 3D Dashboard
+  // Mock data for Charts
   const salesData = [
-    { name: 'Jan', value: 4000 },
-    { name: 'Feb', value: 3000 },
-    { name: 'Mar', value: 2000 },
-    { name: 'Apr', value: 2780 },
-    { name: 'May', value: 1890 },
-    { name: 'Jun', value: 2390 },
+    { name: 'Jan', value: 4000, leads: 2400 },
+    { name: 'Feb', value: 3000, leads: 1398 },
+    { name: 'Mar', value: 2000, leads: 9800 },
+    { name: 'Apr', value: 2780, leads: 3908 },
+    { name: 'May', value: 1890, leads: 4800 },
+    { name: 'Jun', value: 2390, leads: 3800 },
   ];
 
-  const leadsData = [
-    { name: 'Social', value: 35 },
-    { name: 'Direct', value: 25 },
-    { name: 'Referral', value: 20 },
-    { name: 'Organic', value: 20 },
-  ];
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="glass-panel p-3 !bg-dark-card/90 border-white/10">
+          <p className="text-white font-bold mb-1">{label}</p>
+          <p className="text-primary text-sm">
+            Sales: ${payload[0].value.toLocaleString()}
+          </p>
+          {payload[1] && (
+            <p className="text-secondary text-sm">
+              Leads: {payload[1].value.toLocaleString()}
+            </p>
+          )}
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 font-sans">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-end gap-4">
         <div>
@@ -131,14 +142,46 @@ const Dashboard = () => {
 
       {/* Main Content Grid */}
       {viewMode === '3D' ? (
-        <Dashboard3D salesData={salesData} leadsData={leadsData} />
+        <Dashboard3D salesData={salesData} leadsData={salesData} />
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[500px]">
-          <div className="lg:col-span-2 h-full">
-            <SalesChart />
+          <div className="lg:col-span-2 h-full glass-panel p-6 flex flex-col">
+            <h3 className="text-xl font-bold text-white mb-6 font-heading">Revenue Analytics</h3>
+            <div className="flex-1 w-full min-h-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={salesData}>
+                  <defs>
+                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#00F0FF" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#00F0FF" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorLeads" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#7000FF" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#7000FF" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
+                  <XAxis dataKey="name" stroke="#718096" tick={{fill: '#718096'}} axisLine={false} tickLine={false} />
+                  <YAxis stroke="#718096" tick={{fill: '#718096'}} axisLine={false} tickLine={false} tickFormatter={(value) => `$${value}`} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Area type="monotone" dataKey="value" stroke="#00F0FF" strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" />
+                  <Area type="monotone" dataKey="leads" stroke="#7000FF" strokeWidth={3} fillOpacity={1} fill="url(#colorLeads)" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="h-full">
-            <TrafficChart />
+          <div className="h-full glass-panel p-6 flex flex-col">
+            <h3 className="text-xl font-bold text-white mb-6 font-heading">Traffic Sources</h3>
+            <div className="flex-1 w-full min-h-0">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={salesData}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
+                  <XAxis dataKey="name" stroke="#718096" tick={{fill: '#718096'}} axisLine={false} tickLine={false} />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="value" fill="#00F0FF" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
       )}
@@ -163,7 +206,7 @@ const Dashboard = () => {
                 <span className="text-sm text-gray-300 group-hover:text-white">Add Listing</span>
               </button>
               <button className="p-4 rounded-xl bg-white/5 hover:bg-purple-500/20 hover:border-purple-500/50 border border-white/10 transition-all group flex flex-col items-center justify-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">
+                <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
                   <UserPlus size={20} />
                 </div>
                 <span className="text-sm text-gray-300 group-hover:text-white">New User</span>

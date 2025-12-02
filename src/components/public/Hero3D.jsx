@@ -6,45 +6,47 @@ import Button from '../shared/Button';
 import { Link } from 'react-router-dom';
 import * as THREE from 'three';
 
-const AbstractCity = () => {
-  const buildings = useMemo(() => {
-    return Array.from({ length: 20 }).map((_, i) => ({
-      position: [
-        (Math.random() - 0.5) * 10,
-        Math.random() * 2,
-        (Math.random() - 0.5) * 10
-      ],
-      scale: [
-        0.5 + Math.random(),
-        2 + Math.random() * 4,
-        0.5 + Math.random()
-      ],
-      color: Math.random() > 0.5 ? '#00F0FF' : '#7000FF'
-    }));
-  }, []);
+const HolographicHouse = () => {
+  const group = useRef();
+  
+  useFrame((state) => {
+    const t = state.clock.getElapsedTime();
+    group.current.rotation.y = Math.sin(t / 4) * 0.2;
+    group.current.position.y = Math.sin(t / 2) * 0.1;
+  });
 
   return (
-    <group rotation={[0, Math.PI / 4, 0]}>
-      {buildings.map((b, i) => (
-        <Float key={i} speed={1 + Math.random()} rotationIntensity={0.2} floatIntensity={0.5}>
-          <Box args={[1, 1, 1]} position={b.position} scale={b.scale}>
-            <meshStandardMaterial 
-              color={b.color} 
-              transparent 
-              opacity={0.6} 
-              roughness={0.1}
-              metalness={0.8}
-            />
-            <lineSegments>
-              <edgesGeometry args={[new THREE.BoxGeometry(1, 1, 1)]} />
-              <lineBasicMaterial color="white" transparent opacity={0.2} />
-            </lineSegments>
-          </Box>
-        </Float>
-      ))}
-      <Torus args={[6, 0.1, 16, 100]} rotation={[Math.PI / 2, 0, 0]}>
-        <meshBasicMaterial color="#FF0055" transparent opacity={0.5} />
+    <group ref={group} rotation={[0, -Math.PI / 4, 0]} scale={1.5}>
+      {/* Base / Floor */}
+      <Box args={[4, 0.2, 4]} position={[0, -1, 0]}>
+        <meshStandardMaterial color="#00F0FF" transparent opacity={0.3} wireframe />
+      </Box>
+      
+      {/* Main Structure */}
+      <Box args={[3, 2, 3]} position={[0, 0.1, 0]}>
+        <meshStandardMaterial color="#7000FF" transparent opacity={0.1} />
+        <lineSegments>
+          <edgesGeometry args={[new THREE.BoxGeometry(3, 2, 3)]} />
+          <lineBasicMaterial color="#00F0FF" transparent opacity={0.5} />
+        </lineSegments>
+      </Box>
+
+      {/* Roof */}
+      <mesh position={[0, 1.6, 0]} rotation={[0, Math.PI / 4, 0]}>
+        <coneGeometry args={[2.5, 1.5, 4]} />
+        <meshStandardMaterial color="#FF0055" transparent opacity={0.2} wireframe />
+      </mesh>
+
+      {/* Floating Elements / Scanning Effect */}
+      <Torus args={[3.5, 0.05, 16, 100]} rotation={[Math.PI / 2, 0, 0]} position={[0, -0.8, 0]}>
+        <meshBasicMaterial color="#00F0FF" transparent opacity={0.5} />
       </Torus>
+      
+      <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5}>
+        <Box args={[0.5, 0.5, 0.5]} position={[2, 1, 2]}>
+          <meshStandardMaterial color="#FF0055" wireframe />
+        </Box>
+      </Float>
     </group>
   );
 };
@@ -57,7 +59,7 @@ const Scene = () => {
       <pointLight position={[-10, -10, -10]} intensity={1} color="#FF0055" />
       <Stars radius={100} depth={50} count={7000} factor={4} saturation={0} fade speed={1} />
       <Environment preset="city" />
-      <AbstractCity />
+      <HolographicHouse />
     </>
   );
 };

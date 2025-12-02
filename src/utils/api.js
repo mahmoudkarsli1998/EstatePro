@@ -1,4 +1,4 @@
-import { projects, units, leads, developers, agents, users } from '../data/mockData';
+import { projects, units, leads, developers, agents, users, blocks } from '../data/mockData';
 
 export const api = {
   // Projects
@@ -24,6 +24,16 @@ export const api = {
         projects.push(newProject);
         resolve(newProject);
       }, 1000);
+    });
+  },
+
+  updateProject: (id, data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const project = projects.find(p => p.id === parseInt(id));
+        if (project) Object.assign(project, data);
+        resolve(project);
+      }, 800);
     });
   },
 
@@ -57,7 +67,169 @@ export const api = {
       }, 500);
     });
   },
-  
+
+  createUnit: (data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const newUnit = { 
+          ...data, 
+          id: Date.now(),
+          images: data.images || [],
+          features: data.features || { bedrooms: 0, bathrooms: 0 }
+        };
+        units.push(newUnit);
+        
+        // Update project stats
+        const project = projects.find(p => p.id === parseInt(data.projectId));
+        if (project) {
+          project.stats.totalUnits++;
+          project.stats.available++;
+        }
+        
+        resolve(newUnit);
+      }, 800);
+    });
+  },
+
+  updateUnit: (id, data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const unit = units.find(u => u.id === parseInt(id));
+        if (unit) Object.assign(unit, data);
+        resolve(unit);
+      }, 600);
+    });
+  },
+
+  deleteUnit: (id) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const index = units.findIndex(u => u.id === parseInt(id));
+        if (index > -1) {
+          const unit = units[index];
+          // Update project stats
+          const project = projects.find(p => p.id === unit.projectId);
+          if (project) {
+            project.stats.totalUnits--;
+            if (unit.status === 'available') project.stats.available--;
+          }
+          units.splice(index, 1);
+        }
+        resolve({ success: true });
+      }, 600);
+    });
+  },
+
+  getPhases: (projectId) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const project = projects.find(p => p.id === parseInt(projectId));
+        resolve(project ? project.phases : []);
+      }, 500);
+    });
+  },
+
+  createPhase: (projectId, data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const project = projects.find(p => p.id === parseInt(projectId));
+        if (project) {
+          const newPhase = { ...data, id: Date.now() };
+          if (!project.phases) project.phases = [];
+          project.phases.push(newPhase);
+          resolve(newPhase);
+        }
+      }, 800);
+    });
+  },
+
+  deletePhase: (projectId, phaseId) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const project = projects.find(p => p.id === parseInt(projectId));
+        if (project && project.phases) {
+          const index = project.phases.findIndex(p => p.id === parseInt(phaseId));
+          if (index > -1) project.phases.splice(index, 1);
+        }
+        resolve({ success: true });
+      }, 600);
+    });
+  },
+
+  // Blocks
+  getBlocks: (projectId) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const filtered = projectId 
+          ? blocks.filter(b => b.projectId === parseInt(projectId))
+          : blocks;
+        resolve(filtered);
+      }, 500);
+    });
+  },
+
+  createBlock: (data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const newBlock = { ...data, id: Date.now() };
+        blocks.push(newBlock);
+        resolve(newBlock);
+      }, 800);
+    });
+  },
+
+  deleteBlock: (id) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const index = blocks.findIndex(b => b.id === parseInt(id));
+        if (index > -1) blocks.splice(index, 1);
+        resolve({ success: true });
+      }, 600);
+    });
+  },
+
+  // Developers
+  createDeveloper: (data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const newDev = { ...data, id: Date.now(), projects: [] };
+        developers.push(newDev);
+        resolve(newDev);
+      }, 800);
+    });
+  },
+
+  deleteDeveloper: (id) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const index = developers.findIndex(d => d.id === parseInt(id));
+        if (index > -1) developers.splice(index, 1);
+        resolve({ success: true });
+      }, 600);
+    });
+  },
+
+  // Agents
+  createAgent: (data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const newAgent = { ...data, id: Date.now(), assignedProjects: [] };
+        agents.push(newAgent);
+        resolve(newAgent);
+      }, 800);
+    });
+  },
+
+  deleteAgent: (id) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const index = agents.findIndex(a => a.id === parseInt(id));
+        if (index > -1) agents.splice(index, 1);
+        resolve({ success: true });
+      }, 600);
+    });
+  },
+
   // Leads
   getLeads: () => {
     return new Promise((resolve) => {
@@ -118,6 +290,22 @@ export const api = {
   getUsers: () => {
     return new Promise((resolve) => {
       setTimeout(() => resolve(users), 500);
+    });
+  },
+
+  inviteUser: (data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const newUser = { 
+          ...data, 
+          id: Date.now(), 
+          isActive: false, 
+          createdAt: new Date().toISOString(),
+          inviteToken: Math.random().toString(36).substring(7)
+        };
+        users.push(newUser);
+        resolve(newUser);
+      }, 800);
     });
   },
 

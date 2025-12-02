@@ -1,18 +1,25 @@
 import React from 'react';
-import { Bell, Search, User } from 'lucide-react';
+import { Bell, Search, User, Menu } from 'lucide-react';
 
 import ThemeToggle from '../shared/ThemeToggle';
 
-const Header = () => {
+const Header = ({ onMenuClick }) => {
   return (
-    <header className="h-16 bg-dark-card/80 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-6 sticky top-0 z-40">
-      <div className="flex items-center w-96">
-        <div className="relative w-full">
+    <header className="h-16 glass-panel !rounded-none !border-l-0 !border-r-0 !border-t-0 border-b border-white/10 flex items-center justify-between px-4 md:px-6 sticky top-0 z-40 font-sans">
+      <div className="flex items-center gap-4 w-full md:w-96">
+        <button 
+          onClick={onMenuClick}
+          className="p-2 text-gray-400 hover:text-white hover:bg-white/10 rounded-lg md:hidden transition-colors"
+        >
+          <Menu size={24} />
+        </button>
+
+        <div className="relative w-full hidden md:block">
           <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
           <input 
             type="text" 
             placeholder="Search..." 
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-500"
+            className="w-full pl-10 pr-4 py-2 rounded-xl border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-500 transition-all focus:bg-white/10"
           />
         </div>
       </div>

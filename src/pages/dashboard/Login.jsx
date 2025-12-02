@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import { api } from '../../utils/api';
-
 import LoginBackground3D from '../../components/dashboard/LoginBackground3D';
 
 const Login = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({ email: '', password: '', name: '', confirmPassword: '' });
   const [error, setError] = useState('');
 
   const handleChange = (e) => {
@@ -22,72 +22,167 @@ const Login = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.login(formData.email, formData.password);
-      // In a real app, store token here
-      navigate('/dashboard');
+      if (isLogin) {
+        const { user, token } = await api.login(formData.email, formData.password);
+        localStorage.setItem('authToken', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        navigate('/dashboard');
+      } else {
+        // Mock Signup
+        if (formData.password !== formData.confirmPassword) {
+          throw new Error("Passwords don't match");
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API
+        setIsLogin(true); // Flip back to login on success
+        alert("Account created! Please sign in.");
+      }
     } catch (err) {
-      setError('Invalid email or password');
+      setError(err.message || 'Authentication failed');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 overflow-hidden relative">
+    <div className="min-h-screen flex items-center justify-center bg-gray-900 overflow-hidden relative perspective-1000">
       {/* 3D Animated Background */}
       <LoginBackground3D />
 
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative z-10 w-full max-w-md p-8 bg-white/10 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl"
-      >
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold font-heading text-white mb-2">Welcome Back</h1>
-          <p className="text-gray-400">Sign in to access the dashboard</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <Input
-              label="Email Address"
-              name="email"
-              type="email"
-              required
-              value={formData.email}
-              onChange={handleChange}
-              className="text-white"
-            />
-          </div>
-          <div>
-            <Input
-              label="Password"
-              name="password"
-              type="password"
-              required
-              value={formData.password}
-              onChange={handleChange}
-              className="text-white"
-            />
-          </div>
-
-          {error && (
-            <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm text-center">
-              {error}
+      <div className="relative w-full max-w-md h-[600px] z-10" style={{ perspective: '1000px' }}>
+        <motion.div
+          className="w-full h-full relative"
+          initial={false}
+          animate={{ rotateY: isLogin ? 0 : 180 }}
+          transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
+          style={{ transformStyle: 'preserve-3d' }}
+        >
+          {/* Front Face - Login */}
+          <div 
+            className="absolute inset-0 w-full h-full glass-panel p-8 flex flex-col justify-center backface-hidden"
+            style={{ backfaceVisibility: 'hidden' }}
+          >
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold font-heading text-white mb-2">Welcome Back</h1>
+              <p className="text-gray-400">Sign in to access the dashboard</p>
             </div>
-          )}
 
-          <Button type="submit" className="w-full" size="lg" isLoading={loading}>
-            Sign In
-          </Button>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <Input
+                label="Email Address"
+                name="email"
+                type="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                className="text-white"
+              />
+              <Input
+                label="Password"
+                name="password"
+                type="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+                className="text-white"
+              />
 
-          <div className="text-center">
-            <a href="#" className="text-sm text-gray-400 hover:text-white transition-colors">
-              Forgot your password?
-            </a>
+              {error && (
+                <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm text-center">
+                  {error}
+                </div>
+              )}
+
+              <Button type="submit" className="w-full" size="lg" isLoading={loading}>
+                Sign In
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-gray-400">
+                Don't have an account?{' '}
+                <button 
+                  onClick={() => setIsLogin(false)}
+                  className="text-primary hover:text-white font-bold transition-colors"
+                >
+                  Sign Up
+                </button>
+              </p>
+            </div>
           </div>
-        </form>
-      </motion.div>
+
+          {/* Back Face - Signup */}
+          <div 
+            className="absolute inset-0 w-full h-full glass-panel p-8 flex flex-col justify-center backface-hidden"
+            style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
+          >
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold font-heading text-white mb-2">Create Account</h1>
+              <p className="text-gray-400">Join us to manage your properties</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <Input
+                label="Full Name"
+                name="name"
+                type="text"
+                required
+                value={formData.name}
+                onChange={handleChange}
+                className="text-white"
+              />
+              <Input
+                label="Email Address"
+                name="email"
+                type="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                className="text-white"
+              />
+              <Input
+                label="Password"
+                name="password"
+                type="password"
+                required
+                value={formData.password}
+                onChange={handleChange}
+                className="text-white"
+              />
+              <Input
+                label="Confirm Password"
+                name="confirmPassword"
+                type="password"
+                required
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="text-white"
+              />
+
+              {error && (
+                <div className="p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-200 text-sm text-center">
+                  {error}
+                </div>
+              )}
+
+              <Button type="submit" className="w-full" size="lg" isLoading={loading}>
+                Sign Up
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-gray-400">
+                Already have an account?{' '}
+                <button 
+                  onClick={() => setIsLogin(true)}
+                  className="text-primary hover:text-white font-bold transition-colors"
+                >
+                  Sign In
+                </button>
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 };

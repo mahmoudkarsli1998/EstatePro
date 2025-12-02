@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import Hero3D from '../../components/public/Hero3D';
+import Hero3DOverlay from '../../components/public/Hero3DOverlay';
 import FeaturedProjects from '../../components/public/FeaturedProjects';
 import StatsCounter from '../../components/public/StatsCounter';
 import LiquidBackground from '../../components/shared/LiquidBackground';
@@ -41,69 +41,69 @@ const Home = () => {
       <DemoModal isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
       
       {/* Hero Section */}
-      <section className="relative h-screen flex items-center pt-20">
-        <div className="container mx-auto px-4 md:px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
+      <section className="relative h-screen flex items-center justify-center overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/assets/3D-bg.png" 
+            alt="Modern Architecture" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-dark-bg"></div>
+        </div>
+
+        {/* 3D Animation Overlay */}
+        <Hero3DOverlay />
+
+        <div className="container mx-auto px-4 md:px-6 relative z-10 text-center">
           <motion.div
             initial="hidden"
             animate="visible"
             variants={staggerContainer}
+            className="max-w-4xl mx-auto"
           >
-            <motion.div variants={fadeInUp} className="inline-block mb-4 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary font-bold text-sm tracking-wide uppercase">
-              The Future of Real Estate
-            </motion.div>
-            <motion.h1 variants={fadeInUp} className="text-5xl md:text-7xl font-bold font-heading mb-6 leading-tight text-white drop-shadow-lg">
-              Find Your <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Dream Space</span> in the Metaverse
-            </motion.h1>
-            <motion.p variants={fadeInUp} className="text-xl text-gray-300 mb-8 max-w-lg leading-relaxed">
-              Experience properties like never before with our immersive 3D tours and liquid-smooth interface.
-            </motion.p>
-            <motion.div variants={fadeInUp} className="flex flex-wrap gap-4">
-              <Link to="/projects">
-                <Button size="lg" className="shadow-[0_0_30px_rgba(0,240,255,0.4)]">Explore Projects</Button>
-              </Link>
-              <Button variant="outline" size="lg" onClick={handleDemo}>View Demo</Button>
-              <Button variant="ghost" size="lg" onClick={handleLearnMore}>Learn More</Button>
+            <motion.div variants={fadeInUp} className="inline-block mb-6 px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-medium tracking-wide uppercase shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+              The Future of Living
             </motion.div>
             
-            <motion.div variants={fadeInUp} className="mt-12 flex items-center gap-8">
-              <div className="flex -space-x-4">
-                {[1, 2, 3, 4].map((i) => (
-                  <div key={i} className="w-12 h-12 rounded-full border-2 border-dark-bg bg-gray-800 overflow-hidden">
-                    <img src={`https://i.pravatar.cc/100?img=${i + 10}`} alt="User" />
-                  </div>
-                ))}
-              </div>
-              <div>
-                <p className="font-bold text-white text-lg">12k+ Happy Users</p>
-                <div className="flex text-yellow-400 text-sm">★★★★★</div>
-              </div>
-            </motion.div>
-          </motion.div>
+            <motion.h1 variants={fadeInUp} className="text-6xl md:text-8xl font-bold font-heading mb-8 leading-tight text-white drop-shadow-2xl">
+              Discover Your <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-secondary">Perfect Sanctuary</span>
+            </motion.h1>
+            
+            <motion.p variants={fadeInUp} className="text-xl md:text-2xl text-gray-200 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
+              Experience the most immersive real estate platform. Find your dream home with our 3D tours and AI-powered insights.
+            </motion.p>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 1, delay: 0.2 }}
-            className="h-[500px] lg:h-[700px] w-full relative"
-          >
-            <Hero3D />
-            {/* Floating Elements */}
-            <motion.div 
-              animate={{ y: [0, -20, 0] }}
-              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute top-20 right-10 glass-panel p-4 z-20 max-w-xs"
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-400">
-                  <Zap size={20} />
-                </div>
-                <div>
-                  <p className="text-xs text-gray-400">Market Status</p>
-                  <p className="font-bold text-white">Trending Up</p>
-                </div>
+            <motion.div variants={fadeInUp} className="max-w-2xl mx-auto bg-white/10 backdrop-blur-xl border border-white/20 p-2 rounded-2xl flex flex-col md:flex-row gap-2 shadow-[0_0_40px_rgba(0,0,0,0.3)]">
+              <div className="flex-1 relative">
+                <input 
+                  type="text" 
+                  placeholder="Search by location, project, or type..." 
+                  className="w-full h-14 pl-6 pr-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all"
+                />
               </div>
-              <div className="h-1 w-full bg-gray-700 rounded-full overflow-hidden">
-                <div className="h-full bg-green-500 w-[75%]"></div>
+              <Link to="/projects">
+                <Button size="lg" className="w-full md:w-auto h-14 px-8 text-lg shadow-[0_0_20px_rgba(0,240,255,0.3)]">
+                  Search Properties
+                </Button>
+              </Link>
+            </motion.div>
+
+            <motion.div variants={fadeInUp} className="mt-16 flex justify-center items-center gap-12 text-gray-400">
+              <div className="flex flex-col items-center">
+                <span className="text-3xl font-bold text-white">150+</span>
+                <span className="text-sm uppercase tracking-wider">Projects</span>
+              </div>
+              <div className="w-px h-12 bg-white/10"></div>
+              <div className="flex flex-col items-center">
+                <span className="text-3xl font-bold text-white">12k+</span>
+                <span className="text-sm uppercase tracking-wider">Happy Users</span>
+              </div>
+              <div className="w-px h-12 bg-white/10"></div>
+              <div className="flex flex-col items-center">
+                <span className="text-3xl font-bold text-white">50+</span>
+                <span className="text-sm uppercase tracking-wider">Awards</span>
               </div>
             </motion.div>
           </motion.div>
