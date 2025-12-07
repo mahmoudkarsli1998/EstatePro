@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Plus, Edit, Trash, Search, MapPin, Layers, Download, Home, Maximize } from 'lucide-react';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
@@ -39,6 +40,16 @@ const Projects = () => {
     },
     (proj, term) => proj.name.toLowerCase().includes(term.toLowerCase())
   );
+  
+  // Auto-open modal if requested via navigation state
+  const location = useLocation();
+  useEffect(() => {
+    if (location.state?.openCreateModal && !loading) {
+       handleOpenModal();
+       // Clear state to prevent reopening on refresh (optional, but good practice if using history.replace)
+       window.history.replaceState({}, document.title);
+    }
+  }, [location.state, loading]);
 
   const [activeTab, setActiveTab] = useState('details');
 

@@ -427,6 +427,41 @@ export const api = {
     });
   },
 
+  // Activities
+  getActivities: (page = 1, limit = 10) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Generate mock activities on the fly if needed, or use a static large list
+        const actions = ['purchased', 'joined', 'listed', 'reported', 'reserved', 'viewed', 'updated'];
+        const targets = ['Sunset Villa #4', 'the platform', 'Downtown Loft', 'Server Load High', 'Ocean View Apt', 'Mountain Cabin', 'City Condo'];
+        const usersList = ['John Doe', 'Sarah Smith', 'Admin', 'System', 'Mike Ross', 'Emily Clark', 'David Wilson'];
+        
+        const allActivities = Array.from({ length: 50 }, (_, i) => ({
+          id: i + 1,
+          type: ['sale', 'new_user', 'listing', 'alert'][i % 4],
+          user: usersList[i % usersList.length],
+          action: actions[i % actions.length],
+          target: targets[i % targets.length],
+          time: `${Math.floor(Math.random() * 24) + 1} hours ago`,
+          icon: null, // Will be mapped in component
+          color: '', // Will be mapped in component
+          bg: '' // Will be mapped in component
+        }));
+
+        const start = (page - 1) * limit;
+        const end = start + limit;
+        const paginatedItems = allActivities.slice(start, end);
+        
+        resolve({
+          items: paginatedItems,
+          total: allActivities.length,
+          page,
+          totalPages: Math.ceil(allActivities.length / limit)
+        });
+      }, 600);
+    });
+  },
+
   // Auth (Mock)
   login: (email, password) => {
     return new Promise((resolve, reject) => {

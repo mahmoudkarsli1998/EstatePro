@@ -7,7 +7,8 @@ export const projects = [
     description: "Luxury residential towers in prime location",
     address: "123 Ocean Drive, Miami Beach",
     location: { lat: 25.7617, lng: -80.1918 },
-    status: "active",
+    status: "ready",
+    type: "keys",
     images: [
       "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00",
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750"
@@ -30,6 +31,7 @@ export const projects = [
     address: "456 Coastal Hwy, Malibu",
     location: { lat: 34.0259, lng: -118.7798 },
     status: "active",
+    type: "developer",
     images: [
       "https://images.unsplash.com/photo-1613490493576-7fde63acd811",
       "https://images.unsplash.com/photo-1613977257363-707ba9348227"
@@ -51,6 +53,7 @@ export const projects = [
     address: "789 Downtown Ave, New York",
     location: { lat: 40.7128, lng: -74.0060 },
     status: "upcoming",
+    type: "invest",
     images: [
       "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab",
       "https://images.unsplash.com/photo-1460317442991-0ec209397118"
@@ -73,6 +76,7 @@ export const projects = [
     address: "321 Forest Rd, Portland",
     location: { lat: 45.5152, lng: -122.6784 },
     status: "active",
+    type: "offer",
     images: [
       "https://images.unsplash.com/photo-1564013799919-ab600027ffc6",
       "https://images.unsplash.com/photo-1518780664697-55e3ad937233"
@@ -93,7 +97,8 @@ export const projects = [
     description: "Iconic skyscraper with panoramic city views",
     address: "555 High St, Chicago",
     location: { lat: 41.8781, lng: -87.6298 },
-    status: "sold_out",
+    status: "resale",
+    type: "keys",
     images: [
       "https://images.unsplash.com/photo-1479839672679-a46483c0e7c8",
       "https://images.unsplash.com/photo-1430285561322-7808604715df"
@@ -114,7 +119,8 @@ export const projects = [
     description: "Peaceful living by the lake with modern amenities",
     address: "88 Lakeview Dr, Seattle",
     location: { lat: 47.6062, lng: -122.3321 },
-    status: "active",
+    status: "unlocked",
+    type: "developer",
     images: [
       "https://images.unsplash.com/photo-1580587771525-78b9dba3b91d",
       "https://images.unsplash.com/photo-1516156008625-3a9d6067fab5"
@@ -136,6 +142,7 @@ export const projects = [
     address: "777 Sand Dune Way, Phoenix",
     location: { lat: 33.4484, lng: -112.0740 },
     status: "upcoming",
+    type: "offer",
     images: [
       "https://images.unsplash.com/photo-1513584685908-2274653fa36f",
       "https://images.unsplash.com/photo-1505577058444-a3dab90d4253"
@@ -156,7 +163,8 @@ export const projects = [
     description: "Cozy cabins and lodges in the mountains",
     address: "99 Alpine Rd, Denver",
     location: { lat: 39.7392, lng: -104.9903 },
-    status: "active",
+    status: "ready",
+    type: "invest",
     images: [
       "https://images.unsplash.com/photo-1510798831971-661eb04b3739",
       "https://images.unsplash.com/photo-1449156493391-d2cfa28e468b"
@@ -178,6 +186,7 @@ export const projects = [
     address: "22 Bay St, San Francisco",
     location: { lat: 37.7749, lng: -122.4194 },
     status: "active",
+    type: "keys",
     images: [
       "https://images.unsplash.com/photo-1515263487990-61b07816b324",
       "https://images.unsplash.com/photo-1523217582562-09d0def993a6"
@@ -198,7 +207,8 @@ export const projects = [
     description: "Aristocratic living in expansive gardens",
     address: "10 Palace Ave, London",
     location: { lat: 51.5074, lng: -0.1278 },
-    status: "upcoming",
+    status: "unlocked",
+    type: "invest",
     images: [
       "https://images.unsplash.com/photo-1564013799919-ab600027ffc6",
       "https://images.unsplash.com/photo-1600596542815-27bfef402399"

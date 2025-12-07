@@ -11,6 +11,8 @@ import About from './pages/public/About';
 import Contact from './pages/public/Contact';
 import Locations from './pages/public/Locations';
 import DesignStudio from './pages/public/DesignStudio';
+import Sell from './pages/public/Sell';
+import Developer from './pages/public/Developer';
 import InviteAccept from './pages/dashboard/InviteAccept';
 import Login from './pages/dashboard/Login';
 import Dashboard from './pages/dashboard/Dashboard';
@@ -66,6 +68,8 @@ const AnimatedRoutes = () => {
           <Route path="/contact" element={<Contact />} />
           <Route path="/locations" element={<Locations />} />
           <Route path="/design" element={<DesignStudio />} />
+          <Route path="/sell" element={<Sell />} />
+          <Route path="/developer" element={<Developer />} />
         </Route>
 
         {/* Dashboard Routes */}

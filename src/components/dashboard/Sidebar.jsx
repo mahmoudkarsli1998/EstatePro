@@ -24,15 +24,15 @@ const Sidebar = ({ isOpen, onClose }) => {
   ];
 
   return (
-    <aside className={`fixed inset-y-0 start-0 w-64 glass-panel !rounded-none !border-l-0 !border-t-0 !border-b-0 border-e border-white/10 text-white z-50 flex flex-col transform transition-transform duration-300 ease-in-out ${
+    <aside className={`fixed inset-y-0 start-0 w-64 glass-panel !rounded-none !border-l-0 !border-t-0 !border-b-0 border-e border-slate-200 dark:border-white/10 text-slate-900 dark:text-white z-50 flex flex-col transform transition-transform duration-300 ease-in-out ${
       isOpen ? 'translate-x-0' : `${isRtl ? 'translate-x-full' : '-translate-x-full'} md:translate-x-0`
     }`}>
-      <div className="p-6 border-b border-white/10 flex justify-between items-center">
+      <div className="p-6 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
         <Link to="/" className="text-2xl font-bold font-heading text-primary block">
-          Estate<span className="text-white">Pro</span>
+          Estate<span className="text-slate-900 dark:text-white">Pro</span>
           <span className="text-xs text-gray-400 block font-sans font-normal mt-1">Admin Panel</span>
         </Link>
-        <button onClick={onClose} className="md:hidden text-gray-400 hover:text-white">
+        <button onClick={onClose} className="md:hidden text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white">
           <X size={24} />
         </button>
       </div>
@@ -49,7 +49,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               className={`flex items-center px-4 py-3 rounded-xl transition-all duration-300 ${
                 isActive 
                   ? 'bg-primary text-black font-bold shadow-[0_0_15px_rgba(0,240,255,0.3)]' 
-                  : 'text-gray-400 hover:bg-white/5 hover:text-white hover:translate-x-1 rtl:hover:-translate-x-1'
+                  : 'text-slate-500 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-primary dark:hover:text-white hover:translate-x-1 rtl:hover:-translate-x-1'
               }`}
             >
               <Icon size={20} className="me-3" />
@@ -59,10 +59,10 @@ const Sidebar = ({ isOpen, onClose }) => {
         })}
       </nav>
 
-      <div className="p-4 border-t border-white/10 font-sans">
+      <div className="p-4 border-t border-slate-200 dark:border-white/10 font-sans">
         <Link 
           to="/login" 
-          className="flex items-center px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
+          className="flex items-center px-4 py-3 rounded-xl text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-500/10 hover:text-red-700 dark:hover:text-red-300 transition-colors"
         >
           <LogOut size={20} className="me-3" />
           <span className="font-medium">{t('signOut', 'Sign Out')}</span>

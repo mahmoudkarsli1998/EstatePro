@@ -49,6 +49,7 @@ const ProjectsList = () => {
   const filteredProjects = projects.filter(project => {
     if (filters.search && !project.name.toLowerCase().includes(filters.search.toLowerCase())) return false;
     if (filters.status && project.status !== filters.status) return false;
+    if (filters.type && project.type !== filters.type) return false;
     if (filters.minPrice && project.priceRange.min < parseInt(filters.minPrice)) return false;
     if (filters.maxPrice && project.priceRange.max > parseInt(filters.maxPrice)) return false;
     return true;

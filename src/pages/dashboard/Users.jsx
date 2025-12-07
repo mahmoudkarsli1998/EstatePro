@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Plus, User, Edit, Trash, Download } from 'lucide-react';
 import Button from '../../components/shared/Button';
@@ -35,6 +36,15 @@ const Users = () => {
       user.fullName.toLowerCase().includes(term.toLowerCase()) || 
       user.email.toLowerCase().includes(term.toLowerCase())
   );
+
+  // Auto-open modal if requested via navigation state
+  const location = useLocation();
+  useEffect(() => {
+    if (location.state?.openCreateModal && !loading) {
+       handleOpenModal();
+       window.history.replaceState({}, document.title);
+    }
+  }, [location.state, loading]);
 
   const onExport = () => {
     handleExport(

@@ -30,22 +30,22 @@ const LiquidBackground = () => {
   }, { scope: containerRef });
 
   return (
-    <div ref={containerRef} className="fixed inset-0 -z-10 overflow-hidden bg-[#050510]">
+    <div ref={containerRef} className="fixed inset-0 -z-10 overflow-hidden bg-slate-50 dark:bg-[#050510] transition-colors duration-500">
       <div className="absolute inset-0 opacity-40 filter blur-[80px]">
         <div 
           ref={blob1Ref}
-          className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/30 rounded-full mix-blend-screen"
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 dark:bg-primary/30 rounded-full mix-blend-multiply dark:mix-blend-screen"
         />
         <div 
           ref={blob2Ref}
-          className="absolute top-3/4 right-1/4 w-[500px] h-[500px] bg-secondary/30 rounded-full mix-blend-screen"
+          className="absolute top-3/4 right-1/4 w-[500px] h-[500px] bg-secondary/20 dark:bg-secondary/30 rounded-full mix-blend-multiply dark:mix-blend-screen"
         />
         <div 
           ref={blob3Ref}
-          className="absolute bottom-1/4 left-1/2 w-80 h-80 bg-purple-500/30 rounded-full mix-blend-screen"
+          className="absolute bottom-1/4 left-1/2 w-80 h-80 bg-purple-500/20 dark:bg-purple-500/30 rounded-full mix-blend-multiply dark:mix-blend-screen"
         />
       </div>
-      <div className="absolute inset-0 bg-[#050510]/60 backdrop-blur-[2px]"></div>
+      <div className="absolute inset-0 bg-white/40 dark:bg-[#050510]/60 backdrop-blur-[2px]"></div>
     </div>
   );
 };

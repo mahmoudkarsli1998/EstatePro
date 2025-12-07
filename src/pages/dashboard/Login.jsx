@@ -61,7 +61,7 @@ const Login = () => {
   };
 
   return (
-    <div ref={containerRef} className="min-h-screen flex items-center justify-center bg-gray-900 overflow-hidden relative perspective-1000">
+    <div ref={containerRef} className="min-h-screen flex items-center justify-center bg-[var(--bg-primary)] dark:bg-gray-900 overflow-hidden relative perspective-1000 transition-colors duration-500">
       {/* 3D Animated Background */}
       <LoginBackground3D />
 
@@ -77,7 +77,7 @@ const Login = () => {
             style={{ backfaceVisibility: 'hidden' }}
           >
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold font-heading text-white mb-2">{t('welcomeBack')}</h1>
+              <h1 className="text-3xl font-bold font-heading text-slate-900 dark:text-white mb-2">{t('welcomeBack')}</h1>
               <p className="text-gray-400">{t('signInToAccess')}</p>
             </div>
 
@@ -89,7 +89,7 @@ const Login = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="text-white"
+                className="text-slate-900 dark:text-white"
               />
               <Input
                 label={t('password')}
@@ -98,7 +98,7 @@ const Login = () => {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="text-white"
+                className="text-slate-900 dark:text-white"
               />
 
               {error && (
@@ -131,7 +131,7 @@ const Login = () => {
             style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
           >
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold font-heading text-white mb-2">{t('createAccount')}</h1>
+              <h1 className="text-3xl font-bold font-heading text-slate-900 dark:text-white mb-2">{t('createAccount')}</h1>
               <p className="text-gray-400">{t('joinUs')}</p>
             </div>
 
@@ -143,7 +143,7 @@ const Login = () => {
                 required
                 value={formData.name}
                 onChange={handleChange}
-                className="text-white"
+                className="text-slate-900 dark:text-white"
               />
               <Input
                 label={t('emailAddress')}
@@ -152,7 +152,7 @@ const Login = () => {
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="text-white"
+                className="text-slate-900 dark:text-white"
               />
               <Input
                 label={t('password')}
@@ -161,7 +161,7 @@ const Login = () => {
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="text-white"
+                className="text-slate-900 dark:text-white"
               />
               <Input
                 label={t('confirmPassword')}
@@ -170,7 +170,7 @@ const Login = () => {
                 required
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                className="text-white"
+                className="text-slate-900 dark:text-white"
               />
 
               {error && (

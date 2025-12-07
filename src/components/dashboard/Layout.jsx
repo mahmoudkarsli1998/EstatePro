@@ -7,7 +7,7 @@ const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = React.useState(false);
 
   return (
-    <div className="min-h-screen bg-dark-bg flex relative">
+    <div className="min-h-screen bg-[var(--bg-primary)] dark:bg-dark-bg flex relative">
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
       
       {/* Mobile Overlay */}
