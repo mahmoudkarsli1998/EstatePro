@@ -1,60 +1,55 @@
-import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash, Search, Building } from 'lucide-react';
+import React from 'react';
+import { Plus, Edit, Trash, Search, Download } from 'lucide-react';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import Modal from '../../components/shared/Modal';
 import { api } from '../../utils/api';
+import { useDashboardCrud } from '../../hooks/useDashboardCrud';
 
 const Developers = () => {
-  const [developers, setDevelopers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [formData, setFormData] = useState({
-    name: '',
-    contactEmail: '',
-    contactPhone: '',
-    logo: 'https://via.placeholder.com/150'
-  });
-
-  useEffect(() => {
-    loadDevelopers();
-  }, []);
-
-  const loadDevelopers = () => {
-    setLoading(true);
-    api.getDevelopers().then(data => {
-      setDevelopers(data);
-      setLoading(false);
-    });
-  };
-
-  const handleCreate = async (e) => {
-    e.preventDefault();
-    await api.createDeveloper(formData);
-    setIsModalOpen(false);
-    loadDevelopers();
-    setFormData({ name: '', contactEmail: '', contactPhone: '', logo: 'https://via.placeholder.com/150' });
-  };
-
-  const handleDelete = async (id) => {
-    if(window.confirm('Are you sure you want to delete this developer?')) {
-      await api.deleteDeveloper(id);
-      loadDevelopers();
-    }
-  };
-
-  const filteredDevelopers = developers.filter(d => 
-    d.name.toLowerCase().includes(searchTerm.toLowerCase())
+  const {
+    filteredItems: developers,
+    loading,
+    isModalOpen,
+    editingItem,
+    formData,
+    searchTerm,
+    setSearchTerm,
+    handleOpenModal,
+    handleCloseModal,
+    handleInputChange,
+    handleSubmit,
+    handleDelete,
+    handleExport
+  } = useDashboardCrud(
+    api.getDevelopers,
+    api.createDeveloper,
+    api.updateDeveloper, // Assuming this exists or will be added
+    api.deleteDeveloper,
+    { name: '', contactEmail: '', contactPhone: '', logo: 'https://via.placeholder.com/150' },
+    (dev, term) => dev.name.toLowerCase().includes(term.toLowerCase())
   );
+
+  const onExport = () => {
+    handleExport(
+      "developers_export.csv",
+      ["ID", "Name", "Email", "Phone", "Projects Count"],
+      d => [d.id, `"${d.name}"`, d.contactEmail, d.contactPhone, d.projects?.length || 0].join(",")
+    );
+  };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">Developers</h1>
-        <Button onClick={() => setIsModalOpen(true)}>
-          <Plus size={20} className="mr-2" /> Add Developer
-        </Button>
+        <div className="flex gap-3">
+          <Button variant="outline" onClick={onExport}>
+            <Download size={18} className="mr-2" /> Export
+          </Button>
+          <Button onClick={() => handleOpenModal()}>
+            <Plus size={20} className="mr-2" /> Add Developer
+          </Button>
+        </div>
       </div>
 
       <div className="bg-dark-card border border-white/10 rounded-xl shadow-sm overflow-hidden">
@@ -74,7 +69,9 @@ const Developers = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
           {loading ? (
             <div className="text-center col-span-full text-gray-400">Loading...</div>
-          ) : filteredDevelopers.map((dev) => (
+          ) : developers.length === 0 ? (
+            <div className="text-center col-span-full text-gray-400">No developers found.</div>
+          ) : developers.map((dev) => (
             <div key={dev.id} className="bg-white/5 border border-white/10 rounded-xl p-6 flex flex-col items-center text-center hover:border-primary/50 transition-colors group">
               <div className="w-20 h-20 rounded-full bg-gray-800 mb-4 overflow-hidden border-2 border-white/10 group-hover:border-primary/50 transition-colors">
                 <img src={dev.logo} alt={dev.name} className="w-full h-full object-cover" />
@@ -84,10 +81,13 @@ const Developers = () => {
               
               <div className="flex items-center justify-center space-x-4 w-full mt-auto pt-4 border-t border-white/5">
                 <div className="text-xs text-gray-500">
-                  <span className="block font-bold text-white">{dev.projects.length}</span> Projects
+                  <span className="block font-bold text-white">{dev.projects?.length || 0}</span> Projects
                 </div>
                 <div className="flex space-x-2 ml-auto">
-                  <button className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors">
+                  <button 
+                    className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                    onClick={() => handleOpenModal(dev)}
+                  >
                     <Edit size={16} />
                   </button>
                   <button 
@@ -105,37 +105,41 @@ const Developers = () => {
 
       <Modal 
         isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        title="Add New Developer"
+        onClose={handleCloseModal} 
+        title={editingItem ? "Edit Developer" : "Add New Developer"}
       >
-        <form onSubmit={handleCreate} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <Input 
             label="Developer Name" 
+            name="name"
             value={formData.name}
-            onChange={(e) => setFormData({...formData, name: e.target.value})}
+            onChange={handleInputChange}
             required
           />
           <Input 
             label="Contact Email" 
             type="email"
+            name="contactEmail"
             value={formData.contactEmail}
-            onChange={(e) => setFormData({...formData, contactEmail: e.target.value})}
+            onChange={handleInputChange}
             required
           />
           <Input 
             label="Contact Phone" 
+            name="contactPhone"
             value={formData.contactPhone}
-            onChange={(e) => setFormData({...formData, contactPhone: e.target.value})}
+            onChange={handleInputChange}
             required
           />
           <Input 
             label="Logo URL" 
+            name="logo"
             value={formData.logo}
-            onChange={(e) => setFormData({...formData, logo: e.target.value})}
+            onChange={handleInputChange}
           />
           <div className="pt-4 flex justify-end space-x-3">
-            <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-            <Button type="submit">Create Developer</Button>
+            <Button type="button" variant="ghost" onClick={handleCloseModal}>Cancel</Button>
+            <Button type="submit">{editingItem ? "Update Developer" : "Create Developer"}</Button>
           </div>
         </form>
       </Modal>

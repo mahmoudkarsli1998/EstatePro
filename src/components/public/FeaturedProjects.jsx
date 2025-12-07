@@ -1,20 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { MapPin, ArrowRight } from 'lucide-react';
-import Card from '../shared/Card';
 import Button from '../shared/Button';
-import Badge from '../shared/Badge';
 import { api } from '../../utils/api';
+import { useStaggerList, useHover3D } from '../../hooks/useGSAPAnimations';
 
 const ProjectCard = ({ project }) => {
+  const cardRef = useHover3D({ intensity: 10, scale: 1.02 });
+
   return (
-    <motion.div
-      whileHover={{ y: -10 }}
-      transition={{ type: 'spring', stiffness: 300 }}
-      className="h-full"
-    >
-      <div className="h-full flex flex-col glass-panel overflow-hidden group hover:border-primary/50 transition-all duration-300 relative">
+    <div ref={cardRef} className="h-full stagger-item opacity-0">
+      <div className="h-full flex flex-col glass-panel overflow-hidden group hover:border-primary/50 transition-all duration-300 relative transform-style-3d">
         <div className="relative h-72 overflow-hidden">
           <img 
             src={project.images[0]} 
@@ -23,7 +19,7 @@ const ProjectCard = ({ project }) => {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-transparent to-transparent opacity-60"></div>
           
-          <div className="absolute top-4 right-4 z-10">
+          <div className="absolute top-4 right-4 z-10 translate-z-10">
             <div className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg backdrop-blur-md border border-white/10 ${
               project.status === 'active' 
                 ? 'bg-green-500/90 text-white shadow-green-500/20' 
@@ -33,14 +29,14 @@ const ProjectCard = ({ project }) => {
             </div>
           </div>
 
-          <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+          <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 translate-z-20">
              <Link to={`/projects/${project.id}`} className="block w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
               <Button variant="primary" className="w-full shadow-[0_0_20px_rgba(0,240,255,0.3)]">View Details</Button>
             </Link>
           </div>
         </div>
         
-        <div className="p-6 flex-grow flex flex-col relative z-10 bg-gradient-to-b from-transparent to-black/20">
+        <div className="p-6 flex-grow flex flex-col relative z-10 bg-gradient-to-b from-transparent to-black/20 translate-z-10">
           <div className="flex justify-between items-start mb-3">
             <h3 className="text-2xl font-bold font-heading text-white line-clamp-1 group-hover:text-primary transition-colors">
               {project.name}
@@ -71,13 +67,14 @@ const ProjectCard = ({ project }) => {
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
 const FeaturedProjects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const containerRef = useStaggerList({ selector: '.stagger-item', delay: 0.2, dependencies: [loading, projects] });
 
   useEffect(() => {
     api.getProjects().then(data => {
@@ -110,7 +107,7 @@ const FeaturedProjects = () => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 perspective-1000">
             {projects.map(project => (
               <ProjectCard key={project.id} project={project} />
             ))}

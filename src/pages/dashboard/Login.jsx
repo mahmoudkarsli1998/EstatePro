@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import { api } from '../../utils/api';
 import LoginBackground3D from '../../components/dashboard/LoginBackground3D';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -12,6 +13,19 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '', name: '', confirmPassword: '' });
   const [error, setError] = useState('');
+  
+  const cardRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useGSAP(() => {
+    if (cardRef.current) {
+      gsap.to(cardRef.current, {
+        rotationY: isLogin ? 0 : 180,
+        duration: 0.8,
+        ease: "back.out(1.2)",
+      });
+    }
+  }, { scope: containerRef, dependencies: [isLogin] });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -44,16 +58,14 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-900 overflow-hidden relative perspective-1000">
+    <div ref={containerRef} className="min-h-screen flex items-center justify-center bg-gray-900 overflow-hidden relative perspective-1000">
       {/* 3D Animated Background */}
       <LoginBackground3D />
 
       <div className="relative w-full max-w-md h-[600px] z-10" style={{ perspective: '1000px' }}>
-        <motion.div
+        <div
+          ref={cardRef}
           className="w-full h-full relative"
-          initial={false}
-          animate={{ rotateY: isLogin ? 0 : 180 }}
-          transition={{ duration: 0.6, type: "spring", stiffness: 260, damping: 20 }}
           style={{ transformStyle: 'preserve-3d' }}
         >
           {/* Front Face - Login */}
@@ -181,7 +193,7 @@ const Login = () => {
               </p>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

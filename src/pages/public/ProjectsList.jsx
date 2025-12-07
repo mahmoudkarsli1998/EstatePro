@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Filter, Map as MapIcon, Grid } from 'lucide-react';
 import Card from '../../components/shared/Card';
 import Badge from '../../components/shared/Badge';
@@ -8,6 +7,7 @@ import Button from '../../components/shared/Button';
 import FilterSidebar from '../../components/public/FilterSidebar';
 import LiquidBackground from '../../components/shared/LiquidBackground';
 import { api } from '../../utils/api';
+import { useStaggerList } from '../../hooks/useGSAPAnimations';
 
 const ProjectsList = () => {
   const [projects, setProjects] = useState([]);
@@ -22,13 +22,26 @@ const ProjectsList = () => {
     status: '',
   });
 
+  const [searchParams] = useSearchParams();
+
   useEffect(() => {
     setLoading(true);
+    
+    // Initialize filters from URL params
+    const initialFilters = {
+      search: searchParams.get('search') || '',
+      minPrice: searchParams.get('minPrice') || '',
+      maxPrice: searchParams.get('maxPrice') || '',
+      type: searchParams.get('type') || '',
+      status: searchParams.get('status') || '',
+    };
+    setFilters(prev => ({ ...prev, ...initialFilters }));
+
     api.getProjects().then(data => {
       setProjects(data);
       setLoading(false);
     });
-  }, []);
+  }, [searchParams]);
 
   const filteredProjects = projects.filter(project => {
     if (filters.search && !project.name.toLowerCase().includes(filters.search.toLowerCase())) return false;
@@ -36,6 +49,13 @@ const ProjectsList = () => {
     if (filters.minPrice && project.priceRange.min < parseInt(filters.minPrice)) return false;
     if (filters.maxPrice && project.priceRange.max > parseInt(filters.maxPrice)) return false;
     return true;
+  });
+
+  // Pass filteredProjects as a dependency so the animation re-runs when the list changes
+  const containerRef = useStaggerList({ 
+    selector: '.project-item', 
+    delay: 0.1, 
+    dependencies: [filteredProjects, viewMode, loading] 
   });
 
   return (
@@ -98,13 +118,11 @@ const ProjectsList = () => {
                 <p className="text-gray-400">Try adjusting your filters.</p>
               </div>
             ) : viewMode === 'grid' ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProjects.map(project => (
-                  <motion.div
+                  <div
                     key={project.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
+                    className="project-item opacity-0"
                   >
                     <Link to={`/projects/${project.id}`}>
                       <Card hover className="h-full flex flex-col group">
@@ -141,7 +159,7 @@ const ProjectsList = () => {
                         </div>
                       </Card>
                     </Link>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             ) : (

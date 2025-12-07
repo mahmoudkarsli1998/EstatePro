@@ -1,10 +1,16 @@
-import { projects, units, leads, developers, agents, users, blocks } from '../data/mockData';
+import { projects, units, leads, developers, agents, users, blocks, managers, admins } from '../data/mockData';
 
 export const api = {
   // Projects
   getProjects: () => {
     return new Promise((resolve) => {
-      setTimeout(() => resolve(projects), 800);
+      setTimeout(() => {
+        const optimizedProjects = projects.map(p => ({
+          ...p,
+          images: p.images.map(img => img.includes('?') ? img : `${img}?auto=format&fit=crop&w=800&q=80`)
+        }));
+        resolve(optimizedProjects);
+      }, 800);
     });
   },
   
@@ -188,48 +194,6 @@ export const api = {
     });
   },
 
-  // Developers
-  createDeveloper: (data) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const newDev = { ...data, id: Date.now(), projects: [] };
-        developers.push(newDev);
-        resolve(newDev);
-      }, 800);
-    });
-  },
-
-  deleteDeveloper: (id) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const index = developers.findIndex(d => d.id === parseInt(id));
-        if (index > -1) developers.splice(index, 1);
-        resolve({ success: true });
-      }, 600);
-    });
-  },
-
-  // Agents
-  createAgent: (data) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const newAgent = { ...data, id: Date.now(), assignedProjects: [] };
-        agents.push(newAgent);
-        resolve(newAgent);
-      }, 800);
-    });
-  },
-
-  deleteAgent: (id) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const index = agents.findIndex(a => a.id === parseInt(id));
-        if (index > -1) agents.splice(index, 1);
-        resolve({ success: true });
-      }, 600);
-    });
-  },
-
   // Leads
   getLeads: () => {
     return new Promise((resolve) => {
@@ -279,10 +243,70 @@ export const api = {
     });
   },
 
+  createDeveloper: (data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const newDeveloper = { ...data, id: Date.now(), projects: [] };
+        developers.push(newDeveloper);
+        resolve(newDeveloper);
+      }, 800);
+    });
+  },
+
+  updateDeveloper: (id, data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const developer = developers.find(d => d.id === parseInt(id));
+        if (developer) Object.assign(developer, data);
+        resolve(developer);
+      }, 600);
+    });
+  },
+
+  deleteDeveloper: (id) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const index = developers.findIndex(d => d.id === parseInt(id));
+        if (index > -1) developers.splice(index, 1);
+        resolve({ success: true });
+      }, 600);
+    });
+  },
+
   // Agents
   getAgents: () => {
     return new Promise((resolve) => {
       setTimeout(() => resolve(agents), 500);
+    });
+  },
+
+  createAgent: (data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const newAgent = { ...data, id: Date.now(), assignedProjects: [] };
+        agents.push(newAgent);
+        resolve(newAgent);
+      }, 800);
+    });
+  },
+
+  updateAgent: (id, data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const agent = agents.find(a => a.id === parseInt(id));
+        if (agent) Object.assign(agent, data);
+        resolve(agent);
+      }, 600);
+    });
+  },
+
+  deleteAgent: (id) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const index = agents.findIndex(a => a.id === parseInt(id));
+        if (index > -1) agents.splice(index, 1);
+        resolve({ success: true });
+      }, 600);
     });
   },
 
@@ -324,6 +348,80 @@ export const api = {
       setTimeout(() => {
         const index = users.findIndex(u => u.id === parseInt(id));
         if (index > -1) users.splice(index, 1);
+        resolve({ success: true });
+      }, 600);
+    });
+  },
+
+  // Managers
+  getManagers: () => {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(managers), 500);
+    });
+  },
+
+  createManager: (data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const newManager = { ...data, id: Date.now(), joinDate: new Date().toISOString() };
+        managers.push(newManager);
+        resolve(newManager);
+      }, 800);
+    });
+  },
+
+  updateManager: (id, data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const manager = managers.find(m => m.id === parseInt(id));
+        if (manager) Object.assign(manager, data);
+        resolve(manager);
+      }, 600);
+    });
+  },
+
+  deleteManager: (id) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const index = managers.findIndex(m => m.id === parseInt(id));
+        if (index > -1) managers.splice(index, 1);
+        resolve({ success: true });
+      }, 600);
+    });
+  },
+
+  // Admins
+  getAdmins: () => {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(admins), 500);
+    });
+  },
+
+  createAdmin: (data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const newAdmin = { ...data, id: Date.now(), lastLogin: new Date().toISOString() };
+        admins.push(newAdmin);
+        resolve(newAdmin);
+      }, 800);
+    });
+  },
+
+  updateAdmin: (id, data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const admin = admins.find(a => a.id === parseInt(id));
+        if (admin) Object.assign(admin, data);
+        resolve(admin);
+      }, 600);
+    });
+  },
+
+  deleteAdmin: (id) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const index = admins.findIndex(a => a.id === parseInt(id));
+        if (index > -1) admins.splice(index, 1);
         resolve({ success: true });
       }, 600);
     });

@@ -604,6 +604,48 @@ export const users = [
   }
 ];
 
+export const managers = [
+  {
+    id: 1,
+    name: "Sarah Connor",
+    email: "sarah@company.com",
+    phone: "+1-555-0301",
+    department: "Sales",
+    status: "active",
+    joinDate: "2025-03-12"
+  },
+  {
+    id: 2,
+    name: "Pending Manager",
+    email: "manager@company.com",
+    phone: "+1-555-0302",
+    department: "Marketing",
+    status: "perm_pending", // waiting for permission/invite accept
+    joinDate: "2025-11-25"
+  }
+];
+
+export const admins = [
+  {
+    id: 1,
+    name: "Admin User",
+    email: "admin@company.com",
+    phone: "+1-555-0000",
+    role: "Super Admin",
+    status: "active",
+    lastLogin: "2025-12-07T08:00:00Z"
+  },
+  {
+    id: 2,
+    name: "Tech Support",
+    email: "support@company.com",
+    phone: "+1-555-0001",
+    role: "Support Admin",
+    status: "active",
+    lastLogin: "2025-12-06T14:30:00Z"
+  }
+];
+
 // Leads
 export const leads = [
   {

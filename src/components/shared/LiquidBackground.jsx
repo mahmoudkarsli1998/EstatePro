@@ -1,45 +1,51 @@
 import React, { useRef } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
-import { Sphere, MeshDistortMaterial } from '@react-three/drei';
-
-const AnimatedSphere = () => {
-  const sphereRef = useRef();
-
-  useFrame(({ clock }) => {
-    const t = clock.getElapsedTime();
-    if (sphereRef.current) {
-      sphereRef.current.rotation.x = t * 0.1;
-      sphereRef.current.rotation.y = t * 0.15;
-    }
-  });
-
-  return (
-    <Sphere ref={sphereRef} args={[1, 100, 100]} scale={2}>
-      <MeshDistortMaterial
-        color="#7000FF"
-        attach="material"
-        distort={0.5}
-        speed={1.5}
-        roughness={0.2}
-        metalness={0.8}
-      />
-    </Sphere>
-  );
-};
-
-import FloatingShapes from '../public/FloatingShapes';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 
 const LiquidBackground = () => {
+  const containerRef = useRef(null);
+  const blob1Ref = useRef(null);
+  const blob2Ref = useRef(null);
+  const blob3Ref = useRef(null);
+
+  useGSAP(() => {
+    // Animate blobs moving around
+    const animateBlob = (ref, duration, scale) => {
+      gsap.to(ref.current, {
+        x: "random(-100, 100, 5)",
+        y: "random(-100, 100, 5)",
+        scale: `random(${scale * 0.8}, ${scale * 1.2})`,
+        rotation: "random(-180, 180)",
+        duration: duration,
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true,
+      });
+    };
+
+    animateBlob(blob1Ref, 10, 1);
+    animateBlob(blob2Ref, 15, 1.2);
+    animateBlob(blob3Ref, 12, 0.8);
+
+  }, { scope: containerRef });
+
   return (
-    <div className="fixed inset-0 -z-10 opacity-30 pointer-events-none">
-      <Canvas camera={{ position: [0, 0, 5] }}>
-        <ambientLight intensity={0.5} />
-        <directionalLight position={[10, 10, 5]} intensity={1} color="#00F0FF" />
-        <pointLight position={[-10, -10, -5]} intensity={1} color="#FF0055" />
-        <AnimatedSphere />
-        <FloatingShapes />
-      </Canvas>
-      <div className="absolute inset-0 bg-[#050510]/80 backdrop-blur-[2px]"></div>
+    <div ref={containerRef} className="fixed inset-0 -z-10 overflow-hidden bg-[#050510]">
+      <div className="absolute inset-0 opacity-40 filter blur-[80px]">
+        <div 
+          ref={blob1Ref}
+          className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/30 rounded-full mix-blend-screen"
+        />
+        <div 
+          ref={blob2Ref}
+          className="absolute top-3/4 right-1/4 w-[500px] h-[500px] bg-secondary/30 rounded-full mix-blend-screen"
+        />
+        <div 
+          ref={blob3Ref}
+          className="absolute bottom-1/4 left-1/2 w-80 h-80 bg-purple-500/30 rounded-full mix-blend-screen"
+        />
+      </div>
+      <div className="absolute inset-0 bg-[#050510]/60 backdrop-blur-[2px]"></div>
     </div>
   );
 };

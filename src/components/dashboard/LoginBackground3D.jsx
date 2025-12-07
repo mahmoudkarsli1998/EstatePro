@@ -1,48 +1,51 @@
-import React, { useRef, Suspense } from 'react';
-import { Canvas, useFrame, useLoader, useThree } from '@react-three/fiber';
-import { TextureLoader } from 'three';
-import { Stars, Sparkles } from '@react-three/drei';
-import * as THREE from 'three';
-
-const BackgroundPlane = () => {
-  const mesh = useRef();
-  const texture = useLoader(TextureLoader, '/assets/3d-graph-computer-illustration.jpg');
-  const { viewport } = useThree();
-  
-  useFrame((state) => {
-    const { mouse } = state;
-    // Subtle parallax based on mouse
-    if (mesh.current) {
-      mesh.current.rotation.x = THREE.MathUtils.lerp(mesh.current.rotation.x, -mouse.y * 0.02, 0.05);
-      mesh.current.rotation.y = THREE.MathUtils.lerp(mesh.current.rotation.y, mouse.x * 0.02, 0.05);
-    }
-  });
-
-  // Scale to cover the viewport (like background-size: cover)
-  const scale = Math.max(viewport.width, viewport.height) * 1.2; // Add some bleed for parallax
-
-  return (
-    <mesh ref={mesh} scale={[scale, scale, 1]}>
-      <planeGeometry args={[1.6, 0.9]} /> {/* 16:9 aspect ratio */}
-      <meshBasicMaterial map={texture} toneMapped={false} />
-    </mesh>
-  );
-};
+import React, { useRef } from 'react';
+import { useGSAP } from '@gsap/react';
+import gsap from 'gsap';
 
 const LoginBackground3D = () => {
+  const containerRef = useRef(null);
+  const bgRef = useRef(null);
+
+  useGSAP(() => {
+    const onMouseMove = (e) => {
+      if (!bgRef.current) return;
+      const { clientX, clientY } = e;
+      const x = (clientX / window.innerWidth - 0.5) * 30;
+      const y = (clientY / window.innerHeight - 0.5) * 30;
+
+      gsap.to(bgRef.current, {
+        x: x,
+        y: y,
+        duration: 1.5,
+        ease: "power2.out"
+      });
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+    };
+  }, { scope: containerRef });
+
   return (
-    <div className="absolute inset-0 z-0 bg-gray-900">
-      <Canvas camera={{ position: [0, 0, 5], fov: 75 }}>
-        <color attach="background" args={['#0f172a']} />
-        <fog attach="fog" args={['#0f172a', 5, 20]} />
-        
-        <Suspense fallback={null}>
-          <BackgroundPlane />
-        </Suspense>
-        
-        <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
-        <Sparkles count={100} scale={10} size={2} speed={0.4} opacity={0.5} color="#00F0FF" />
-      </Canvas>
+    <div ref={containerRef} className="absolute inset-0 z-0 bg-gray-900 overflow-hidden">
+      <div 
+        ref={bgRef}
+        className="absolute inset-[-5%] w-[110%] h-[110%] bg-cover bg-center"
+        style={{ backgroundImage: "url('/assets/3d-graph-computer-illustration.jpg')" }}
+      >
+        <div className="absolute inset-0 bg-black/40"></div>
+      </div>
+      
+      {/* Animated Particles/Stars (CSS only for performance) */}
+      <div className="absolute inset-0 opacity-30">
+        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white rounded-full animate-pulse"></div>
+        <div className="absolute top-3/4 right-1/3 w-1.5 h-1.5 bg-primary rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
+        <div className="absolute bottom-1/4 left-1/3 w-2 h-2 bg-secondary rounded-full animate-pulse" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 right-1/4 w-1 h-1 bg-white rounded-full animate-pulse" style={{ animationDelay: '1.5s' }}></div>
+      </div>
+
       {/* Overlay gradient to ensure text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a]/90 via-[#0f172a]/40 to-[#0f172a]/80 pointer-events-none" />
     </div>

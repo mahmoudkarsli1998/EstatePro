@@ -1,38 +1,30 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef } from 'react';
 import LiquidBackground from '../../components/shared/LiquidBackground';
-import FloatingGeometry from '../../components/shared/FloatingGeometry';
-import ContactForm from '../../components/public/ContactForm'; // Reusing the component but adapting layout
 import { MapPin, Phone, Mail, Clock } from 'lucide-react';
+import { useFadeIn, useSlideIn } from '../../hooks/useGSAPAnimations';
 
 const Contact = () => {
+  const headerRef = useFadeIn({ delay: 0.2 });
+  const infoRef = useSlideIn({ direction: 'left', delay: 0.4 });
+  const formRef = useSlideIn({ direction: 'right', delay: 0.6 });
+
   return (
     <div className="min-h-screen relative pt-24 pb-12 overflow-hidden">
       <LiquidBackground />
-      <FloatingGeometry className="opacity-50" />
       
       <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
+        <div ref={headerRef} className="text-center mb-16 opacity-0">
           <h1 className="text-4xl md:text-6xl font-bold font-heading text-white mb-6 drop-shadow-[0_0_15px_rgba(0,240,255,0.3)]">
             Get in <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Touch</span>
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
             Have questions about a property or want to list with us? We're here to help.
           </p>
-        </motion.div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           {/* Contact Info */}
-          <motion.div 
-            initial={{ opacity: 0, x: -50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.2 }}
-            className="space-y-8"
-          >
+          <div ref={infoRef} className="space-y-8 opacity-0">
             <div className="glass-panel p-8">
               <h2 className="text-2xl font-bold font-heading text-white mb-6">Contact Information</h2>
               <div className="space-y-6">
@@ -85,15 +77,10 @@ const Contact = () => {
               </div>
               <div className="absolute inset-0 bg-primary/5 group-hover:bg-primary/10 transition-colors"></div>
             </div>
-          </motion.div>
+          </div>
 
           {/* Contact Form Wrapper */}
-          <motion.div 
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-            className="glass-panel p-8"
-          >
+          <div ref={formRef} className="glass-panel p-8 opacity-0">
              <h2 className="text-2xl font-bold font-heading text-white mb-6">Send us a Message</h2>
              <form className="space-y-6">
                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -127,7 +114,7 @@ const Contact = () => {
                  Send Message
                </button>
              </form>
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const Modal = ({ isOpen, onClose, title, children }) => {
+const Modal = ({ isOpen, onClose, title, children, maxWidth = "max-w-lg" }) => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -30,7 +30,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-lg overflow-hidden pointer-events-auto"
+              className={`bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full ${maxWidth} overflow-hidden pointer-events-auto`}
             >
               <div className="flex justify-between items-center p-6 border-b border-gray-100 dark:border-gray-700">
                 <h3 className="text-xl font-bold font-heading dark:text-white">{title}</h3>

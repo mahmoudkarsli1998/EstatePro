@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Building, Home, Users, UserCheck, FileText, LogOut, Briefcase, Calendar, BarChart2, X } from 'lucide-react';
+import { LayoutDashboard, Building, Home, Users, UserCheck, FileText, LogOut, Briefcase, Calendar, BarChart2, X, Shield } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
@@ -11,6 +11,8 @@ const Sidebar = ({ isOpen, onClose }) => {
     { name: 'Units', path: '/dashboard/units', icon: Home },
     { name: 'Leads', path: '/dashboard/leads', icon: Users },
     { name: 'Developers', path: '/dashboard/developers', icon: Briefcase },
+    { name: 'Managers', path: '/dashboard/managers', icon: Users },
+    { name: 'Admins', path: '/dashboard/admins', icon: Shield },
     { name: 'Agents', path: '/dashboard/agents', icon: UserCheck }, 
     { name: 'Users', path: '/dashboard/users', icon: Users },
     { name: 'Calendar', path: '/dashboard/calendar', icon: Calendar },
