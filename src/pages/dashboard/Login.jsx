@@ -7,7 +7,10 @@ import LoginBackground3D from '../../components/dashboard/LoginBackground3D';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 
+import { useTranslation } from 'react-i18next';
+
 const Login = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -74,13 +77,13 @@ const Login = () => {
             style={{ backfaceVisibility: 'hidden' }}
           >
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold font-heading text-white mb-2">Welcome Back</h1>
-              <p className="text-gray-400">Sign in to access the dashboard</p>
+              <h1 className="text-3xl font-bold font-heading text-white mb-2">{t('welcomeBack')}</h1>
+              <p className="text-gray-400">{t('signInToAccess')}</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <Input
-                label="Email Address"
+                label={t('emailAddress')}
                 name="email"
                 type="email"
                 required
@@ -89,7 +92,7 @@ const Login = () => {
                 className="text-white"
               />
               <Input
-                label="Password"
+                label={t('password')}
                 name="password"
                 type="password"
                 required
@@ -105,18 +108,18 @@ const Login = () => {
               )}
 
               <Button type="submit" className="w-full" size="lg" isLoading={loading}>
-                Sign In
+                {t('signIn')}
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-gray-400">
-                Don't have an account?{' '}
+                {t('dontHaveAccount')}{' '}
                 <button 
                   onClick={() => setIsLogin(false)}
                   className="text-primary hover:text-white font-bold transition-colors"
                 >
-                  Sign Up
+                  {t('signUp')}
                 </button>
               </p>
             </div>
@@ -128,13 +131,13 @@ const Login = () => {
             style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
           >
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold font-heading text-white mb-2">Create Account</h1>
-              <p className="text-gray-400">Join us to manage your properties</p>
+              <h1 className="text-3xl font-bold font-heading text-white mb-2">{t('createAccount')}</h1>
+              <p className="text-gray-400">{t('joinUs')}</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <Input
-                label="Full Name"
+                label={t('fullName')}
                 name="name"
                 type="text"
                 required
@@ -143,7 +146,7 @@ const Login = () => {
                 className="text-white"
               />
               <Input
-                label="Email Address"
+                label={t('emailAddress')}
                 name="email"
                 type="email"
                 required
@@ -152,7 +155,7 @@ const Login = () => {
                 className="text-white"
               />
               <Input
-                label="Password"
+                label={t('password')}
                 name="password"
                 type="password"
                 required
@@ -161,7 +164,7 @@ const Login = () => {
                 className="text-white"
               />
               <Input
-                label="Confirm Password"
+                label={t('confirmPassword')}
                 name="confirmPassword"
                 type="password"
                 required
@@ -177,18 +180,18 @@ const Login = () => {
               )}
 
               <Button type="submit" className="w-full" size="lg" isLoading={loading}>
-                Sign Up
+                {t('signUp')}
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-gray-400">
-                Already have an account?{' '}
+                {t('alreadyHaveAccount')}{' '}
                 <button 
                   onClick={() => setIsLogin(true)}
                   className="text-primary hover:text-white font-bold transition-colors"
                 >
-                  Sign In
+                  {t('signIn')}
                 </button>
               </p>
             </div>

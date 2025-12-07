@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Search, User } from 'lucide-react';
 import Button from '../shared/Button';
 import ThemeToggle from '../shared/ThemeToggle';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 const Navbar = () => {
+  const { t } = useTranslation();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
@@ -18,12 +21,12 @@ const Navbar = () => {
   }, []);
 
   const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'Projects', path: '/projects' },
-    { name: 'Locations', path: '/locations' },
-    { name: 'Design Studio', path: '/design' },
-    { name: 'About Us', path: '/about' },
-    { name: 'Contact', path: '/contact' },
+    { name: t('home'), path: '/' },
+    { name: t('projects'), path: '/projects' },
+    { name: t('location'), path: '/locations' },
+    { name: t('designStudio'), path: '/design' },
+    { name: t('aboutUs'), path: '/about' },
+    { name: t('contact'), path: '/contact' },
   ];
 
   return (
@@ -63,14 +66,15 @@ const Navbar = () => {
 
         {/* Actions */}
         <div className="hidden md:flex items-center space-x-4">
+          <LanguageSwitcher />
           <ThemeToggle />
           <button className="p-2 text-gray-300 hover:text-primary transition-colors">
             <Search size={20} />
           </button>
           <Link to="/login">
             <Button variant="primary" size="sm" className="shadow-[0_0_15px_rgba(0,240,255,0.3)]">
-              <User size={16} className="mr-2" />
-              Login
+              <User size={16} className="mr-2 rtl:ml-2 rtl:mr-0" />
+              {t('login')}
             </Button>
           </Link>
         </div>
@@ -99,7 +103,7 @@ const Navbar = () => {
           ))}
           <div className="pt-4 border-t border-white/10 flex flex-col space-y-3">
             <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
-              <Button className="w-full">Login</Button>
+              <Button className="w-full">{t('login')}</Button>
             </Link>
           </div>
         </div>

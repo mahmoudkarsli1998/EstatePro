@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus, User, Edit, Trash, Download } from 'lucide-react';
 import Button from '../../components/shared/Button';
 import Badge from '../../components/shared/Badge';
@@ -8,6 +9,7 @@ import { api } from '../../utils/api';
 import { useDashboardCrud } from '../../hooks/useDashboardCrud';
 
 const Users = () => {
+  const { t } = useTranslation();
   const {
     filteredItems: users,
     loading,
@@ -45,13 +47,13 @@ const Users = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">Users</h1>
+        <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">{t('users')}</h1>
         <div className="flex gap-3">
           <Button variant="outline" onClick={onExport}>
-            <Download size={18} className="mr-2" /> Export
+            <Download size={18} className="me-2" /> {t('export')}
           </Button>
           <Button onClick={() => handleOpenModal()}>
-            <Plus size={20} className="mr-2" /> Invite User
+            <Plus size={20} className="me-2" /> {t('inviteUser')}
           </Button>
         </div>
       </div>
@@ -60,8 +62,8 @@ const Users = () => {
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <input 
             type="text" 
-            placeholder="Search users..." 
-            className="w-full max-w-md pl-4 pr-4 py-2 rounded-lg border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-500"
+            placeholder={t('searchUsers')}
+            className="w-full max-w-md ps-4 pe-4 py-2 rounded-lg border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-500"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -71,23 +73,23 @@ const Users = () => {
           <table className="w-full text-left">
             <thead className="bg-white/5 text-gray-400 font-medium text-sm">
               <tr>
-                <th className="px-6 py-4">User</th>
-                <th className="px-6 py-4">Role</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Joined</th>
-                <th className="px-6 py-4">Actions</th>
+                <th className="px-6 py-4 text-start">{t('user')}</th>
+                <th className="px-6 py-4 text-start">{t('role')}</th>
+                <th className="px-6 py-4 text-start">{t('status')}</th>
+                <th className="px-6 py-4 text-start">{t('joined')}</th>
+                <th className="px-6 py-4 text-start">{t('actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {loading ? (
-                <tr><td colSpan="5" className="px-6 py-4 text-center">Loading...</td></tr>
+                <tr><td colSpan="5" className="px-6 py-4 text-center">{t('loading')}</td></tr>
               ) : users.length === 0 ? (
-                <tr><td colSpan="5" className="px-6 py-4 text-center">No users found</td></tr>
+                <tr><td colSpan="5" className="px-6 py-4 text-center">{t('noUsersFound')}</td></tr>
               ) : users.map((user) => (
                 <tr key={user.id} className="hover:bg-white/5 transition-colors border-b border-white/5 last:border-0">
                   <td className="px-6 py-4">
                     <div className="flex items-center">
-                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mr-3">
+                      <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center me-3">
                         <User size={16} className="text-gray-400" />
                       </div>
                       <div>
@@ -99,7 +101,7 @@ const Users = () => {
                   <td className="px-6 py-4 capitalize text-gray-300">{user.role}</td>
                   <td className="px-6 py-4">
                     <Badge variant={user.isActive ? 'success' : 'warning'}>
-                      {user.isActive ? 'Active' : 'Pending'}
+                      {user.isActive ? t('active') : t('pending')}
                     </Badge>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-400">
@@ -129,18 +131,18 @@ const Users = () => {
       <Modal 
         isOpen={isModalOpen} 
         onClose={handleCloseModal} 
-        title={editingItem ? "Edit User" : "Invite New User"}
+        title={editingItem ? t('editUser') : t('inviteNewUser')}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input 
-            label="Full Name" 
+            label={t('fullName')} 
             name="fullName"
             value={formData.fullName}
             onChange={handleInputChange}
             required
           />
           <Input 
-            label="Email Address" 
+            label={t('emailAddress')} 
             type="email"
             name="email"
             value={formData.email}
@@ -149,22 +151,22 @@ const Users = () => {
             disabled={!!editingItem} // Cannot change email for existing users
           />
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">Role</label>
+            <label className="block text-sm font-medium text-gray-400 mb-1">{t('role')}</label>
             <select 
               className="w-full px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary"
               name="role"
               value={formData.role}
               onChange={handleInputChange}
             >
-              <option value="agent">Agent</option>
-              <option value="manager">Manager</option>
-              <option value="admin">Admin</option>
+              <option value="agent">{t('agent')}</option>
+              <option value="manager">{t('managers')}</option>
+              <option value="admin">{t('admins')}</option>
             </select>
           </div>
           
-          <div className="flex justify-end pt-4 space-x-3">
-            <Button type="button" variant="ghost" onClick={handleCloseModal}>Cancel</Button>
-            <Button type="submit">{editingItem ? "Update User" : "Send Invitation"}</Button>
+          <div className="pt-4 flex justify-end gap-3">
+            <Button type="button" variant="ghost" onClick={handleCloseModal}>{t('cancel')}</Button>
+            <Button type="submit">{editingItem ? t('updateUser') : t('sendInvitation')}</Button>
           </div>
         </form>
       </Modal>

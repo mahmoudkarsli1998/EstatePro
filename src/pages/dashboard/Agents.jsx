@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus, Edit, Trash, Search, Mail, Phone, Download } from 'lucide-react';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
@@ -7,6 +8,7 @@ import { api } from '../../utils/api';
 import { useDashboardCrud } from '../../hooks/useDashboardCrud';
 
 const Agents = () => {
+  const { t } = useTranslation();
   const {
     filteredItems: agents,
     loading,
@@ -45,13 +47,13 @@ const Agents = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">Agents</h1>
+        <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">{t('agents')}</h1>
         <div className="flex gap-3">
           <Button variant="outline" onClick={onExport}>
-            <Download size={18} className="mr-2" /> Export
+            <Download size={18} className="me-2" /> {t('export')}
           </Button>
           <Button onClick={() => handleOpenModal()}>
-            <Plus size={20} className="mr-2" /> Add Agent
+            <Plus size={20} className="me-2" /> {t('addAgent')}
           </Button>
         </div>
       </div>
@@ -59,11 +61,11 @@ const Agents = () => {
       <div className="bg-dark-card border border-white/10 rounded-xl shadow-sm overflow-hidden">
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="relative max-w-md">
-            <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Search size={18} className="absolute inset-y-0 start-3 my-auto text-gray-400" />
             <input 
               type="text" 
-              placeholder="Search agents..." 
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-500"
+              placeholder={t('searchAgents')}
+              className="w-full ps-10 pe-4 py-2 rounded-lg border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -72,9 +74,9 @@ const Agents = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
           {loading ? (
-            <div className="text-center col-span-full text-gray-400">Loading...</div>
+            <div className="text-center col-span-full text-gray-400">{t('loading')}</div>
           ) : agents.length === 0 ? (
-            <div className="text-center col-span-full text-gray-400">No agents found.</div>
+            <div className="text-center col-span-full text-gray-400">{t('noAgentsFound')}</div>
           ) : agents.map((agent) => (
             <div key={agent.id} className="bg-white/5 border border-white/10 rounded-xl p-6 flex flex-col items-center text-center hover:border-primary/50 transition-colors group">
               <div className="w-20 h-20 rounded-full bg-gray-800 mb-4 overflow-hidden border-2 border-white/10 group-hover:border-primary/50 transition-colors">
@@ -82,17 +84,17 @@ const Agents = () => {
               </div>
               <h3 className="text-lg font-bold text-white mb-1">{agent.name}</h3>
               <div className="text-sm text-gray-400 mb-2 flex items-center justify-center">
-                <Mail size={14} className="mr-1" /> {agent.email}
+                <Mail size={14} className="me-1" /> {agent.email}
               </div>
               <div className="text-sm text-gray-400 mb-4 flex items-center justify-center">
-                <Phone size={14} className="mr-1" /> {agent.phone}
+                <Phone size={14} className="me-1" /> {agent.phone}
               </div>
               
               <div className="flex items-center justify-center space-x-4 w-full mt-auto pt-4 border-t border-white/5">
                 <div className="text-xs text-gray-500">
-                  <span className="block font-bold text-white">{agent.assignedProjects?.length || 0}</span> Projects
+                  <span className="block font-bold text-white">{agent.assignedProjects?.length || 0}</span> {t('projects')}
                 </div>
-                <div className="flex space-x-2 ml-auto">
+                <div className="flex space-x-2 ms-auto">
                   <button 
                     className="p-2 text-primary hover:bg-primary/10 rounded-lg transition-colors"
                     onClick={() => setSelectedAgent(agent)}
@@ -122,18 +124,18 @@ const Agents = () => {
       <Modal 
         isOpen={isModalOpen} 
         onClose={handleCloseModal} 
-        title={editingItem ? "Edit Agent" : "Add New Agent"}
+        title={editingItem ? t('editAgent') : t('addNewAgent')}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input 
-            label="Agent Name" 
+            label={t('agentName')} 
             name="name"
             value={formData.name}
             onChange={handleInputChange}
             required
           />
           <Input 
-            label="Email" 
+            label={t('email')} 
             type="email"
             name="email"
             value={formData.email}
@@ -141,21 +143,21 @@ const Agents = () => {
             required
           />
           <Input 
-            label="Phone" 
+            label={t('phone')} 
             name="phone"
             value={formData.phone}
             onChange={handleInputChange}
             required
           />
           <Input 
-            label="Avatar URL" 
+            label={t('avatarUrl')} 
             name="avatar"
             value={formData.avatar}
             onChange={handleInputChange}
           />
           <div className="pt-4 flex justify-end space-x-3">
-            <Button type="button" variant="ghost" onClick={handleCloseModal}>Cancel</Button>
-            <Button type="submit">{editingItem ? "Update Agent" : "Create Agent"}</Button>
+            <Button type="button" variant="ghost" onClick={handleCloseModal}>{t('cancel')}</Button>
+            <Button type="submit">{editingItem ? t('updateAgent') : t('createAgent')}</Button>
           </div>
         </form>
       </Modal>
@@ -165,7 +167,7 @@ const Agents = () => {
         <Modal
           isOpen={!!selectedAgent}
           onClose={() => setSelectedAgent(null)}
-          title="Agent Profile"
+          title={t('agentProfile')}
           maxWidth="max-w-2xl"
         >
           <div className="space-y-6">
@@ -175,10 +177,10 @@ const Agents = () => {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-white mb-1">{selectedAgent.name}</h2>
-                <p className="text-primary font-medium mb-3">Senior Real Estate Agent</p>
+                <p className="text-primary font-medium mb-3">{t('seniorAgent')}</p>
                 <div className="space-y-1 text-sm text-gray-300">
-                  <div className="flex items-center"><Mail size={14} className="mr-2 text-gray-500" /> {selectedAgent.email}</div>
-                  <div className="flex items-center"><Phone size={14} className="mr-2 text-gray-500" /> {selectedAgent.phone}</div>
+                  <div className="flex items-center"><Mail size={14} className="me-2 text-gray-500" /> {selectedAgent.email}</div>
+                  <div className="flex items-center"><Phone size={14} className="me-2 text-gray-500" /> {selectedAgent.phone}</div>
                 </div>
               </div>
             </div>
@@ -186,28 +188,27 @@ const Agents = () => {
             <div className="grid grid-cols-3 gap-4">
               <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
                 <div className="text-2xl font-bold text-white mb-1">$4.2M</div>
-                <div className="text-xs text-gray-400 uppercase tracking-wider">Total Sales</div>
+                <div className="text-xs text-gray-400 uppercase tracking-wider">{t('totalSales')}</div>
               </div>
               <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
                 <div className="text-2xl font-bold text-white mb-1">{selectedAgent.assignedProjects?.length || 12}</div>
-                <div className="text-xs text-gray-400 uppercase tracking-wider">Active Listings</div>
+                <div className="text-xs text-gray-400 uppercase tracking-wider">{t('activeListings')}</div>
               </div>
               <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
                 <div className="text-2xl font-bold text-white mb-1">4.9</div>
-                <div className="text-xs text-gray-400 uppercase tracking-wider">Rating</div>
+                <div className="text-xs text-gray-400 uppercase tracking-wider">{t('rating')}</div>
               </div>
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-white mb-3">About</h3>
+              <h3 className="text-lg font-bold text-white mb-3">{t('about')}</h3>
               <p className="text-gray-300 leading-relaxed text-sm">
-                {selectedAgent.name} is a dedicated real estate professional with over 5 years of experience in the luxury market. 
-                Specializing in high-end residential properties, they have a proven track record of closing complex deals and ensuring client satisfaction.
+                {selectedAgent.name} {t('agentDescription', 'is a dedicated real estate professional with over 5 years of experience...')}
               </p>
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-white mb-3">Recent Performance</h3>
+              <h3 className="text-lg font-bold text-white mb-3">{t('recentPerformance')}</h3>
               <div className="space-y-3">
                 {[1, 2, 3].map((i) => (
                   <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5">

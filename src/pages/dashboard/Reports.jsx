@@ -1,9 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import Card from '../../components/shared/Card';
 import { Download, Calendar } from 'lucide-react';
 
 const Reports = () => {
+  const { t } = useTranslation();
   const monthlyRevenue = [
     { name: 'Jan', revenue: 45000 },
     { name: 'Feb', revenue: 52000 },
@@ -14,10 +16,10 @@ const Reports = () => {
   ];
 
   const propertyTypes = [
-    { name: 'Apartments', value: 45 },
-    { name: 'Villas', value: 25 },
-    { name: 'Penthouses', value: 20 },
-    { name: 'Studios', value: 10 },
+    { name: t('apartments'), value: 45 },
+    { name: t('villas'), value: 25 },
+    { name: t('penthouses'), value: 20 },
+    { name: t('studios'), value: 10 },
   ];
 
   const COLORS = ['#00F0FF', '#FF0055', '#7000FF', '#00D18B'];
@@ -26,20 +28,20 @@ const Reports = () => {
     <div>
       <div className="mb-8 flex justify-between items-end">
         <div>
-          <h1 className="text-3xl font-bold font-heading text-white mb-2">Analytics & Reports</h1>
-          <p className="text-gray-300">Detailed insights into platform performance.</p>
+          <h1 className="text-3xl font-bold font-heading text-white mb-2">{t('analyticsReports')}</h1>
+          <p className="text-gray-300">{t('detailedInsights')}</p>
         </div>
         <button className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg text-sm shadow-[0_0_15px_rgba(0,240,255,0.3)] hover:bg-primary/90 transition-colors">
-          <Download size={16} /> Export PDF
+          <Download size={16} /> {t('exportReport')}
         </button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
         <Card className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-bold text-white">Revenue Growth</h3>
+            <h3 className="text-lg font-bold text-white">{t('revenueGrowth')}</h3>
             <div className="flex items-center gap-2 text-sm text-gray-300">
-              <Calendar size={14} /> Last 6 Months
+              <Calendar size={14} /> {t('last6Months')}
             </div>
           </div>
           <div className="h-80 w-full">
@@ -60,7 +62,7 @@ const Reports = () => {
 
         <Card className="p-6">
           <div className="flex justify-between items-center mb-6">
-            <h3 className="text-lg font-bold text-white">Property Distribution</h3>
+            <h3 className="text-lg font-bold text-white">{t('propertyDistribution')}</h3>
           </div>
           <div className="h-80 w-full flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
@@ -96,24 +98,24 @@ const Reports = () => {
       </div>
 
       <Card className="p-6">
-        <h3 className="text-lg font-bold mb-6 text-white">Performance Metrics</h3>
+        <h3 className="text-lg font-bold mb-6 text-white">{t('performanceMetrics')}</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead className="bg-white/5 text-gray-400 font-medium text-sm">
               <tr>
-                <th className="px-6 py-4 rounded-l-lg">Metric</th>
-                <th className="px-6 py-4">Current Value</th>
-                <th className="px-6 py-4">Target</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4 rounded-r-lg">Trend</th>
+                <th className="px-6 py-4 rounded-s-lg text-start">{t('metric')}</th>
+                <th className="px-6 py-4 text-start">{t('currentValue')}</th>
+                <th className="px-6 py-4 text-start">{t('target')}</th>
+                <th className="px-6 py-4 text-start">{t('status')}</th>
+                <th className="px-6 py-4 rounded-e-lg text-start">{t('trend')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {[
-                { metric: 'User Acquisition', value: '1,240', target: '1,000', status: 'Exceeded', trend: '+24%' },
-                { metric: 'Conversion Rate', value: '3.2%', target: '3.0%', status: 'On Track', trend: '+0.2%' },
-                { metric: 'Avg. Session Duration', value: '4m 30s', target: '5m 00s', status: 'Behind', trend: '-10%' },
-                { metric: 'Bounce Rate', value: '42%', target: '40%', status: 'At Risk', trend: '+2%' },
+                { metric: t('userAcquisition'), value: '1,240', target: '1,000', status: 'Exceeded', trend: '+24%' },
+                { metric: t('conversionRate'), value: '3.2%', target: '3.0%', status: 'On Track', trend: '+0.2%' },
+                { metric: t('avgSessionDuration'), value: '4m 30s', target: '5m 00s', status: 'Behind', trend: '-10%' },
+                { metric: t('bounceRate'), value: '42%', target: '40%', status: 'At Risk', trend: '+2%' },
               ].map((row, i) => (
                 <tr key={i} className="hover:bg-primary/5 transition-colors border-b border-white/5 last:border-0">
                   <td className="px-6 py-4 font-medium text-white">{row.metric}</td>
@@ -126,7 +128,10 @@ const Reports = () => {
                       row.status === 'Behind' ? 'bg-yellow-500/20 text-yellow-400' :
                       'bg-red-500/20 text-red-400'
                     }`}>
-                      {row.status}
+                      {row.status === 'Exceeded' ? t('exceeded') :
+                       row.status === 'On Track' ? t('onTrack') :
+                       row.status === 'Behind' ? t('behind') :
+                       t('atRisk')}
                     </span>
                   </td>
                   <td className={`px-6 py-4 text-sm ${row.trend.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>

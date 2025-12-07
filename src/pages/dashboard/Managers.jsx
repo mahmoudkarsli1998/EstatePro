@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus, Edit, Trash, Search, Download, Filter, Phone, Mail, Trash2 } from 'lucide-react';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
@@ -8,6 +9,7 @@ import { api } from '../../utils/api';
 import { useDashboardCrud } from '../../hooks/useDashboardCrud';
 
 const Managers = () => {
+  const { t } = useTranslation();
   const [departmentFilter, setDepartmentFilter] = useState('All Departments');
 
   const formatDate = (dateString) => {
@@ -64,15 +66,15 @@ const Managers = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <div>
-           <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">Managers</h1>
-           <p className="text-gray-400 text-sm mt-1">Manage your team leads and department heads</p>
+           <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">{t('managers')}</h1>
+           <p className="text-gray-400 text-sm mt-1">{t('manageManagers')}</p>
         </div>
         <div className="flex gap-3">
           <Button variant="outline" onClick={onExport}>
-            <Download size={18} className="mr-2" /> Export
+            <Download size={18} className="me-2" /> {t('export')}
           </Button>
           <Button onClick={() => handleOpenModal()}>
-            <Plus size={20} className="mr-2" /> Add Manager
+            <Plus size={20} className="me-2" /> {t('addManager')}
           </Button>
         </div>
       </div>
@@ -80,11 +82,11 @@ const Managers = () => {
       <div className="bg-dark-card border border-white/10 rounded-xl shadow-sm overflow-hidden">
         <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
           <div className="relative max-w-md w-full">
-            <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Search size={18} className="absolute inset-y-0 start-3 my-auto text-gray-400" />
             <input 
               type="text" 
-              placeholder="Search managers..." 
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-500"
+              placeholder={t('searchManagers')}
+              className="w-full ps-10 pe-4 py-2 rounded-lg border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -96,32 +98,32 @@ const Managers = () => {
               value={departmentFilter}
               onChange={(e) => setDepartmentFilter(e.target.value)}
             >
-              <option>All Departments</option>
-              <option>Sales</option>
-              <option>Marketing</option>
-              <option>IT</option>
-              <option>HR</option>
+              <option value="All Departments">{t('allDepartments')}</option>
+              <option value="Sales">{t('sales')}</option>
+              <option value="Marketing">{t('marketing')}</option>
+              <option value="IT">{t('it')}</option>
+              <option value="HR">{t('hr')}</option>
             </select>
           </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left">
+          <table className="w-full text-start">
             <thead className="bg-white/5 text-gray-400 font-medium text-sm">
               <tr>
-                <th className="px-6 py-4">Name</th>
-                <th className="px-6 py-4">Contact</th>
-                <th className="px-6 py-4">Department</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Join Date</th>
-                <th className="px-6 py-4">Actions</th>
+                <th className="px-6 py-4 text-start">{t('name')}</th>
+                <th className="px-6 py-4 text-start">{t('contact')}</th>
+                <th className="px-6 py-4 text-start">{t('department')}</th>
+                <th className="px-6 py-4 text-start">{t('status')}</th>
+                <th className="px-6 py-4 text-start">{t('joinDate', 'Join Date')}</th>
+                <th className="px-6 py-4 text-start">{t('actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {loading ? (
-                <tr><td colSpan="6" className="px-6 py-4 text-center">Loading...</td></tr>
+                <tr><td colSpan="6" className="px-6 py-4 text-center">{t('loading')}</td></tr>
               ) : managers.length === 0 ? (
-                <tr><td colSpan="6" className="px-6 py-4 text-center">No managers found</td></tr>
+                <tr><td colSpan="6" className="px-6 py-4 text-center">{t('noManagersFound')}</td></tr>
               ) : managers.map((manager) => (
                 <tr key={manager.id} className="hover:bg-white/5 transition-colors border-b border-white/5 last:border-0">
                   <td className="px-6 py-4">
@@ -130,10 +132,10 @@ const Managers = () => {
                   <td className="px-6 py-4">
                     <div className="flex flex-col space-y-1">
                       <div className="flex items-center text-sm text-gray-300">
-                        <Mail size={12} className="mr-2 text-gray-500" /> {manager.email}
+                        <Mail size={12} className="me-2 text-gray-500" /> {manager.email}
                       </div>
                       <div className="flex items-center text-sm text-gray-300">
-                        <Phone size={12} className="mr-2 text-gray-500" /> {manager.phone}
+                        <Phone size={12} className="me-2 text-gray-500" /> {manager.phone}
                       </div>
                     </div>
                   </td>
@@ -174,18 +176,18 @@ const Managers = () => {
       <Modal 
         isOpen={isModalOpen} 
         onClose={handleCloseModal} 
-        title={editingItem ? "Edit Manager" : "Add Manager"}
+        title={editingItem ? t('editManager') : t('addManager')}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input 
-            label="Full Name" 
+            label={t('fullName')} 
             name="name"
             value={formData.name}
             onChange={handleInputChange}
             required
           />
           <Input 
-            label="Email" 
+            label={t('email')} 
             type="email"
             name="email"
             value={formData.email}
@@ -193,13 +195,13 @@ const Managers = () => {
             required
           />
           <Input 
-             label="Phone Number"
+             label={t('phoneNumber')}
              name="phone"
              value={formData.phone}
              onChange={handleInputChange}
           />
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">Department</label>
+            <label className="block text-sm font-medium text-gray-400 mb-1">{t('department')}</label>
             <select 
               className="w-full px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary"
               name="department"
@@ -207,30 +209,30 @@ const Managers = () => {
               onChange={handleInputChange}
               required
             >
-                <option value="" disabled>Select Department</option>
-                <option value="Sales">Sales</option>
-                <option value="Marketing">Marketing</option>
-                <option value="IT">IT</option>
-                <option value="HR">HR</option>
+                <option value="" disabled>{t('department')}</option>
+                <option value="Sales">{t('sales')}</option>
+                <option value="Marketing">{t('marketing')}</option>
+                <option value="IT">{t('it')}</option>
+                <option value="HR">{t('hr')}</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">Status</label>
+            <label className="block text-sm font-medium text-gray-400 mb-1">{t('status')}</label>
             <select 
               className="w-full px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary"
               name="status"
               value={formData.status}
               onChange={handleInputChange}
             >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="on_leave">On Leave</option>
+              <option value="active">{t('active')}</option>
+              <option value="inactive">{t('inactive')}</option>
+              <option value="on_leave">{t('onLeave')}</option>
             </select>
           </div>
           
           <div className="flex justify-end pt-4 space-x-3">
-            <Button type="button" variant="ghost" onClick={handleCloseModal}>Cancel</Button>
-            <Button type="submit">{editingItem ? "Update Manager" : "Create Manager"}</Button>
+            <Button type="button" variant="ghost" onClick={handleCloseModal}>{t('cancel')}</Button>
+            <Button type="submit">{editingItem ? t('updateManager') : t('createManager')}</Button>
           </div>
         </form>
       </Modal>

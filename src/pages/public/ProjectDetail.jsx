@@ -10,7 +10,10 @@ import ContactForm from '../../components/public/ContactForm';
 import LiquidBackground from '../../components/shared/LiquidBackground';
 import { api } from '../../utils/api';
 
+import { useTranslation } from 'react-i18next';
+
 const ProjectDetail = () => {
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const [project, setProject] = useState(null);
   const [units, setUnits] = useState([]);
@@ -62,9 +65,9 @@ const ProjectDetail = () => {
     return (
       <div className="min-h-screen pt-24 flex flex-col justify-center items-center relative">
         <LiquidBackground />
-        <h2 className="text-2xl font-bold text-white mb-4">Project Not Found</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">{t('projectNotFound')}</h2>
         <Link to="/projects">
-          <Button>Back to Projects</Button>
+          <Button>{t('backToProjects')}</Button>
         </Link>
       </div>
     );
@@ -98,7 +101,7 @@ const ProjectDetail = () => {
         {/* Breadcrumb */}
         <div className="mb-6">
           <Link to="/projects" className="inline-flex items-center text-gray-400 hover:text-primary transition-colors">
-            <ArrowLeft size={16} className="mr-2" /> Back to Projects
+            <div className={`inline-block ${i18n.dir() === 'rtl' ? 'rotate-180' : ''}`}><ArrowLeft size={16} className="me-2" /></div> {t('backToProjects')}
           </Link>
         </div>
 
@@ -119,14 +122,14 @@ const ProjectDetail = () => {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-sm text-gray-400">Starting from</p>
-              <p className="text-2xl font-bold text-primary">
+            <div className="text-end">
+              <p className="text-sm text-gray-400">{t('startingFrom')}</p>
+              <p className="text-2xl font-bold text-primary" style={{ direction: 'ltr' }}>
                 ${(project.priceRange.min / 1000).toFixed(0)}k
               </p>
             </div>
             <Badge variant={project.status === 'active' ? 'success' : 'warning'} className="text-lg px-4 py-1">
-              {project.status === 'active' ? 'Selling Fast' : 'Upcoming'}
+              {project.status === 'active' ? t('sellingFast') : t('upcoming')}
             </Badge>
           </div>
         </motion.div>
@@ -171,7 +174,7 @@ const ProjectDetail = () => {
               variants={fadeInUp}
               className="glass-panel p-8"
             >
-              <h2 className="text-2xl font-bold font-heading text-white mb-4">Overview</h2>
+              <h2 className="text-2xl font-bold font-heading text-white mb-4">{t('overview')}</h2>
               <p className="text-gray-300 leading-relaxed mb-6">
                 {project.description}
               </p>
@@ -190,7 +193,7 @@ const ProjectDetail = () => {
                     <Ruler size={24} />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400">Units</p>
+                    <p className="text-xs text-gray-400">{t('units')}</p>
                     <p className="font-bold text-white">{project.stats.totalUnits}</p>
                   </div>
                 </div>
@@ -199,7 +202,7 @@ const ProjectDetail = () => {
                     <Calendar size={24} />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400">Completion</p>
+                    <p className="text-xs text-gray-400">{t('completion')}</p>
                     <p className="font-bold text-white">2025</p>
                   </div>
                 </div>
@@ -214,7 +217,7 @@ const ProjectDetail = () => {
               variants={fadeInUp}
               className="glass-panel p-8"
             >
-              <h2 className="text-2xl font-bold font-heading text-white mb-6">Amenities</h2>
+              <h2 className="text-2xl font-bold font-heading text-white mb-6">{t('amenities')}</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {project.amenities.map((amenity, index) => (
                   <div key={index} className="flex items-center gap-3 text-gray-300">
@@ -234,7 +237,7 @@ const ProjectDetail = () => {
               viewport={{ once: true }}
               variants={staggerContainer}
             >
-              <h2 className="text-2xl font-bold font-heading text-white mb-6">Available Units</h2>
+              <h2 className="text-2xl font-bold font-heading text-white mb-6">{t('availableUnits')}</h2>
               <div className="space-y-4">
                 {units.map((unit) => (
                   <motion.div 
@@ -247,18 +250,20 @@ const ProjectDetail = () => {
                         <img src={unit.images[0]} alt={unit.number} className="w-full h-full object-cover" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-lg text-white">Unit {unit.number}</h3>
-                        <p className="text-gray-400 text-sm mb-1">{unit.features.bedrooms} Bed • {unit.features.bathrooms} Bath • {unit.area_m2} m²</p>
+                        <h3 className="font-bold text-lg text-white">{t('unitLabel', { number: unit.number })}</h3>
+                        <p className="text-gray-400 text-sm mb-1">
+                          {unit.features.bedrooms} {t('bed')} • {unit.features.bathrooms} {t('bath')} • {unit.area_m2} m²
+                        </p>
                         <Badge variant={unit.status === 'available' ? 'success' : 'neutral'}>
-                          {unit.status}
+                          {t(unit.status) || unit.status}
                         </Badge>
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-2 w-full md:w-auto">
-                      <span className="text-2xl font-bold text-primary">${unit.price.toLocaleString()}</span>
+                      <span className="text-2xl font-bold text-primary" style={{ direction: 'ltr' }}>${unit.price.toLocaleString()}</span>
                       <div className="flex gap-2 w-full md:w-auto">
                         <Link to={`/units/${unit.id}`} className="flex-1">
-                          <Button variant="outline" size="sm" className="w-full">View 3D</Button>
+                          <Button variant="outline" size="sm" className="w-full">{t('view3D')}</Button>
                         </Link>
                         <Button 
                           size="sm" 
@@ -268,7 +273,7 @@ const ProjectDetail = () => {
                             setIsContactOpen(true);
                           }}
                         >
-                          Enquire
+                          {t('enquire')}
                         </Button>
                       </div>
                     </div>
@@ -287,9 +292,9 @@ const ProjectDetail = () => {
                 transition={{ delay: 0.4, duration: 0.5 }}
               >
                 <Card className="p-6">
-                  <h3 className="text-xl font-bold text-white mb-4">Interested?</h3>
+                  <h3 className="text-xl font-bold text-white mb-4">{t('interested')}</h3>
                   <p className="text-gray-400 mb-6">
-                    Schedule a visit or request more information about {project.name}.
+                    {t('interestedDesc', { name: project.name })}
                   </p>
                   <Button 
                     className="w-full mb-3 shadow-[0_0_15px_rgba(0,240,255,0.3)]" 
@@ -299,10 +304,10 @@ const ProjectDetail = () => {
                       setIsContactOpen(true);
                     }}
                   >
-                    Contact Agent
+                    {t('contactAgent')}
                   </Button>
                   <Button variant="outline" className="w-full">
-                    Download Brochure
+                    {t('downloadBrochure')}
                   </Button>
                 </Card>
               </motion.div>
@@ -313,14 +318,14 @@ const ProjectDetail = () => {
                 transition={{ delay: 0.6, duration: 0.5 }}
               >
                 <Card className="p-6">
-                  <h3 className="text-lg font-bold text-white mb-4">Agent</h3>
+                  <h3 className="text-lg font-bold text-white mb-4">{t('agent')}</h3>
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 rounded-full bg-gray-700 overflow-hidden border border-white/10">
                       <img src={mockAgent.avatar} alt="Agent" />
                     </div>
                     <div>
                       <p className="font-bold text-white">{mockAgent.name}</p>
-                      <p className="text-sm text-gray-400">{mockAgent.role}</p>
+                      <p className="text-sm text-gray-400">{t('seniorPropertyConsultant')}</p>
                     </div>
                   </div>
                   <Button 
@@ -329,7 +334,7 @@ const ProjectDetail = () => {
                     className="w-full hover:bg-primary/10 hover:text-primary"
                     onClick={() => setSelectedAgent(mockAgent)}
                   >
-                    View Profile
+                    {t('viewProfile')}
                   </Button>
                 </Card>
               </motion.div>
@@ -353,7 +358,7 @@ const ProjectDetail = () => {
         <Modal
           isOpen={!!selectedAgent}
           onClose={() => setSelectedAgent(null)}
-          title="Agent Profile"
+          title={t('agentProfile')}
           maxWidth="max-w-2xl"
         >
           <div className="space-y-6">
@@ -363,7 +368,7 @@ const ProjectDetail = () => {
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-white mb-1">{selectedAgent.name}</h2>
-                <p className="text-primary font-medium mb-3">{selectedAgent.role}</p>
+                <p className="text-primary font-medium mb-3">{t('seniorPropertyConsultant')}</p>
                 <div className="space-y-1 text-sm text-gray-300">
                   <div className="flex items-center gap-2">
                     <span className="text-gray-500">Email:</span> {selectedAgent.email}
@@ -378,20 +383,20 @@ const ProjectDetail = () => {
             <div className="grid grid-cols-3 gap-4">
               <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
                 <div className="text-2xl font-bold text-white mb-1">{selectedAgent.stats.sales}</div>
-                <div className="text-xs text-gray-400 uppercase tracking-wider">Total Sales</div>
+                <div className="text-xs text-gray-400 uppercase tracking-wider">{t('totalSales')}</div>
               </div>
               <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
                 <div className="text-2xl font-bold text-white mb-1">{selectedAgent.stats.listings}</div>
-                <div className="text-xs text-gray-400 uppercase tracking-wider">Active Listings</div>
+                <div className="text-xs text-gray-400 uppercase tracking-wider">{t('activeListings')}</div>
               </div>
               <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
                 <div className="text-2xl font-bold text-white mb-1">{selectedAgent.stats.rating}</div>
-                <div className="text-xs text-gray-400 uppercase tracking-wider">Rating</div>
+                <div className="text-xs text-gray-400 uppercase tracking-wider">{t('rating')}</div>
               </div>
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-white mb-3">About</h3>
+              <h3 className="text-lg font-bold text-white mb-3">{t('about')}</h3>
               <p className="text-gray-300 leading-relaxed text-sm">
                 {selectedAgent.name} is a dedicated real estate professional with over 5 years of experience in the luxury market. 
                 Specializing in high-end residential properties, they have a proven track record of closing complex deals and ensuring client satisfaction.

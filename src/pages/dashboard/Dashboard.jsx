@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Users, Building, Home, DollarSign, TrendingUp, Plus, UserPlus, FileText, Box, LayoutGrid } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { api } from '../../utils/api';
@@ -7,6 +8,7 @@ import ActivityFeed from '../../components/dashboard/widgets/ActivityFeed';
 import Dashboard3D from '../../components/dashboard/Dashboard3D';
 
 const Dashboard = () => {
+  const { t } = useTranslation();
   const [viewMode, setViewMode] = useState('2D'); // '2D' or '3D'
   const [stats, setStats] = useState({
     totalProjects: 0,
@@ -76,8 +78,8 @@ const Dashboard = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-end gap-4">
         <div>
-          <h1 className="text-3xl font-bold font-heading text-white mb-2">Dashboard Overview</h1>
-          <p className="text-gray-400">Welcome back, here's what's happening today.</p>
+          <h1 className="text-3xl font-bold font-heading text-white mb-2">{t('dashboardOverview')}</h1>
+          <p className="text-gray-400">{t('welcomeMessage')}</p>
         </div>
         <div className="flex gap-3">
            <div className="bg-dark-card border border-white/10 rounded-lg p-1 flex">
@@ -99,7 +101,7 @@ const Dashboard = () => {
              onClick={() => alert('Report exported successfully!')}
              className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold shadow-[0_0_15px_rgba(0,240,255,0.3)] hover:shadow-[0_0_25px_rgba(0,240,255,0.5)] transition-shadow"
            >
-             Export Report
+             {t('exportReport')}
            </button>
         </div>
       </div>
@@ -107,7 +109,7 @@ const Dashboard = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard 
-          title="Total Projects" 
+          title={t('totalProjects')}
           value={stats.totalProjects} 
           change="12%"
           trend="up"
@@ -115,7 +117,7 @@ const Dashboard = () => {
           color="from-blue-500 to-cyan-500" 
         />
         <StatCard 
-          title="Total Units" 
+          title={t('totalUnits')}
           value={stats.totalUnits} 
           change="5%"
           trend="up"
@@ -123,7 +125,7 @@ const Dashboard = () => {
           color="from-purple-500 to-pink-500" 
         />
         <StatCard 
-          title="Active Leads" 
+          title={t('activeLeads')}
           value={stats.totalLeads} 
           change="8%"
           trend="up"
@@ -131,7 +133,7 @@ const Dashboard = () => {
           color="from-pink-500 to-rose-500" 
         />
         <StatCard 
-          title="Total Revenue" 
+          title={t('totalRevenue')}
           value="$2.4M" 
           change="24%"
           trend="up"
@@ -146,7 +148,7 @@ const Dashboard = () => {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[500px]">
           <div className="lg:col-span-2 h-full glass-panel p-6 flex flex-col">
-            <h3 className="text-xl font-bold text-white mb-6 font-heading">Revenue Analytics</h3>
+            <h3 className="text-xl font-bold text-white mb-6 font-heading">{t('revenueAnalytics')}</h3>
             <div className="flex-1 w-full min-h-0">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={salesData}>
@@ -171,7 +173,7 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="h-full glass-panel p-6 flex flex-col">
-            <h3 className="text-xl font-bold text-white mb-6 font-heading">Traffic Sources</h3>
+            <h3 className="text-xl font-bold text-white mb-6 font-heading">{t('trafficSources')}</h3>
             <div className="flex-1 w-full min-h-0">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={salesData}>
@@ -197,38 +199,38 @@ const Dashboard = () => {
         <div className="space-y-8">
           {/* Quick Actions */}
           <div className="glass-panel p-6">
-            <h3 className="text-xl font-bold text-white mb-6 font-heading">Quick Actions</h3>
+            <h3 className="text-xl font-bold text-white mb-6 font-heading">{t('quickActions')}</h3>
             <div className="grid grid-cols-2 gap-4">
               <button className="p-4 rounded-xl bg-white/5 hover:bg-primary/20 hover:border-primary/50 border border-white/10 transition-all group flex flex-col items-center justify-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                   <Plus size={20} />
                 </div>
-                <span className="text-sm text-gray-300 group-hover:text-white">Add Listing</span>
+                <span className="text-sm text-gray-300 group-hover:text-white">{t('addListing')}</span>
               </button>
               <button className="p-4 rounded-xl bg-white/5 hover:bg-purple-500/20 hover:border-purple-500/50 border border-white/10 transition-all group flex flex-col items-center justify-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
                   <UserPlus size={20} />
                 </div>
-                <span className="text-sm text-gray-300 group-hover:text-white">New User</span>
+                <span className="text-sm text-gray-300 group-hover:text-white">{t('newUser')}</span>
               </button>
               <button className="p-4 rounded-xl bg-white/5 hover:bg-pink-500/20 hover:border-pink-500/50 border border-white/10 transition-all group flex flex-col items-center justify-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-pink-500/20 flex items-center justify-center text-pink-400 group-hover:scale-110 transition-transform">
                   <FileText size={20} />
                 </div>
-                <span className="text-sm text-gray-300 group-hover:text-white">Generate Report</span>
+                <span className="text-sm text-gray-300 group-hover:text-white">{t('generateReport')}</span>
               </button>
               <button className="p-4 rounded-xl bg-white/5 hover:bg-green-500/20 hover:border-green-500/50 border border-white/10 transition-all group flex flex-col items-center justify-center gap-2">
                 <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 group-hover:scale-110 transition-transform">
                   <DollarSign size={20} />
                 </div>
-                <span className="text-sm text-gray-300 group-hover:text-white">Record Sale</span>
+                <span className="text-sm text-gray-300 group-hover:text-white">{t('recordSale')}</span>
               </button>
             </div>
           </div>
 
           {/* Top Agents Mini Widget */}
           <div className="glass-panel p-6">
-            <h3 className="text-lg font-bold mb-4 text-white">Top Performers</h3>
+            <h3 className="text-lg font-bold mb-4 text-white">{t('topPerformers')}</h3>
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
                 <div key={i} className="flex items-center gap-3">
@@ -236,8 +238,8 @@ const Dashboard = () => {
                     A{i}
                   </div>
                   <div>
-                    <p className="text-sm font-bold text-white">Agent {i}</p>
-                    <p className="text-xs text-primary">$1.{i}M Sales</p>
+                    <p className="text-sm font-bold text-white">{t('agent')} {i}</p>
+                    <p className="text-xs text-primary">$1.{i}M {t('sales')}</p>
                   </div>
                 </div>
               ))}

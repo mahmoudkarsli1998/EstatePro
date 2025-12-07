@@ -2,6 +2,7 @@ import React from 'react';
 import { Bell, Search, User, Menu } from 'lucide-react';
 
 import ThemeToggle from '../shared/ThemeToggle';
+import LanguageSwitcher from '../LanguageSwitcher';
 
 const Header = ({ onMenuClick }) => {
   return (
@@ -25,6 +26,7 @@ const Header = ({ onMenuClick }) => {
       </div>
 
       <div className="flex items-center space-x-4">
+        <LanguageSwitcher />
         <ThemeToggle />
         <button className="relative p-2 text-gray-400 hover:bg-white/10 rounded-full transition-colors">
           <Bell size={20} />

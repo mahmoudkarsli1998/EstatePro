@@ -4,7 +4,10 @@ import LiquidBackground from '../../components/shared/LiquidBackground';
 import MaadiScene from '../../components/public/MaadiScene';
 import { MapPin, Navigation, Building } from 'lucide-react';
 
+import { useTranslation } from 'react-i18next';
+
 const Locations = () => {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen relative pt-24 pb-12 overflow-hidden">
       <LiquidBackground />
@@ -16,10 +19,10 @@ const Locations = () => {
           className="text-center mb-12"
         >
           <h1 className="text-4xl md:text-6xl font-bold font-heading text-white mb-6 drop-shadow-[0_0_15px_rgba(0,240,255,0.3)]">
-            Explore <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Locations</span>
+            {t('exploreLocations')}
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Discover our premium developments in the heart of Cairo's most exclusive districts.
+            {t('locationsDesc')}
           </p>
         </motion.div>
 
@@ -41,37 +44,37 @@ const Locations = () => {
           >
             <div className="glass-panel p-6">
               <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
-                <MapPin className="text-primary" /> Maadi District
+                <MapPin className="text-primary" /> {t('maadiDistrict')}
               </h2>
               <p className="text-gray-400 mb-4">
-                Known for its quiet, leafy streets and expatriate community, Maadi offers a serene lifestyle just minutes from the city center.
+                {t('maadiDesc')}
               </p>
               <div className="space-y-3">
                 <div className="flex items-center gap-3 text-gray-300">
                   <Building size={18} className="text-secondary" />
-                  <span>3 Active Projects</span>
+                  <span>3 {t('activeProjects')}</span>
                 </div>
                 <div className="flex items-center gap-3 text-gray-300">
                   <Navigation size={18} className="text-secondary" />
-                  <span>15 mins to Downtown</span>
+                  <span>15 {t('minsToDowntown')}</span>
                 </div>
               </div>
             </div>
 
             <div className="glass-panel p-6">
-              <h3 className="text-xl font-bold text-white mb-3">Upcoming Locations</h3>
+              <h3 className="text-xl font-bold text-white mb-3">{t('upcomingLocations')}</h3>
               <ul className="space-y-3">
                 <li className="flex items-center justify-between text-gray-400 border-b border-white/5 pb-2">
-                  <span>New Cairo</span>
+                  <span>{t('newCairo')}</span>
                   <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">Q4 2026</span>
                 </li>
                 <li className="flex items-center justify-between text-gray-400 border-b border-white/5 pb-2">
-                  <span>Sheikh Zayed</span>
+                  <span>{t('sheikhZayed')}</span>
                   <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">Q1 2027</span>
                 </li>
                 <li className="flex items-center justify-between text-gray-400">
-                  <span>North Coast</span>
-                  <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">Summer 2027</span>
+                  <span>{t('northCoast')}</span>
+                  <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">{t('summer')} 2027</span>
                 </li>
               </ul>
             </div>

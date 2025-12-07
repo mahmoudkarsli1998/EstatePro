@@ -10,7 +10,10 @@ import Card from '../../components/shared/Card';
 import LiquidBackground from '../../components/shared/LiquidBackground';
 import { api } from '../../utils/api';
 
+import { useTranslation } from 'react-i18next';
+
 const UnitDetail = () => {
+  const { t, i18n } = useTranslation();
   const { id } = useParams();
   const [unit, setUnit] = useState(null);
   const [project, setProject] = useState(null);
@@ -45,9 +48,9 @@ const UnitDetail = () => {
     return (
       <div className="min-h-screen pt-24 flex flex-col justify-center items-center relative">
         <LiquidBackground />
-        <h2 className="text-2xl font-bold text-white mb-4">Unit Not Found</h2>
+        <h2 className="text-2xl font-bold text-white mb-4">{t('unitNotFound') || "Unit Not Found"}</h2>
         <Link to="/projects">
-          <Button>Back to Projects</Button>
+          <Button>{t('backToProjects')}</Button>
         </Link>
       </div>
     );
@@ -71,7 +74,7 @@ const UnitDetail = () => {
         {/* Breadcrumb */}
         <div className="mb-6">
           <Link to={`/projects/${project.id}`} className="inline-flex items-center text-gray-400 hover:text-primary transition-colors">
-            <ArrowLeft size={16} className="mr-2" /> Back to {project.name}
+            <div className={`inline-block ${i18n.dir() === 'rtl' ? 'rotate-180' : ''}`}><ArrowLeft size={16} className="me-2" /></div> {t('backTo')} {project.name}
           </Link>
         </div>
 
@@ -86,14 +89,14 @@ const UnitDetail = () => {
             >
               <div>
                 <h1 className="text-3xl font-bold font-heading text-white mb-2">
-                  Unit {unit.number}
+                  {t('unitLabel', { number: unit.number })}
                 </h1>
                 <p className="text-xl text-gray-400 capitalize">
-                  {unit.type} • {unit.floor === 0 ? 'Ground' : `${unit.floor}th`} Floor
+                  {unit.type} • {unit.floor === 0 ? t('groundFloor') : t('floorTh', { floor: unit.floor })}
                 </p>
               </div>
               <Badge variant={unit.status === 'available' ? 'success' : 'warning'} className="text-lg px-4 py-1">
-                {unit.status}
+                  {t(unit.status) || unit.status}
               </Badge>
             </motion.div>
 
@@ -105,7 +108,7 @@ const UnitDetail = () => {
                 }`}
                 onClick={() => setActiveTab('3d')}
               >
-                3D View
+                {t('3dView')}
               </button>
               <button
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -113,7 +116,7 @@ const UnitDetail = () => {
                 }`}
                 onClick={() => setActiveTab('images')}
               >
-                Photos
+                {t('photos')}
               </button>
             </div>
 
@@ -141,23 +144,23 @@ const UnitDetail = () => {
               variants={fadeInUp}
             >
               <h2 className="text-2xl font-bold font-heading text-white mb-6">
-                Unit Features
+                {t('unitFeatures')}
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <Card className="p-4 text-center">
-                  <div className="text-gray-400 mb-2">Bedrooms</div>
+                  <div className="text-gray-400 mb-2">{t('bedrooms')}</div>
                   <div className="text-2xl font-bold text-white">{unit.features.bedrooms}</div>
                 </Card>
                 <Card className="p-4 text-center">
-                  <div className="text-gray-400 mb-2">Bathrooms</div>
+                  <div className="text-gray-400 mb-2">{t('bathrooms')}</div>
                   <div className="text-2xl font-bold text-white">{unit.features.bathrooms}</div>
                 </Card>
                 <Card className="p-4 text-center">
-                  <div className="text-gray-400 mb-2">Area</div>
+                  <div className="text-gray-400 mb-2">{t('area')}</div>
                   <div className="text-2xl font-bold text-white">{unit.area_m2} m²</div>
                 </Card>
                 <Card className="p-4 text-center">
-                  <div className="text-gray-400 mb-2">Parking</div>
+                  <div className="text-gray-400 mb-2">{t('parking')}</div>
                   <div className="text-2xl font-bold text-white">{unit.features.parking}</div>
                 </Card>
               </div>
@@ -171,28 +174,28 @@ const UnitDetail = () => {
               variants={fadeInUp}
               className="glass-panel p-6"
             >
-              <h3 className="text-lg font-bold mb-4 text-white">Additional Details</h3>
+              <h3 className="text-lg font-bold mb-4 text-white">{t('additionalDetails')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="flex justify-between py-2 border-b border-white/10">
-                  <span className="text-gray-400">View</span>
+                  <span className="text-gray-400">{t('view')}</span>
                   <span className="font-medium text-white">{unit.features.view}</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-white/10">
-                  <span className="text-gray-400">Furnished</span>
-                  <span className="font-medium text-white">{unit.features.furnished ? 'Yes' : 'No'}</span>
+                  <span className="text-gray-400">{t('furnished')}</span>
+                  <span className="font-medium text-white">{unit.features.furnished ? t('yes') : t('no')}</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-white/10">
-                  <span className="text-gray-400">Balcony</span>
-                  <span className="font-medium text-white">{unit.features.balcony ? 'Yes' : 'No'}</span>
+                  <span className="text-gray-400">{t('balcony')}</span>
+                  <span className="font-medium text-white">{unit.features.balcony ? t('yes') : t('no')}</span>
                 </div>
                 <div className="flex justify-between py-2 border-b border-white/10">
-                  <span className="text-gray-400">Project</span>
+                  <span className="text-gray-400">{t('project')}</span>
                   <span className="font-medium text-white">{project.name}</span>
                 </div>
               </div>
               {unit.notes && (
                 <div className="mt-4 pt-4 border-t border-white/10">
-                  <span className="text-gray-400 block mb-2">Notes</span>
+                  <span className="text-gray-400 block mb-2">{t('notes')}</span>
                   <p className="text-gray-300">{unit.notes}</p>
                 </div>
               )}
@@ -209,8 +212,8 @@ const UnitDetail = () => {
               >
                 <Card className="p-6">
                   <div className="text-center mb-6">
-                    <p className="text-gray-400 mb-1">Total Price</p>
-                    <h2 className="text-4xl font-bold text-primary drop-shadow-[0_0_10px_rgba(0,240,255,0.5)]">
+                    <p className="text-gray-400 mb-1">{t('totalPrice')}</p>
+                    <h2 className="text-4xl font-bold text-primary drop-shadow-[0_0_10px_rgba(0,240,255,0.5)]" style={{ direction: 'ltr' }}>
                       ${(unit.price).toLocaleString()}
                     </h2>
                   </div>
@@ -220,14 +223,14 @@ const UnitDetail = () => {
                     size="lg"
                     onClick={() => setIsContactOpen(true)}
                   >
-                    Request Information
+                    {t('requestInformation')}
                   </Button>
                   <Button 
                     variant="outline" 
                     className="w-full"
                     onClick={() => setIsContactOpen(true)}
                   >
-                    Schedule Viewing
+                    {t('scheduleViewing')}
                   </Button>
                 </Card>
               </motion.div>
@@ -238,24 +241,24 @@ const UnitDetail = () => {
                 transition={{ delay: 0.6, duration: 0.5 }}
               >
                 <Card className="p-6">
-                  <h3 className="text-lg font-bold mb-4 text-white">Payment Calculator</h3>
+                  <h3 className="text-lg font-bold mb-4 text-white">{t('paymentCalculator')}</h3>
                   <div className="space-y-4">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Down Payment (20%)</span>
-                      <span className="font-medium text-white">${(unit.price * 0.2).toLocaleString()}</span>
+                      <span className="text-gray-400">{t('downPayment')}</span>
+                      <span className="font-medium text-white" style={{ direction: 'ltr' }}>${(unit.price * 0.2).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Loan Amount</span>
-                      <span className="font-medium text-white">${(unit.price * 0.8).toLocaleString()}</span>
+                      <span className="text-gray-400">{t('loanAmount')}</span>
+                      <span className="font-medium text-white" style={{ direction: 'ltr' }}>${(unit.price * 0.8).toLocaleString()}</span>
                     </div>
                     <div className="pt-4 border-t border-white/10">
                       <div className="flex justify-between items-center">
-                        <span className="font-bold text-white">Est. Monthly</span>
-                        <span className="text-xl font-bold text-primary">
+                        <span className="font-bold text-white">{t('estMonthly')}</span>
+                        <span className="text-xl font-bold text-primary" style={{ direction: 'ltr' }}>
                           ${Math.round((unit.price * 0.8 * 0.05) / 12).toLocaleString()}
                         </span>
                       </div>
-                      <p className="text-xs text-gray-500 mt-1 text-right">*Based on 5% interest rate</p>
+                      <p className="text-xs text-gray-500 mt-1 text-end">{t('basedOnInterest')}</p>
                     </div>
                   </div>
                 </Card>

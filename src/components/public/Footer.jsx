@@ -1,8 +1,11 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
 
 const Footer = () => {
+  const { t } = useTranslation();
+  
   return (
     <footer className="bg-gray-900 text-white pt-16 pb-8">
       <div className="container mx-auto px-4 md:px-6">
@@ -13,7 +16,7 @@ const Footer = () => {
               Estate<span className="text-white">Pro</span>
             </Link>
             <p className="text-gray-400 mb-6">
-              Premium real estate solutions for modern living. Find your dream home with our immersive 3D experience.
+              {t('footerDesc')}
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-primary transition-colors"><Facebook size={20} /></a>
@@ -25,41 +28,41 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-bold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-bold mb-4">{t('quickLinks')}</h3>
             <ul className="space-y-2">
-              <li><Link to="/projects" className="text-gray-400 hover:text-primary transition-colors">All Projects</Link></li>
-              <li><Link to="/about" className="text-gray-400 hover:text-primary transition-colors">About Us</Link></li>
-              <li><Link to="/contact" className="text-gray-400 hover:text-primary transition-colors">Contact</Link></li>
-              <li><Link to="/careers" className="text-gray-400 hover:text-primary transition-colors">Careers</Link></li>
+              <li><Link to="/projects" className="text-gray-400 hover:text-primary transition-colors">{t('allProjects')}</Link></li>
+              <li><Link to="/about" className="text-gray-400 hover:text-primary transition-colors">{t('aboutUs')}</Link></li>
+              <li><Link to="/contact" className="text-gray-400 hover:text-primary transition-colors">{t('contactUs')}</Link></li>
+              <li><Link to="/careers" className="text-gray-400 hover:text-primary transition-colors">{t('careers')}</Link></li>
             </ul>
           </div>
 
           {/* Services */}
           <div>
-            <h3 className="text-lg font-bold mb-4">Services</h3>
+            <h3 className="text-lg font-bold mb-4">{t('services')}</h3>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Property Management</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Consulting</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Development</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">Interior Design</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">{t('propertyManagement')}</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">{t('consulting')}</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">{t('development')}</a></li>
+              <li><a href="#" className="text-gray-400 hover:text-primary transition-colors">{t('interiorDesign')}</a></li>
             </ul>
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="text-lg font-bold mb-4">Contact Us</h3>
+            <h3 className="text-lg font-bold mb-4">{t('contactUs')}</h3>
             <ul className="space-y-4">
               <li className="flex items-start">
-                <MapPin size={20} className="text-primary mr-3 mt-1 flex-shrink-0" />
-                <span className="text-gray-400">123 Business Ave, Suite 100<br />New York, NY 10001</span>
+                <MapPin size={20} className="text-primary mr-2 mt-1 shrink-0 rtl:ml-2 rtl:mr-0" />
+                <span className="text-gray-400">123 Innovation Blvd, Tech City, TC 90210</span>
               </li>
               <li className="flex items-center">
-                <Phone size={20} className="text-primary mr-3 flex-shrink-0" />
+                <Phone size={20} className="text-primary mr-2 shrink-0 rtl:ml-2 rtl:mr-0" />
                 <span className="text-gray-400">+1 (555) 123-4567</span>
               </li>
               <li className="flex items-center">
-                <Mail size={20} className="text-primary mr-3 flex-shrink-0" />
-                <span className="text-gray-400">info@estatepro.com</span>
+                <Mail size={20} className="text-primary mr-2 shrink-0 rtl:ml-2 rtl:mr-0" />
+                <span className="text-gray-400">hello@estatepro.com</span>
               </li>
             </ul>
           </div>
@@ -67,11 +70,11 @@ const Footer = () => {
 
         <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-gray-500 text-sm mb-4 md:mb-0">
-            &copy; {new Date().getFullYear()} EstatePro. All rights reserved.
+            &copy; {new Date().getFullYear()} EstatePro. {t('rightsReserved')}
           </p>
           <div className="flex space-x-6 text-sm text-gray-500">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-white transition-colors">{t('privacyPolicy')}</a>
+            <a href="#" className="hover:text-white transition-colors">{t('termsOfService')}</a>
           </div>
         </div>
       </div>

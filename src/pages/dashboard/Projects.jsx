@@ -5,8 +5,10 @@ import Input from '../../components/shared/Input';
 import Modal from '../../components/shared/Modal';
 import { api } from '../../utils/api';
 import { useDashboardCrud } from '../../hooks/useDashboardCrud';
+import { useTranslation } from 'react-i18next';
 
 const Projects = () => {
+  const { t } = useTranslation();
   const {
     filteredItems: projects,
     loading,
@@ -76,13 +78,13 @@ const Projects = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">Projects</h1>
+        <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">{t('projects')}</h1>
         <div className="flex gap-3">
            <Button variant="outline" onClick={onExport}>
-            <Download size={18} className="mr-2" /> Export
+            <Download size={18} className="me-2" /> {t('export')}
           </Button>
           <Button onClick={() => handleOpenModal()}>
-            <Plus size={20} className="mr-2" /> Add Project
+            <Plus size={20} className="me-2" /> {t('addProject')}
           </Button>
         </div>
       </div>
@@ -90,11 +92,11 @@ const Projects = () => {
       <div className="bg-dark-card border border-white/10 rounded-xl shadow-sm overflow-hidden">
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <div className="relative max-w-md">
-            <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Search size={18} className="absolute inset-y-0 start-3 my-auto text-gray-400" />
             <input 
               type="text" 
-              placeholder="Search projects by name..." 
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-500"
+              placeholder={t('searchProjects')}
+              className="w-full ps-10 pe-4 py-2 rounded-lg border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -103,9 +105,9 @@ const Projects = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
           {loading ? (
-            <div className="text-center col-span-full text-gray-400">Loading...</div>
+            <div className="text-center col-span-full text-gray-400">{t('loading')}</div>
           ) : projects.length === 0 ? (
-            <div className="text-center col-span-full text-gray-400">No projects found.</div>
+            <div className="text-center col-span-full text-gray-400">{t('noProjects')}</div>
           ) : projects.map((project) => (
             <div key={project.id} className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-primary/50 transition-colors group flex flex-col">
               <div className="h-48 bg-gray-800 relative">
@@ -117,28 +119,28 @@ const Projects = () => {
               <div className="p-5 flex-1 flex flex-col">
                 <h3 className="text-xl font-bold text-white mb-2">{project.name}</h3>
                 <div className="flex items-center text-gray-400 mb-4 text-sm">
-                  <MapPin size={14} className="mr-1" /> {project.address}
+                  <MapPin size={14} className="me-1" /> {project.address}
                 </div>
                 
                 <div className="grid grid-cols-3 gap-2 mb-4">
                   <div className="bg-white/5 p-2 rounded text-center">
                     <div className="text-lg font-bold text-white">{project.stats.totalUnits}</div>
-                    <div className="text-[10px] text-gray-500 uppercase">Units</div>
+                    <div className="text-[10px] text-gray-500 uppercase">{t('units')}</div>
                   </div>
                   <div className="bg-white/5 p-2 rounded text-center">
                     <div className="text-lg font-bold text-primary">{project.stats.available}</div>
-                    <div className="text-[10px] text-gray-500 uppercase">Avail</div>
+                    <div className="text-[10px] text-gray-500 uppercase">{t('avail')}</div>
                   </div>
                   <div className="bg-white/5 p-2 rounded text-center">
                     <div className="text-lg font-bold text-green-400">{project.stats.sold}</div>
-                    <div className="text-[10px] text-gray-500 uppercase">Sold</div>
+                    <div className="text-[10px] text-gray-500 uppercase">{t('sold')}</div>
                   </div>
                 </div>
 
                 <div className="mt-auto flex justify-between items-center pt-4 border-t border-white/5">
                   <div className="flex items-center text-sm text-gray-400">
-                    <Layers size={14} className="mr-2" />
-                    {project.phases?.length || 0} Phases
+                    <Layers size={14} className="me-2" />
+                    {project.phases?.length || 0} {t('phases')}
                   </div>
                   <div className="flex space-x-2">
                     <button 
@@ -166,7 +168,7 @@ const Projects = () => {
       <Modal 
         isOpen={isModalOpen} 
         onClose={handleModalCloseWrapper} 
-        title={editingItem ? `Edit Project: ${editingItem.name}` : "Create New Project"}
+        title={editingItem ? `${t('edit')}: ${editingItem.name}` : t('createProject')}
         maxWidth="max-w-4xl"
       >
         <div className="flex flex-col md:flex-row gap-6">
@@ -175,20 +177,20 @@ const Projects = () => {
               className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'details' ? 'bg-primary/20 text-primary' : 'text-gray-400 hover:text-white'}`}
               onClick={() => setActiveTab('details')}
             >
-              <Home size={16} className="inline mr-2" /> Details
+              <Home size={16} className="inline me-2" /> {t('details')}
             </button>
             <button 
               className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'images' ? 'bg-primary/20 text-primary' : 'text-gray-400 hover:text-white'}`}
               onClick={() => setActiveTab('images')}
             >
-              <Maximize size={16} className="inline mr-2" /> Images
+              <Maximize size={16} className="inline me-2" /> {t('images')}
             </button>
             <button 
               className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'phases' ? 'bg-primary/20 text-primary' : 'text-gray-400 hover:text-white'}`}
               onClick={() => setActiveTab('phases')}
               disabled={!editingItem} // Disable for new projects until created
             >
-              <Layers size={16} className="inline mr-2" /> Phases
+              <Layers size={16} className="inline me-2" /> {t('phases')}
             </button>
           </div>
 
@@ -197,21 +199,21 @@ const Projects = () => {
               {activeTab === 'details' && (
                 <>
                   <Input 
-                    label="Project Name" 
+                    label={t('projectName')} 
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
                     required
                   />
                   <Input 
-                    label="Address" 
+                    label={t('address')} 
                     name="address"
                     value={formData.address}
                     onChange={handleInputChange}
                     required
                   />
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">Description</label>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">{t('description')}</label>
                     <textarea 
                       className="w-full px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary h-32 resize-none"
                       name="description"
@@ -220,16 +222,16 @@ const Projects = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">Status</label>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">{t('status')}</label>
                     <select 
                       className="w-full px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary"
                       name="status"
                       value={formData.status}
                       onChange={handleInputChange}
                     >
-                      <option value="active">Active</option>
-                      <option value="upcoming">Upcoming</option>
-                      <option value="completed">Completed</option>
+                      <option value="active">{t('active')}</option>
+                      <option value="upcoming">{t('upcoming')}</option>
+                      <option value="completed">{t('completed')}</option>
                     </select>
                   </div>
                 </>
@@ -287,8 +289,8 @@ const Projects = () => {
               {/* Only show 'Save' button on Details tab to avoid confusion, or assume instant save for others */}
               {activeTab === 'details' && (
                 <div className="pt-6 flex justify-end space-x-3 border-t border-white/5 mt-4">
-                    <Button type="button" variant="ghost" onClick={handleModalCloseWrapper}>Cancel</Button>
-                    <Button type="submit">{editingItem ? "Save Details" : "Create Project"}</Button>
+                    <Button type="button" variant="ghost" onClick={handleModalCloseWrapper}>{t('cancel')}</Button>
+                    <Button type="submit">{editingItem ? t('saveDetails') : t('createProject')}</Button>
                 </div>
               )}
             </form>

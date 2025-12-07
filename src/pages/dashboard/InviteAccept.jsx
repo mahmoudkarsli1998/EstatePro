@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Check, AlertCircle } from 'lucide-react';
 import Button from '../../components/shared/Button';
@@ -6,6 +7,7 @@ import Input from '../../components/shared/Input';
 import LiquidBackground from '../../components/shared/LiquidBackground';
 
 const InviteAccept = () => {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const token = searchParams.get('token');
@@ -30,12 +32,12 @@ const InviteAccept = () => {
     setError('');
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      setError(t('passwordsDoNotMatch'));
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+      setError(t('passwordLength'));
       return;
     }
 
@@ -61,9 +63,9 @@ const InviteAccept = () => {
           <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center mx-auto mb-4 text-red-500">
             <AlertCircle size={32} />
           </div>
-          <h2 className="text-2xl font-bold text-white mb-2">Invalid Invitation</h2>
-          <p className="text-gray-400 mb-6">The invitation link is invalid or has expired.</p>
-          <Button onClick={() => navigate('/')}>Go Home</Button>
+          <h2 className="text-2xl font-bold text-white mb-2">{t('invalidInvitation')}</h2>
+          <p className="text-gray-400 mb-6">{t('invitationInvalidDesc')}</p>
+          <Button onClick={() => navigate('/')}>{t('goHome')}</Button>
         </div>
       </div>
     );
@@ -75,8 +77,8 @@ const InviteAccept = () => {
       
       <div className="glass-panel p-8 max-w-md w-full z-10">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold font-heading text-white mb-2">Welcome!</h1>
-          <p className="text-gray-400">Complete your account setup to join the team.</p>
+          <h1 className="text-3xl font-bold font-heading text-white mb-2">{t('welcomeExclamation')}</h1>
+          <p className="text-gray-400">{t('completeSetup')}</p>
         </div>
 
         {success ? (
@@ -84,8 +86,8 @@ const InviteAccept = () => {
             <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4 text-green-500">
               <Check size={32} />
             </div>
-            <h2 className="text-xl font-bold text-white mb-2">Account Created!</h2>
-            <p className="text-gray-400">Redirecting to login...</p>
+            <h2 className="text-xl font-bold text-white mb-2">{t('accountCreated')}</h2>
+            <p className="text-gray-400">{t('redirectingToLogin')}</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -97,7 +99,7 @@ const InviteAccept = () => {
             )}
 
             <Input
-              label="Full Name"
+              label={t('fullName')}
               value={formData.fullName}
               onChange={(e) => setFormData({...formData, fullName: e.target.value})}
               required
@@ -105,7 +107,7 @@ const InviteAccept = () => {
             />
 
             <Input
-              label="Password"
+              label={t('password')}
               type="password"
               value={formData.password}
               onChange={(e) => setFormData({...formData, password: e.target.value})}
@@ -114,7 +116,7 @@ const InviteAccept = () => {
             />
 
             <Input
-              label="Confirm Password"
+              label={t('confirmPassword')}
               type="password"
               value={formData.confirmPassword}
               onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
@@ -123,7 +125,7 @@ const InviteAccept = () => {
             />
 
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Setting up...' : 'Create Account'}
+              {loading ? t('settingUp') : t('createAccount')}
             </Button>
           </form>
         )}

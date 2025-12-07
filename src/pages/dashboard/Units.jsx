@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash, Search, Filter, Home, DollarSign, Maximize, Layers } from 'lucide-react';
+import { Plus, Edit, Trash, Search, Filter, Home, DollarSign, Maximize, Layers, Download } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import Modal from '../../components/shared/Modal';
@@ -8,6 +9,7 @@ import { api } from '../../utils/api';
 import { useDashboardCrud } from '../../hooks/useDashboardCrud';
 
 const Units = () => {
+  const { t } = useTranslation();
   const {
     filteredItems: units,
     loading,
@@ -80,13 +82,13 @@ const Units = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">Units</h1>
+        <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">{t('units')}</h1>
         <div className="flex gap-3">
           <Button variant="outline" onClick={onExport}>
-            <Download size={18} className="mr-2" /> Export
+            <Download size={18} className="me-2" /> {t('export')}
           </Button>
           <Button onClick={() => handleOpenModal()}>
-            <Plus size={20} className="mr-2" /> Add Unit
+            <Plus size={20} className="me-2" /> {t('addUnit')}
           </Button>
         </div>
       </div>
@@ -94,17 +96,17 @@ const Units = () => {
       <div className="bg-dark-card border border-white/10 rounded-xl shadow-sm overflow-hidden">
         <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
           <div className="relative max-w-md w-full">
-            <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <Search size={18} className="absolute inset-y-0 start-3 my-auto text-gray-400" />
             <input 
               type="text" 
-              placeholder="Search units by number or type..." 
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-500"
+              placeholder={t('searchUnits')}
+              className="w-full ps-10 pe-4 py-2 rounded-lg border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-500"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <Button variant="ghost" size="sm">
-            <Filter size={18} className="mr-2" /> Filter
+            <Filter size={18} className="me-2" /> {t('filter')}
           </Button>
         </div>
 
@@ -112,37 +114,37 @@ const Units = () => {
           <table className="w-full text-left">
             <thead className="bg-white/5 text-gray-400 font-medium text-sm">
               <tr>
-                <th className="px-6 py-4">Number</th>
-                <th className="px-6 py-4">Type</th>
-                <th className="px-6 py-4">Location</th>
-                <th className="px-6 py-4">Details</th>
-                <th className="px-6 py-4">Price</th>
-                <th className="px-6 py-4">Status</th>
-                <th className="px-6 py-4">Actions</th>
+                <th className="px-6 py-4 text-start">{t('number')}</th>
+                <th className="px-6 py-4 text-start">{t('type')}</th>
+                <th className="px-6 py-4 text-start">{t('location')}</th>
+                <th className="px-6 py-4 text-start">{t('details')}</th>
+                <th className="px-6 py-4 text-start">{t('price')}</th>
+                <th className="px-6 py-4 text-start">{t('status')}</th>
+                <th className="px-6 py-4 text-start">{t('actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {loading ? (
-                <tr><td colSpan="7" className="px-6 py-4 text-center">Loading...</td></tr>
+                <tr><td colSpan="7" className="px-6 py-4 text-center">{t('loading')}</td></tr>
               ) : units.length === 0 ? (
-                <tr><td colSpan="7" className="px-6 py-4 text-center">No units found</td></tr>
+                <tr><td colSpan="7" className="px-6 py-4 text-center">{t('noUnitsFound', 'No units found')}</td></tr>
               ) : units.map((unit) => (
                 <tr key={unit.id} className="hover:bg-white/5 transition-colors border-b border-white/5 last:border-0">
                   <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">{unit.number}</td>
-                  <td className="px-6 py-4 capitalize text-gray-300">{unit.type}</td>
+                  <td className="px-6 py-4 capitalize text-gray-300">{t(unit.type) || unit.type}</td>
                   <td className="px-6 py-4 text-gray-300">
                     <div className="flex flex-col text-xs">
-                       <span>Floor: {unit.floor}</span>
-                       <span className="text-gray-500">Proj ID: {unit.projectId}</span>
+                       <span>{t('floor')}: {unit.floor}</span>
+                       <span className="text-gray-500">{t('project')} ID: {unit.projectId}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 text-gray-300 text-sm">
-                    {unit.area_m2} m² • {unit.features?.bedrooms || 0} Bed • {unit.features?.bathrooms || 0} Bath
+                    {unit.area_m2} m² • {unit.features?.bedrooms || 0} {t('bed')} • {unit.features?.bathrooms || 0} {t('bath')}
                   </td>
                   <td className="px-6 py-4 font-medium text-primary">${(unit.price || 0).toLocaleString()}</td>
                   <td className="px-6 py-4">
                     <Badge variant={getStatusColor(unit.status)}>
-                      {unit.status}
+                      {t(unit.status) || unit.status}
                     </Badge>
                   </td>
                   <td className="px-6 py-4 flex gap-2">
@@ -169,13 +171,13 @@ const Units = () => {
       <Modal 
         isOpen={isModalOpen} 
         onClose={handleCloseModal} 
-        title={editingItem ? "Edit Unit" : "Add New Unit"}
+        title={editingItem ? t('editUnit') : t('addUnit')}
         maxWidth="max-w-2xl"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Project</label>
+                <label className="block text-sm font-medium text-gray-400 mb-1">{t('project')}</label>
                 <select 
                   className="w-full px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary"
                   name="projectId"
@@ -183,14 +185,14 @@ const Units = () => {
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="">Select Project</option>
+                  <option value="">{t('selectProject')}</option>
                   {projects.map(p => (
                     <option key={p.id} value={p.id}>{p.name}</option>
                   ))}
                 </select>
              </div>
              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Phase / Block</label>
+                <label className="block text-sm font-medium text-gray-400 mb-1">{t('phaseBlock')}</label>
                 <div className="flex gap-2">
                     <select 
                       className="w-1/2 px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary"
@@ -199,7 +201,7 @@ const Units = () => {
                       onChange={handleInputChange}
                       disabled={!formData.projectId}
                     >
-                      <option value="">Phase</option>
+                      <option value="">{t('phase')}</option>
                       {phases.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
                     </select>
                     <select 
@@ -209,7 +211,7 @@ const Units = () => {
                       onChange={handleInputChange}
                       disabled={!formData.projectId}
                     >
-                      <option value="">Block</option>
+                      <option value="">{t('block')}</option>
                       {blocks.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                     </select>
                 </div>
@@ -218,14 +220,14 @@ const Units = () => {
 
           <div className="grid grid-cols-3 gap-4">
             <Input 
-              label="Unit Number" 
+              label={t('unitNumber')} 
               name="number"
               value={formData.number}
               onChange={handleInputChange}
               required
             />
             <Input 
-              label="Floor" 
+              label={t('floor')} 
               type="number"
               name="floor"
               value={formData.floor}
@@ -233,23 +235,23 @@ const Units = () => {
               required
             />
              <div>
-                <label className="block text-sm font-medium text-gray-400 mb-1">Type</label>
+                <label className="block text-sm font-medium text-gray-400 mb-1">{t('type')}</label>
                 <select 
                   className="w-full px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary"
                   name="type"
                   value={formData.type}
                   onChange={handleInputChange}
                 >
-                  <option value="residential">Residential</option>
-                  <option value="commercial">Commercial</option>
-                  <option value="office">Office</option>
+                  <option value="residential">{t('residential')}</option>
+                  <option value="commercial">{t('commercial')}</option>
+                  <option value="office">{t('office')}</option>
                 </select>
              </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <Input 
-              label="Area (m²)" 
+              label={t('area') + " (m²)"} 
               type="number"
               name="area_m2"
               value={formData.area_m2}
@@ -257,7 +259,7 @@ const Units = () => {
               required
             />
             <Input 
-              label="Price ($)" 
+              label={t('price') + " ($)"} 
               type="number"
               name="price"
               value={formData.price}
@@ -267,12 +269,8 @@ const Units = () => {
           </div>
 
           <div className="grid grid-cols-2 gap-4">
-             {/* Note: Nested object updates (features) require custom handling or flattened form data.  
-                 For simplicity with hook, we can handle them as manual updates if needed, or bind to flattened inputs.
-                 Here we'll manually update state for features.
-             */}
              <Input 
-                label="Bedrooms"
+                label={t('bedrooms')}
                 type="number"
                 value={formData.features?.bedrooms || ''}
                 onChange={(e) => setFormData({
@@ -281,7 +279,7 @@ const Units = () => {
                 })}
              />
              <Input 
-                label="Bathrooms"
+                label={t('bathrooms')}
                 type="number"
                 value={formData.features?.bathrooms || ''}
                 onChange={(e) => setFormData({
@@ -292,30 +290,27 @@ const Units = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">Status</label>
+            <label className="block text-sm font-medium text-gray-400 mb-1">{t('status')}</label>
             <select 
               className="w-full px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary"
               name="status"
               value={formData.status}
               onChange={handleInputChange}
             >
-              <option value="available">Available</option>
-              <option value="reserved">Reserved</option>
-              <option value="sold">Sold</option>
+              <option value="available">{t('available')}</option>
+              <option value="reserved">{t('reserved')}</option>
+              <option value="sold">{t('sold')}</option>
             </select>
           </div>
           
-          <div className="pt-4 flex justify-end space-x-3">
-            <Button type="button" variant="ghost" onClick={handleCloseModal}>Cancel</Button>
-            <Button type="submit">{editingItem ? "Update Unit" : "Create Unit"}</Button>
+          <div className="pt-4 flex justify-end gap-3">
+            <Button type="button" variant="ghost" onClick={handleCloseModal}>{t('cancel')}</Button>
+            <Button type="submit">{editingItem ? t('updateUnit') : t('createUnit')}</Button>
           </div>
         </form>
       </Modal>
     </div>
   );
 };
-
-// Add missing Download import manually since I might have missed it in imports string
-import { Download } from 'lucide-react';
 
 export default Units;

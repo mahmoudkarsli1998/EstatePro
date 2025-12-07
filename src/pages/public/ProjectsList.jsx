@@ -9,7 +9,10 @@ import LiquidBackground from '../../components/shared/LiquidBackground';
 import { api } from '../../utils/api';
 import { useStaggerList } from '../../hooks/useGSAPAnimations';
 
+import { useTranslation } from 'react-i18next';
+
 const ProjectsList = () => {
+  const { t, i18n } = useTranslation();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -76,7 +79,7 @@ const ProjectsList = () => {
           <div className="flex-1">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-3xl font-bold font-heading text-white">
-                Projects <span className="text-primary">({filteredProjects.length})</span>
+                {t('projects')} <span className="text-primary">({filteredProjects.length})</span>
               </h1>
               
               <div className="flex items-center gap-3">
@@ -86,7 +89,7 @@ const ProjectsList = () => {
                   className="md:hidden"
                   onClick={() => setIsFilterOpen(true)}
                 >
-                  <Filter size={18} className="mr-2" /> Filters
+                  <Filter size={18} className="me-2" /> {t('filters')}
                 </Button>
                 
                 <div className="glass-panel p-1 flex">
@@ -114,8 +117,8 @@ const ProjectsList = () => {
               </div>
             ) : filteredProjects.length === 0 ? (
               <div className="text-center py-20 glass-panel">
-                <h3 className="text-xl font-bold text-white mb-2">No projects found</h3>
-                <p className="text-gray-400">Try adjusting your filters.</p>
+                <h3 className="text-xl font-bold text-white mb-2">{t('noProjectsFound')}</h3>
+                <p className="text-gray-400">{t('tryAdjustingFilters')}</p>
               </div>
             ) : viewMode === 'grid' ? (
               <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -133,9 +136,9 @@ const ProjectsList = () => {
                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                           />
                           <div className="absolute inset-0 bg-gradient-to-t from-dark-bg/80 to-transparent opacity-60"></div>
-                          <div className="absolute top-3 right-3">
+                          <div className={`absolute top-3 ${i18n.dir() === 'rtl' ? 'left-3' : 'right-3'}`}>
                             <Badge variant={project.status === 'active' ? 'success' : 'warning'}>
-                              {project.status === 'active' ? 'Selling Fast' : 'Upcoming'}
+                              {project.status === 'active' ? t('sellingFast') : t('upcoming')}
                             </Badge>
                           </div>
                         </div>
@@ -149,11 +152,11 @@ const ProjectsList = () => {
                             {project.address}
                           </p>
                           <div className="mt-auto pt-4 border-t border-white/10 flex justify-between items-center">
-                            <span className="text-primary font-bold text-lg">
+                            <span className="text-primary font-bold text-lg" style={{ direction: 'ltr' }}>
                               ${(project.priceRange.min / 1000).toFixed(0)}k - ${(project.priceRange.max / 1000).toFixed(0)}k
                             </span>
                             <span className="text-xs text-gray-400 bg-white/5 px-2 py-1 rounded">
-                              {project.stats.available} Units Left
+                              {project.stats.available} {t('unitsLeft')}
                             </span>
                           </div>
                         </div>
@@ -192,8 +195,8 @@ const ProjectsList = () => {
                   </div>
                 ))}
 
-                <div className="absolute bottom-4 right-4 glass-panel px-4 py-2 text-xs text-gray-300">
-                  Interactive Map View
+                <div className={`absolute bottom-4 ${i18n.dir() === 'rtl' ? 'left-4' : 'right-4'} glass-panel px-4 py-2 text-xs text-gray-300`}>
+                  {t('interactiveMapView')}
                 </div>
               </div>
             )}

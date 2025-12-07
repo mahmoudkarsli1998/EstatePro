@@ -1,9 +1,12 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Building, Home, Users, UserCheck, FileText, LogOut, Briefcase, Calendar, BarChart2, X, Shield } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
+  const { t, i18n } = useTranslation();
+  const isRtl = i18n.language === 'ar';
 
   const links = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
@@ -21,8 +24,8 @@ const Sidebar = ({ isOpen, onClose }) => {
   ];
 
   return (
-    <aside className={`fixed inset-y-0 left-0 w-64 glass-panel !rounded-none !border-l-0 !border-t-0 !border-b-0 border-r border-white/10 text-white z-50 flex flex-col transform transition-transform duration-300 ease-in-out ${
-      isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+    <aside className={`fixed inset-y-0 start-0 w-64 glass-panel !rounded-none !border-l-0 !border-t-0 !border-b-0 border-e border-white/10 text-white z-50 flex flex-col transform transition-transform duration-300 ease-in-out ${
+      isOpen ? 'translate-x-0' : `${isRtl ? 'translate-x-full' : '-translate-x-full'} md:translate-x-0`
     }`}>
       <div className="p-6 border-b border-white/10 flex justify-between items-center">
         <Link to="/" className="text-2xl font-bold font-heading text-primary block">
@@ -46,11 +49,11 @@ const Sidebar = ({ isOpen, onClose }) => {
               className={`flex items-center px-4 py-3 rounded-xl transition-all duration-300 ${
                 isActive 
                   ? 'bg-primary text-black font-bold shadow-[0_0_15px_rgba(0,240,255,0.3)]' 
-                  : 'text-gray-400 hover:bg-white/5 hover:text-white hover:translate-x-1'
+                  : 'text-gray-400 hover:bg-white/5 hover:text-white hover:translate-x-1 rtl:hover:-translate-x-1'
               }`}
             >
-              <Icon size={20} className="mr-3" />
-              <span className="font-medium">{link.name}</span>
+              <Icon size={20} className="me-3" />
+              <span className="font-medium">{t(link.name.toLowerCase())}</span>
             </Link>
           );
         })}
@@ -61,8 +64,8 @@ const Sidebar = ({ isOpen, onClose }) => {
           to="/login" 
           className="flex items-center px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors"
         >
-          <LogOut size={20} className="mr-3" />
-          <span className="font-medium">Sign Out</span>
+          <LogOut size={20} className="me-3" />
+          <span className="font-medium">{t('signOut', 'Sign Out')}</span>
         </Link>
       </div>
     </aside>

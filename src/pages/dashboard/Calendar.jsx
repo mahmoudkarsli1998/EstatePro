@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Filter } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Filter, Plus } from 'lucide-react';
 
 const Calendar = () => {
+  const { t, i18n } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedFilter, setSelectedFilter] = useState('all');
 
@@ -31,8 +33,8 @@ const Calendar = () => {
     <div className="space-y-6 font-sans">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold font-heading text-white mb-2">Calendar</h1>
-          <p className="text-gray-400">Manage your schedule and upcoming events.</p>
+          <h1 className="text-3xl font-bold font-heading text-white mb-2">{t('calendar')}</h1>
+          <p className="text-gray-400">{t('manageSchedule')}</p>
         </div>
         <div className="flex gap-3">
           <div className="glass-panel px-4 py-2 flex items-center gap-2">
@@ -42,35 +44,35 @@ const Calendar = () => {
               onChange={(e) => setSelectedFilter(e.target.value)}
               className="bg-transparent border-none text-white focus:outline-none text-sm"
             >
-              <option value="all">All Events</option>
-              <option value="meeting">Meetings</option>
-              <option value="viewing">Viewings</option>
-              <option value="contract">Contracts</option>
+              <option value="all">{t('allEvents')}</option>
+              <option value="meeting">{t('meetings')}</option>
+              <option value="viewing">{t('viewings')}</option>
+              <option value="contract">{t('contracts')}</option>
             </select>
           </div>
-          <button className="glass-button !py-2">Add Event</button>
+          <button className="glass-button !py-2">{t('addEvent')}</button>
         </div>
       </div>
 
       <div className="glass-panel p-6">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-xl font-bold text-white font-heading">
-            {currentDate.toLocaleString('default', { month: 'long', year: 'numeric' })}
+            {currentDate.toLocaleString(i18n.language === 'ar' ? 'ar-EG' : 'default', { month: 'long', year: 'numeric' })}
           </h2>
           <div className="flex gap-2">
-            <button onClick={prevMonth} className="p-2 hover:bg-white/10 rounded-lg text-white transition-colors">
-              <ChevronLeft size={20} />
+             <button onClick={prevMonth} className="p-2 hover:bg-white/10 rounded-lg text-white transition-colors">
+              {i18n.dir() === 'rtl' ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
             </button>
             <button onClick={nextMonth} className="p-2 hover:bg-white/10 rounded-lg text-white transition-colors">
-              <ChevronRight size={20} />
+              {i18n.dir() === 'rtl' ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
             </button>
           </div>
         </div>
 
         <div className="grid grid-cols-7 gap-4 mb-4">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+          {['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'].map(day => (
             <div key={day} className="text-center text-gray-400 font-medium text-sm">
-              {day}
+              {t(day)}
             </div>
           ))}
         </div>
@@ -95,7 +97,7 @@ const Calendar = () => {
                     </div>
                   ))}
                 </div>
-                <button className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 p-1 hover:bg-white/20 rounded text-white transition-all">
+                <button className="absolute bottom-2 end-2 opacity-0 group-hover:opacity-100 p-1 hover:bg-white/20 rounded text-white transition-all">
                   <Plus size={14} />
                 </button>
               </div>
@@ -108,11 +110,6 @@ const Calendar = () => {
 };
 
 // Helper icon
-const Plus = ({ size }) => (
-  <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <line x1="12" y1="5" x2="12" y2="19"></line>
-    <line x1="5" y1="12" x2="19" y2="12"></line>
-  </svg>
-);
+// Removed Plus definition as it is imported from lucide-react
 
 export default Calendar;

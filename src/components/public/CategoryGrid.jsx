@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Key, LockOpen, Building2, RefreshCw, Percent, KeyRound, Tag, PieChart } from 'lucide-react';
 import { useStaggerList } from '../../hooks/useGSAPAnimations';
 import { useNavigate } from 'react-router-dom';
@@ -16,18 +17,19 @@ const CategoryCard = ({ icon: Icon, title, onClick }) => (
 );
 
 const CategoryGrid = () => {
+  const { t } = useTranslation();
   const containerRef = useStaggerList({ selector: '.category-item', delay: 0.2, threshold: 0.1 });
   const navigate = useNavigate();
 
   const categories = [
-    { icon: Key, title: "EstatePro Keys", filter: { type: 'keys' } },
-    { icon: LockOpen, title: "Unlocked", filter: { status: 'unlocked' } },
-    { icon: Building2, title: "Developer Units", filter: { type: 'developer' } },
-    { icon: RefreshCw, title: "Resale Units", filter: { status: 'resale' } },
-    { icon: Percent, title: "Offers", filter: { type: 'offer' } },
-    { icon: KeyRound, title: "Move Now", filter: { status: 'ready' } },
-    { icon: Tag, title: "Sell Your Unit", action: '/sell' }, // Example direct link
-    { icon: PieChart, title: "Invest", filter: { type: 'invest' } }
+    { icon: Key, title: t('estateProKeys'), filter: { type: 'keys' } },
+    { icon: LockOpen, title: t('unlocked'), filter: { status: 'unlocked' } },
+    { icon: Building2, title: t('developerUnits'), filter: { type: 'developer' } },
+    { icon: RefreshCw, title: t('resaleUnits'), filter: { status: 'resale' } },
+    { icon: Percent, title: t('offers'), filter: { type: 'offer' } },
+    { icon: KeyRound, title: t('moveNow'), filter: { status: 'ready' } },
+    { icon: Tag, title: t('sellYourUnit'), action: '/sell' }, 
+    { icon: PieChart, title: t('invest'), filter: { type: 'invest' } }
   ];
 
   const handleCategoryClick = (category) => {
@@ -46,7 +48,7 @@ const CategoryGrid = () => {
     <section className="py-16 relative z-10 -mt-10">
       <div className="container mx-auto px-4 md:px-6">
         <h2 className="text-2xl md:text-3xl font-bold font-heading text-white mb-8 pl-2 border-l-4 border-primary">
-          What Are You Looking For?
+          {t('whatAreYouLookingFor')}
         </h2>
         
         <div ref={containerRef} className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">

@@ -1,8 +1,10 @@
 import React from 'react';
-import { BarChart2, TrendingUp, Users, DollarSign, Activity } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { BarChart2, TrendingUp, Users, DollarSign, Activity, Download } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
 
 const Analysis = () => {
+  const { t } = useTranslation();
   const data = [
     { name: 'Jan', revenue: 4000, expenses: 2400, profit: 2400 },
     { name: 'Feb', revenue: 3000, expenses: 1398, profit: 2210 },
@@ -14,10 +16,10 @@ const Analysis = () => {
   ];
 
   const pieData = [
-    { name: 'Residential', value: 400 },
-    { name: 'Commercial', value: 300 },
-    { name: 'Industrial', value: 300 },
-    { name: 'Land', value: 200 },
+    { name: t('residential'), value: 400 },
+    { name: t('commercial'), value: 300 },
+    { name: t('industrial'), value: 300 },
+    { name: t('land'), value: 200 },
   ];
 
   const COLORS = ['#00F0FF', '#8B5CF6', '#FF0055', '#00FF94'];
@@ -42,21 +44,21 @@ const Analysis = () => {
     <div className="space-y-8 font-sans">
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-3xl font-bold font-heading text-white mb-2">Analysis & Reports</h1>
-          <p className="text-gray-400">Deep dive into your business performance.</p>
+          <h1 className="text-3xl font-bold font-heading text-white mb-2">{t('analysisReports')}</h1>
+          <p className="text-gray-400">{t('deepDive')}</p>
         </div>
         <div className="flex gap-3">
-          <button className="glass-button">Download PDF</button>
+          <button className="glass-button">{t('downloadPDF')}</button>
         </div>
       </div>
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         {[
-          { title: 'Total Revenue', value: '$128.5K', change: '+12.5%', icon: DollarSign, color: 'text-green-400' },
-          { title: 'Total Expenses', value: '$42.8K', change: '-2.4%', icon: Activity, color: 'text-red-400' },
-          { title: 'Net Profit', value: '$85.7K', change: '+18.2%', icon: TrendingUp, color: 'text-primary' },
-          { title: 'Active Users', value: '2,450', change: '+5.8%', icon: Users, color: 'text-blue-400' },
+          { title: t('totalRevenue'), value: '$128.5K', change: '+12.5%', icon: DollarSign, color: 'text-green-400' },
+          { title: t('totalExpenses'), value: '$42.8K', change: '-2.4%', icon: Activity, color: 'text-red-400' },
+          { title: t('netProfit'), value: '$85.7K', change: '+18.2%', icon: TrendingUp, color: 'text-primary' },
+          { title: t('activeUsers'), value: '2,450', change: '+5.8%', icon: Users, color: 'text-blue-400' },
         ].map((stat, i) => (
           <div key={i} className="glass-panel p-6">
             <div className="flex justify-between items-start mb-4">
@@ -69,7 +71,7 @@ const Analysis = () => {
               </div>
             </div>
             <span className={`text-sm font-bold ${stat.color}`}>{stat.change}</span>
-            <span className="text-xs text-gray-500 ml-2">vs last month</span>
+            <span className="text-xs text-gray-500 ms-2">{t('vsLastMonth')}</span>
           </div>
         ))}
       </div>
@@ -77,7 +79,7 @@ const Analysis = () => {
       {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[400px]">
         <div className="lg:col-span-2 glass-panel p-6 flex flex-col">
-          <h3 className="text-xl font-bold text-white mb-6 font-heading">Financial Overview</h3>
+          <h3 className="text-xl font-bold text-white mb-6 font-heading">{t('financialOverview')}</h3>
           <div className="flex-1 w-full min-h-0">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data}>
@@ -103,7 +105,7 @@ const Analysis = () => {
         </div>
 
         <div className="glass-panel p-6 flex flex-col">
-          <h3 className="text-xl font-bold text-white mb-6 font-heading">Property Distribution</h3>
+          <h3 className="text-xl font-bold text-white mb-6 font-heading">{t('propertyDistribution')}</h3>
           <div className="flex-1 w-full min-h-0 relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -126,7 +128,7 @@ const Analysis = () => {
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
                 <p className="text-2xl font-bold text-white">1,200</p>
-                <p className="text-xs text-gray-400">Total Units</p>
+                <p className="text-xs text-gray-400">{t('units', 'Units')}</p>
               </div>
             </div>
           </div>

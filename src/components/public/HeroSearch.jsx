@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Search, ChevronDown } from 'lucide-react';
 import Button from '../shared/Button';
 import { useGSAP } from '@gsap/react';
@@ -6,6 +7,7 @@ import gsap from 'gsap';
 import { useNavigate } from 'react-router-dom';
 
 const HeroSearch = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('compounds');
   const [isExpanded, setIsExpanded] = useState(false);
   const containerRef = useRef(null);
@@ -73,7 +75,7 @@ const HeroSearch = () => {
           }`}
           onClick={() => setActiveTab('compounds')}
         >
-          Compounds
+          {t('compounds')}
         </button>
         <button
           className={`flex-1 py-4 text-center font-bold text-sm uppercase tracking-wider transition-colors ${
@@ -83,7 +85,7 @@ const HeroSearch = () => {
           }`}
           onClick={() => setActiveTab('properties')}
         >
-          Properties
+          {t('properties')}
         </button>
       </div>
 
@@ -94,7 +96,7 @@ const HeroSearch = () => {
           <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-primary" size={20} />
           <input
             type="text"
-            placeholder="Search by Area, Compound, or Developer..."
+            placeholder={t('searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-12 pr-4 py-4 rounded-xl bg-white/5 border border-white/10 text-white placeholder-gray-400 focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all text-lg"
@@ -112,11 +114,12 @@ const HeroSearch = () => {
                 onChange={(e) => setPropertyType(e.target.value)}
                 className="w-full appearance-none pl-4 pr-10 py-3 rounded-lg border border-white/10 text-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer bg-white/5 backdrop-blur-sm"
               >
-                <option value="" className="bg-dark-bg">Property Types</option>
-                <option value="apartment" className="bg-dark-bg">Apartment</option>
-                <option value="villa" className="bg-dark-bg">Villa</option>
-                <option value="townhouse" className="bg-dark-bg">Townhouse</option>
-                <option value="office" className="bg-dark-bg">Office</option>
+
+                <option value="" className="bg-dark-bg">{t('propertyTypes')}</option>
+                <option value="apartment" className="bg-dark-bg">{t('apartment')}</option>
+                <option value="villa" className="bg-dark-bg">{t('villa')}</option>
+                <option value="townhouse" className="bg-dark-bg">{t('townhouse')}</option>
+                <option value="office" className="bg-dark-bg">{t('office')}</option>
               </select>
               <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
             </div>
@@ -127,10 +130,12 @@ const HeroSearch = () => {
                 onChange={(e) => setBeds(e.target.value)}
                 className="w-full appearance-none pl-4 pr-10 py-3 rounded-lg border border-white/10 text-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer bg-white/5 backdrop-blur-sm"
               >
-                <option value="" className="bg-dark-bg">Beds and Baths</option>
-                <option value="1" className="bg-dark-bg">1+ Bed</option>
-                <option value="2" className="bg-dark-bg">2+ Beds</option>
-                <option value="3" className="bg-dark-bg">3+ Beds</option>
+
+
+                <option value="" className="bg-dark-bg">{t('bedsAndBaths')}</option>
+                <option value="1" className="bg-dark-bg">{t('onePlusBed')}</option>
+                <option value="2" className="bg-dark-bg">{t('twoPlusBeds')}</option>
+                <option value="3" className="bg-dark-bg">{t('threePlusBeds')}</option>
               </select>
               <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
             </div>
@@ -141,10 +146,12 @@ const HeroSearch = () => {
                 onChange={(e) => setPriceRange(e.target.value)}
                 className="w-full appearance-none pl-4 pr-10 py-3 rounded-lg border border-white/10 text-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer bg-white/5 backdrop-blur-sm"
               >
-                <option value="" className="bg-dark-bg">Price Range</option>
-                <option value="0-1m" className="bg-dark-bg">Under 1M</option>
-                <option value="1m-5m" className="bg-dark-bg">1M - 5M</option>
-                <option value="5m+" className="bg-dark-bg">5M+</option>
+
+
+                <option value="" className="bg-dark-bg">{t('priceRange')}</option>
+                <option value="0-1m" className="bg-dark-bg">{t('under1M')}</option>
+                <option value="1m-5m" className="bg-dark-bg">{t('oneToFiveM')}</option>
+                <option value="5m+" className="bg-dark-bg">{t('fiveMPlus')}</option>
               </select>
               <ChevronDown className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
             </div>
@@ -154,7 +161,7 @@ const HeroSearch = () => {
                 onClick={handleSearch}
                 className="w-full md:w-32 h-full justify-center font-bold text-white shadow-[0_0_20px_rgba(0,240,255,0.3)] hover:shadow-[0_0_30px_rgba(0,240,255,0.5)]"
               >
-                Search
+                {t('search')}
               </Button>
             </div>
           </div>

@@ -4,7 +4,10 @@ import LiquidBackground from '../../components/shared/LiquidBackground';
 import HouseDesigner from '../../components/public/HouseDesigner';
 import { PenTool, Layers, Palette } from 'lucide-react';
 
+import { useTranslation } from 'react-i18next';
+
 const DesignStudio = () => {
+  const { t } = useTranslation();
   return (
     <div className="min-h-screen relative pt-24 pb-12 overflow-hidden">
       <LiquidBackground />
@@ -16,10 +19,10 @@ const DesignStudio = () => {
           className="text-center mb-12"
         >
           <h1 className="text-4xl md:text-6xl font-bold font-heading text-white mb-6 drop-shadow-[0_0_15px_rgba(0,240,255,0.3)]">
-            Design <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">Studio</span>
+            {t('designStudio')}
           </h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-            Customize your future home in real-time. Experiment with layouts, finishes, and features.
+            {t('designStudioDesc')}
           </p>
         </motion.div>
 
@@ -33,9 +36,9 @@ const DesignStudio = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16">
           {[
-            { icon: Layers, title: "Modular Layouts", desc: "Add floors and expand your living space effortlessly." },
-            { icon: Palette, title: "Custom Finishes", desc: "Choose from a curated palette of premium materials." },
-            { icon: PenTool, title: "Instant Pricing", desc: "Get real-time cost estimates as you design." }
+            { icon: Layers, title: "modularLayouts", desc: "modularLayoutsDesc" },
+            { icon: Palette, title: "customFinishes", desc: "customFinishesDesc" },
+            { icon: PenTool, title: "instantPricing", desc: "instantPricingDesc" }
           ].map((item, index) => (
             <motion.div
               key={index}
@@ -48,8 +51,8 @@ const DesignStudio = () => {
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                 <item.icon size={24} />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
-              <p className="text-gray-400 text-sm">{item.desc}</p>
+              <h3 className="text-lg font-bold text-white mb-2">{t(item.title)}</h3>
+              <p className="text-gray-400 text-sm">{t(item.desc)}</p>
             </motion.div>
           ))}
         </div>

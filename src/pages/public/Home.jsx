@@ -13,7 +13,10 @@ import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
 import { useFadeIn, useStaggerList } from '../../hooks/useGSAPAnimations';
 
+import { useTranslation } from 'react-i18next';
+
 const Home = () => {
+  const { t, i18n } = useTranslation();
   const [isDemoOpen, setIsDemoOpen] = useState(false);
   const containerRef = useRef(null);
   
@@ -49,16 +52,16 @@ const Home = () => {
         <div className="container mx-auto px-4 md:px-6 relative z-10 text-center">
           <div ref={heroContentRef} className="max-w-5xl mx-auto">
             <div className="stagger-item opacity-0 inline-block mb-6 px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-medium tracking-wide uppercase shadow-[0_0_20px_rgba(255,255,255,0.1)]">
-              The Future of Living
+              {t('futureOfLiving')}
             </div>
             
             <h1 className="stagger-item opacity-0 text-5xl md:text-7xl font-bold font-heading mb-8 leading-tight text-white drop-shadow-2xl">
-              Discover Your <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-secondary">Perfect Sanctuary</span>
+              {t('discoverYour')} <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-secondary">{t('perfectSanctuary')}</span>
             </h1>
             
             <p className="stagger-item opacity-0 text-xl text-gray-200 mb-12 max-w-2xl mx-auto leading-relaxed font-light">
-              Search and Compare Among 15000+ Properties And 800+ Prime Compounds
+              {t('heroSubtitle')}
             </p>
 
             {/* New Hero Search Component */}
@@ -69,17 +72,17 @@ const Home = () => {
             <div className="stagger-item opacity-0 flex justify-center items-center gap-12 text-gray-400">
               <div className="flex flex-col items-center">
                 <span className="text-3xl font-bold text-white">150+</span>
-                <span className="text-sm uppercase tracking-wider">Projects</span>
+                <span className="text-sm uppercase tracking-wider">{t('projects')}</span>
               </div>
               <div className="w-px h-12 bg-white/10"></div>
               <div className="flex flex-col items-center">
                 <span className="text-3xl font-bold text-white">12k+</span>
-                <span className="text-sm uppercase tracking-wider">Happy Users</span>
+                <span className="text-sm uppercase tracking-wider">{t('happyUsers')}</span>
               </div>
               <div className="w-px h-12 bg-white/10"></div>
               <div className="flex flex-col items-center">
                 <span className="text-3xl font-bold text-white">50+</span>
-                <span className="text-sm uppercase tracking-wider">Awards</span>
+                <span className="text-sm uppercase tracking-wider">{t('awards')}</span>
               </div>
             </div>
           </div>
@@ -97,17 +100,17 @@ const Home = () => {
       <section className="py-24 relative z-10">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold font-heading mb-4 text-white">Why Choose Us</h2>
+            <h2 className="text-4xl md:text-5xl font-bold font-heading mb-4 text-white">{t('whyChooseUs')}</h2>
             <p className="text-gray-400 max-w-2xl mx-auto text-lg">
-              We combine cutting-edge technology with premium real estate to deliver an unmatched experience.
+              {t('whyChooseUsDesc')}
             </p>
           </div>
 
           <div ref={featuresRef} className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { icon: Shield, title: "Secure Transactions", desc: "Blockchain-backed security for all your property dealings." },
-              { icon: Globe, title: "Global Access", desc: "Browse and buy properties from anywhere in the world." },
-              { icon: Zap, title: "Instant Valuation", desc: "AI-powered algorithms to give you the best market rates." }
+              { icon: Shield, title: "secureTransactions", desc: "secureTransactionsDesc" },
+              { icon: Globe, title: "globalAccess", desc: "globalAccessDesc" },
+              { icon: Zap, title: "instantValuation", desc: "instantValuationDesc" }
             ].map((item, index) => (
               <div
                 key={index}
@@ -116,8 +119,8 @@ const Home = () => {
                 <div className="w-16 h-16 mx-auto mb-6 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300 shadow-[0_0_20px_rgba(0,240,255,0.2)]">
                   <item.icon size={32} />
                 </div>
-                <h3 className="text-xl font-bold mb-4 text-white group-hover:text-primary transition-colors">{item.title}</h3>
-                <p className="text-gray-400 leading-relaxed">{item.desc}</p>
+                <h3 className="text-xl font-bold mb-4 text-white group-hover:text-primary transition-colors">{t(item.title)}</h3>
+                <p className="text-gray-400 leading-relaxed">{t(item.desc)}</p>
               </div>
             ))}
           </div>
@@ -133,13 +136,13 @@ const Home = () => {
           >
             <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-secondary/10 z-0"></div>
             <div className="relative z-10">
-              <h2 className="text-4xl md:text-6xl font-bold font-heading mb-6 text-white">Ready to Find Your Home?</h2>
+              <h2 className="text-4xl md:text-6xl font-bold font-heading mb-6 text-white">{t('readyToFindHome')}</h2>
               <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
-                Join thousands of satisfied users who have found their dream properties through our platform.
+                {t('readyToFindHomeDesc')}
               </p>
               <Link to="/projects">
                 <Button size="lg" className="text-lg px-10 py-4 shadow-[0_0_40px_rgba(0,240,255,0.3)] hover:shadow-[0_0_60px_rgba(0,240,255,0.5)]">
-                  Get Started Now <ArrowRight className="ml-2" />
+                  {t('getStartedNow')} <div className={`inline-block ${i18n.dir() === 'rtl' ? 'rotate-180' : ''}`}><ArrowRight className="ms-2" /></div>
                 </Button>
               </Link>
             </div>

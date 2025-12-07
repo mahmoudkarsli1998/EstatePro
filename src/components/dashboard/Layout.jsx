@@ -18,7 +18,7 @@ const DashboardLayout = () => {
         />
       )}
 
-      <div className="flex-1 md:ml-64 flex flex-col min-w-0 transition-all duration-300">
+      <div className="flex-1 md:ms-64 flex flex-col min-w-0 transition-all duration-300">
         <Header onMenuClick={() => setIsSidebarOpen(true)} />
         <main className="flex-1 p-4 md:p-6 overflow-y-auto overflow-x-hidden">
           <Outlet />

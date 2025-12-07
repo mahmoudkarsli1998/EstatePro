@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 @config "../tailwind.config.js";
 
@@ -8,6 +8,11 @@
   font-family: 'Plus Jakarta Sans', sans-serif;
   line-height: 1.6; /* Increased for better readability */
   font-weight: 400;
+
+  /* RTL Font Support */
+  &[dir="rtl"] {
+    font-family: 'Cairo', sans-serif;
+  }
   
   /* Light Mode Variables - Soft Glass Aesthetic */
   --bg-primary: #f8fafc; /* Lighter, cleaner background */
