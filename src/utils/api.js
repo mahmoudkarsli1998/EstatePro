@@ -226,6 +226,25 @@ export const api = {
     });
   },
 
+  addFollowUp: (leadId, followUp, performedById) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const lead = leads.find(l => l.id === parseInt(leadId));
+        if (lead) {
+          if (!lead.followUps) lead.followUps = [];
+          const followUpData = typeof followUp === 'string' ? { note: followUp } : followUp;
+          lead.followUps.push({
+            ...followUpData,
+            id: Date.now(),
+            date: new Date().toISOString(),
+            performedById
+          });
+        }
+        resolve(lead);
+      }, 600);
+    });
+  },
+
   deleteLead: (id) => {
     return new Promise((resolve) => {
       setTimeout(() => {

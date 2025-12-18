@@ -669,7 +669,8 @@ export const leads = [
     assignedAgentId: 1,
     status: "new",
     source: "website",
-    createdAt: "2025-11-28T14:30:00Z"
+    createdAt: "2025-11-28T14:30:00Z",
+    followUps: [{ id: 1, date: "2025-11-29T10:00:00Z", note: "Initial contact made via email.", performedById: 1 }]
   },
   {
     id: 2,
@@ -682,7 +683,8 @@ export const leads = [
     assignedAgentId: 2,
     status: "contacted",
     source: "referral",
-    createdAt: "2025-11-27T09:15:00Z"
+    createdAt: "2025-11-27T09:15:00Z",
+    followUps: []
   },
   {
     id: 3,
@@ -695,7 +697,8 @@ export const leads = [
     assignedAgentId: 1,
     status: "qualified",
     source: "social_media",
-    createdAt: "2025-11-26T16:45:00Z"
+    createdAt: "2025-11-26T16:45:00Z",
+    followUps: []
   },
   {
     id: 4,
@@ -708,7 +711,8 @@ export const leads = [
     assignedAgentId: 3,
     status: "closed",
     source: "website",
-    createdAt: "2025-11-20T11:00:00Z"
+    createdAt: "2025-11-20T11:00:00Z",
+    followUps: []
   },
   {
     id: 5,
@@ -721,7 +725,8 @@ export const leads = [
     assignedAgentId: 1,
     status: "new",
     source: "website",
-    createdAt: "2025-11-29T10:00:00Z"
+    createdAt: "2025-11-29T10:00:00Z",
+    followUps: []
   },
   {
     id: 6,
@@ -734,7 +739,8 @@ export const leads = [
     assignedAgentId: 2,
     status: "contacted",
     source: "referral",
-    createdAt: "2025-11-28T15:30:00Z"
+    createdAt: "2025-11-28T15:30:00Z",
+    followUps: []
   },
   {
     id: 7,
@@ -747,7 +753,8 @@ export const leads = [
     assignedAgentId: 2,
     status: "qualified",
     source: "social_media",
-    createdAt: "2025-11-27T12:00:00Z"
+    createdAt: "2025-11-27T12:00:00Z",
+    followUps: []
   },
   {
     id: 8,
@@ -760,6 +767,7 @@ export const leads = [
     assignedAgentId: 3,
     status: "new",
     source: "website",
-    createdAt: "2025-11-26T09:00:00Z"
+    createdAt: "2025-11-26T09:00:00Z",
+    followUps: []
   }
 ];
