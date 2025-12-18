@@ -14,11 +14,11 @@ const LanguageSwitcher = () => {
   return (
     <div className="flex items-center gap-2">
       <button
-        onClick={() => changeLanguage(i18n.language === 'en' ? 'ar' : 'en')}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors text-sm font-medium"
+        onClick={() => changeLanguage(i18n.language.startsWith('en') ? 'ar' : 'en')}
+        className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors text-sm font-medium text-white"
       >
         <Globe className="w-4 h-4" />
-        <span>{i18n.language === 'en' ? 'العربية' : 'English'}</span>
+        <span>{i18n.language.startsWith('en') ? 'العربية' : 'English'}</span>
       </button>
     </div>
   );

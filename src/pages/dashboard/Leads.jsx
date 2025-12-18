@@ -14,7 +14,6 @@ const Leads = () => {
     const { t } = useTranslation();
     const [viewMode, setViewMode] = useState('list');
     const [selectedLead, setSelectedLead] = useState(null);
-    const [activeAssignId, setActiveAssignId] = useState(null);
     const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
     const [followUpNote, setFollowUpNote] = useState('');
     const [currentUser, setCurrentUser] = useState(null);
@@ -56,7 +55,7 @@ const Leads = () => {
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-                setActiveAssignId(null);
+                // setActiveAssignId(null);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
@@ -107,35 +106,79 @@ const Leads = () => {
         );
     };
 
-    const AssignDropdown = ({ leadId }) => (
-        <motion.div
-            initial={{ opacity: 0, y: -10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            className="absolute right-0 mt-2 w-72 bg-slate-950 border border-white/10 rounded-2xl shadow-2xl z-[100] overflow-hidden backdrop-blur-xl"
-            ref={dropdownRef}
-        >
-            <div className="p-4 border-b border-white/5 bg-white/5">
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.2em]">{t('assignAgent')}</span>
-            </div>
-            <div className="max-h-72 overflow-y-auto p-2 custom-scrollbar">
-                {agents.map(agent => (
-                    <button
-                        key={agent.id}
-                        className="w-full flex items-center p-3 rounded-xl hover:bg-white/5 transition-all text-start group mb-1 last:mb-0"
-                        onClick={() => handleAssign(leadId, agent.id)}
+    const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+    const [leadToAssign, setLeadToAssign] = useState(null);
+
+    const openAssignModal = (lead) => {
+        setLeadToAssign(lead);
+        setIsAssignModalOpen(true);
+    };
+
+    const handleAssignAgent = async (agentId) => {
+        if (!leadToAssign) return;
+        await api.updateLead(leadToAssign.id, { assignedAgentId: agentId, status: 'contacted' });
+        await refresh();
+        setIsAssignModalOpen(false);
+        setLeadToAssign(null);
+    };
+
+    const AssignAgentModal = () => (
+        <AnimatePresence>
+            {isAssignModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+                    <motion.div 
+                        initial={{ opacity: 0 }} 
+                        animate={{ opacity: 1 }} 
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                        onClick={() => setIsAssignModalOpen(false)}
+                    />
+                    <motion.div 
+                        initial={{ opacity: 0, scale: 0.95, y: 10 }} 
+                        animate={{ opacity: 1, scale: 1, y: 0 }} 
+                        exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                        className="relative w-full max-w-md bg-[#0f172a] border border-white/10 rounded-3xl shadow-2xl overflow-hidden z-20"
                     >
-                        <div className="relative w-10 h-10 rounded-full border-2 border-white/5 group-hover:border-primary/50 overflow-hidden transition-all shadow-inner">
-                            <img src={agent.avatar} alt={agent.name} className="w-full h-full object-cover" />
+                        <div className="p-8 pb-0">
+                            <h2 className="text-2xl font-black text-white mb-2">{t('assignAgent')}</h2>
+                            <p className="text-sm text-gray-400 font-medium">
+                                {t('selectAgentToAssign', { name: leadToAssign?.name })}
+                            </p>
                         </div>
-                        <div className="ms-3 flex-1 min-w-0">
-                            <div className="font-bold text-white text-sm truncate group-hover:text-primary transition-colors">{agent.name}</div>
-                            <div className="text-[10px] text-gray-500 truncate mt-0.5">{agent.email}</div>
+                        
+                        <div className="p-4 max-h-[400px] overflow-y-auto custom-scrollbar my-4 space-y-1">
+                            {agents.map(agent => (
+                                <button
+                                    key={agent.id}
+                                    onClick={() => handleAssignAgent(agent.id)}
+                                    className="w-full flex items-center p-3 rounded-2xl hover:bg-white/5 transition-all group"
+                                >
+                                    <div className="w-10 h-10 rounded-full bg-slate-800 border-2 border-white/5 group-hover:border-primary/50 overflow-hidden shrink-0">
+                                        <img src={agent.avatar} alt={agent.name} className="w-full h-full object-cover" />
+                                    </div>
+                                    <div className="ml-4 flex-1 text-left min-w-0">
+                                        <div className="text-sm font-bold text-white group-hover:text-primary transition-colors truncate">{agent.name}</div>
+                                        <div className="text-xs text-gray-500 truncate mt-0.5">{agent.email}</div>
+                                    </div>
+                                    {leadToAssign?.assignedAgentId === agent.id && (
+                                        <CheckCircle2 size={18} className="text-primary ml-2 shrink-0" />
+                                    )}
+                                </button>
+                            ))}
                         </div>
-                    </button>
-                ))}
-            </div>
-        </motion.div>
+
+                        <div className="p-6 pt-0 flex justify-end">
+                            <button 
+                                onClick={() => setIsAssignModalOpen(false)}
+                                className="px-6 py-2.5 rounded-xl bg-white/5 text-white font-bold text-sm hover:bg-white/10 transition-colors"
+                            >
+                                {t('cancel')}
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
     );
 
     return (
@@ -241,7 +284,7 @@ const Leads = () => {
                                         <td className="px-8 py-6">
                                             <div className="relative">
                                                 <button 
-                                                    onClick={() => setActiveAssignId(activeAssignId === lead.id ? null : lead.id)}
+                                                    onClick={() => openAssignModal(lead)}
                                                     className={`group/btn p-1 rounded-2xl transition-all duration-300 ${lead.assignedAgentId ? 'bg-white/5 hover:bg-white/10' : 'bg-primary/10 text-primary hover:bg-primary hover:text-white shadow-sm'}`}
                                                 >
                                                     {lead.assignedAgentId ? (
@@ -261,10 +304,6 @@ const Leads = () => {
                                                         </div>
                                                     )}
                                                 </button>
-                                                
-                                                <AnimatePresence>
-                                                    {activeAssignId === lead.id && <AssignDropdown leadId={lead.id} />}
-                                                </AnimatePresence>
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
@@ -356,7 +395,7 @@ const Leads = () => {
                                              <div className="flex items-center">
                                                 <div className="relative">
                                                      <button 
-                                                        onClick={() => setActiveAssignId(activeAssignId === lead.id ? null : lead.id)}
+                                                        onClick={() => openAssignModal(lead)}
                                                         className="w-9 h-9 rounded-xl border-2 border-white/10 hover:border-primary overflow-hidden transition-all shadow-2xl active:scale-90 bg-white/5"
                                                      >
                                                          {lead.assignedAgentId ? (
@@ -367,9 +406,6 @@ const Leads = () => {
                                                             </div>
                                                          )}
                                                      </button>
-                                                     <AnimatePresence>
-                                                        {activeAssignId === lead.id && <AssignDropdown leadId={lead.id} />}
-                                                     </AnimatePresence>
                                                 </div>
                                                 {lead.assignedAgentId && (
                                                     <span className="ms-2 text-[9px] font-bold text-gray-500 uppercase tracking-tighter max-w-[60px] truncate">{agents.find(a => a.id === lead.assignedAgentId)?.name}</span>
@@ -530,6 +566,9 @@ const Leads = () => {
                     </form>
                 </div>
             </Modal>
+
+            {/* Assign Agent Modal */}
+            <AssignAgentModal />
         </div>
     );
 };
