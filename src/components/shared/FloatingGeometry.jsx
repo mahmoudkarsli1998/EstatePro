@@ -44,7 +44,7 @@ const FloatingGeometry = ({ className }) => {
       {/* Shape 2 - Icosahedron representation */}
       <div 
         ref={shape2Ref}
-        className="absolute bottom-1/4 right-10 w-40 h-40 border border-white/10 bg-white/5 backdrop-blur-sm rotate-12"
+        className="absolute bottom-1/4 right-10 w-40 h-40 border border-border/20 bg-white/5 backdrop-blur-sm rotate-12"
         style={{ clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)' }}
       ></div>
     </div>

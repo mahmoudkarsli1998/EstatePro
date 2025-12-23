@@ -77,7 +77,7 @@ const InviteAccept = () => {
       
       <div className="glass-panel p-8 max-w-md w-full z-10">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold font-heading text-white mb-2">{t('welcomeExclamation')}</h1>
+          <h1 className="text-3xl font-bold font-heading text-textDark dark:text-white mb-2">{t('welcomeExclamation')}</h1>
           <p className="text-gray-400">{t('completeSetup')}</p>
         </div>
 

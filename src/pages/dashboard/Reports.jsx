@@ -214,7 +214,7 @@ const Reports = () => {
         <head>
           <title>Report - ${new Date().toLocaleDateString()}</title>
           <style>
-            body { font-family: Arial, sans-serif; padding: 20px; color: #000; }
+            body { font-family: Arial, sans-serif; padding: 20px; color: #000; background: #fff; }
             h1 { color: #333; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
             h2 { color: #555; margin-top: 20px; }
             table { width: 100%; border-collapse: collapse; margin-top: 15px; }
@@ -251,8 +251,8 @@ const Reports = () => {
       {/* Header */}
       <div className="flex flex-col xl:flex-row justify-between items-end gap-4">
         <div className="w-full xl:w-auto">
-          <h1 className="text-3xl font-bold font-heading text-white mb-2">{t('analyticsReports')}</h1>
-          <p className="text-gray-400">{t('detailedInsights')}</p>
+          <h1 className="text-3xl font-bold font-heading text-textDark dark:text-white mb-2">{t('analyticsReports')}</h1>
+          <p className="text-textLight dark:text-gray-400">{t('detailedInsights')}</p>
         </div>
         
         <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
@@ -261,25 +261,25 @@ const Reports = () => {
             <select
               value={selectedProject}
               onChange={(e) => setSelectedProject(e.target.value)}
-              className="w-full appearance-none px-4 py-2.5 bg-dark-card border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
+              className="w-full appearance-none px-4 py-2.5 bg-background dark:bg-dark-card border border-border/20 rounded-lg text-textDark dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer"
             >
               <option value="all">{t('allProjects')}</option>
               {data.projects.map(p => (
                 <option key={p.id} value={p.id}>{p.name}</option>
               ))}
             </select>
-            <Filter size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
+            <Filter size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-textLight dark:text-gray-400 pointer-events-none" />
           </div>
 
-          <div className="bg-dark-card border border-white/10 rounded-lg p-1 flex items-center overflow-x-auto">
+          <div className="bg-background dark:bg-dark-card border border-border/20 rounded-lg p-1 flex items-center overflow-x-auto">
             {['30d', '6m', '1y', 'all'].map(range => (
               <button
                 key={range}
                 onClick={() => setTimeRange(range)}
                 className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all whitespace-nowrap ${
                   timeRange === range 
-                    ? 'bg-primary text-black shadow-lg' 
-                    : 'text-gray-400 hover:text-white'
+                    ? 'bg-primary text-white shadow-lg' 
+                    : 'text-textLight dark:text-gray-400 hover:text-textDark dark:hover:text-white'
                 }`}
               >
                 {t(range === '30d' ? 'last30Days' : range === '6m' ? 'last6Months' : range === '1y' ? 'lastYear' : 'allTime')}
@@ -339,7 +339,7 @@ const Reports = () => {
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <p className="text-gray-400 text-sm">{stat.title}</p>
-                  <h3 className="text-2xl font-bold text-white mt-1">{stat.value}</h3>
+                  <h3 className="text-2xl font-bold text-textDark dark:text-white mt-1">{stat.value}</h3>
                 </div>
                 <div className={`p-3 bg-${stat.color}-500/10 rounded-lg text-${stat.color}-400`}>
                   <stat.icon size={20} />
@@ -359,7 +359,7 @@ const Reports = () => {
         {/* Revenue Trend */}
         <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>
           <Card className="p-6">
-            <h3 className="text-lg font-bold text-white mb-6 font-heading">{t('revenueGrowth')}</h3>
+            <h3 className="text-lg font-bold text-textDark dark:text-white mb-6 font-heading">{t('revenueGrowth')}</h3>
             <div className="h-80 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={processedData.timelineData}>
@@ -369,9 +369,9 @@ const Reports = () => {
                       <stop offset="95%" stopColor="#00F0FF" stopOpacity={0}/>
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
-                  <XAxis dataKey="name" stroke="#64748b" tick={{fill: '#94a3b8'}} axisLine={false} tickLine={false} />
-                  <YAxis stroke="#64748b" tick={{fill: '#94a3b8'}} axisLine={false} tickLine={false} tickFormatter={(val) => `$${val/1000}k`} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(100,100,100,0.1)" vertical={false} />
+                  <XAxis dataKey="name" stroke="#64748b" tick={{fill: 'var(--text-light)'}} axisLine={false} tickLine={false} />
+                  <YAxis stroke="#64748b" tick={{fill: 'var(--text-light)'}} axisLine={false} tickLine={false} tickFormatter={(val) => `$${val/1000}k`} />
                   <Tooltip content={<CustomTooltip />} />
                   <Area type="monotone" dataKey="revenue" stroke="#00F0FF" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
                 </AreaChart>
@@ -383,7 +383,7 @@ const Reports = () => {
         {/* Property Distribution */}
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }}>
           <Card className="p-6">
-            <h3 className="text-lg font-bold text-white mb-6 font-heading">{t('propertyDistribution')}</h3>
+            <h3 className="text-lg font-bold text-textDark dark:text-white mb-6 font-heading">{t('propertyDistribution')}</h3>
             <div className="h-80 w-full flex items-center justify-center">
                <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -418,13 +418,13 @@ const Reports = () => {
          {/* Leads & Users Trend */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
         <Card className="p-6">
-          <h3 className="text-lg font-bold text-white mb-6 font-heading">{t('growthAnalytics')}</h3>
+          <h3 className="text-lg font-bold text-textDark dark:text-white mb-6 font-heading">{t('growthAnalytics')}</h3>
           <div className="h-80 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={processedData.timelineData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
-                <XAxis dataKey="name" stroke="#64748b" tick={{fill: '#94a3b8'}} axisLine={false} tickLine={false} />
-                <YAxis stroke="#64748b" tick={{fill: '#94a3b8'}} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(100,100,100,0.1)" vertical={false} />
+                <XAxis dataKey="name" stroke="#64748b" tick={{fill: 'var(--text-light)'}} axisLine={false} tickLine={false} />
+                <YAxis stroke="#64748b" tick={{fill: 'var(--text-light)'}} axisLine={false} tickLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
                 <Bar dataKey="leads" name={t('leads')} fill="#7000FF" radius={[4, 4, 0, 0]} />
@@ -440,7 +440,7 @@ const Reports = () => {
         {/* Unit Status */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
          <Card className="p-6">
-          <h3 className="text-lg font-bold text-white mb-6 font-heading">{t('unitStatus')}</h3>
+          <h3 className="text-lg font-bold text-textDark dark:text-white mb-6 font-heading">{t('unitStatus')}</h3>
           <div className="h-80 w-full flex items-center justify-center">
              <ResponsiveContainer width="100%" height="100%">
               <PieChart>

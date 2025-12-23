@@ -49,7 +49,7 @@ const Bar = ({ position, height, color, label, value }) => {
       {/* Value Tooltip */}
       {hovered && (
         <Html position={[0, height + 0.5, 0]} center>
-          <div className="bg-black/80 backdrop-blur text-white px-3 py-1.5 rounded-lg text-xs whitespace-nowrap border border-primary/50 shadow-[0_0_15px_rgba(0,240,255,0.3)] font-bold">
+          <div className="bg-black/80 backdrop-blur text-white px-3 py-1.5 rounded-lg text-xs whitespace-nowrap border border-primary/50 shadow-md font-bold">
             ${value}
           </div>
         </Html>

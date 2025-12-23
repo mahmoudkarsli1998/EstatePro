@@ -68,7 +68,7 @@ const Admins = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <div>
-           <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">{t('admins')}</h1>
+           <h1 className="text-2xl font-bold font-heading text-textDark dark:text-white">{t('admins')}</h1>
            <p className="text-gray-400 text-sm mt-1">{t('manageAdmins')}</p>
         </div>
         <div className="flex gap-3">
@@ -81,8 +81,8 @@ const Admins = () => {
         </div>
       </div>
 
-      <div className="bg-dark-card border border-white/10 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+      <div className="bg-background dark:bg-dark-card border border-border/20 rounded-xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-border/20 flex justify-between items-center">
           <div className="relative max-w-md w-full">
             <Search size={18} className="absolute inset-y-0 start-3 my-auto text-gray-400" />
             <input 
@@ -110,7 +110,7 @@ const Admins = () => {
 
         <div className="overflow-x-auto">
           <table className="w-full text-start">
-            <thead className="bg-white/5 text-gray-400 font-medium text-sm">
+            <thead className="bg-section/50 text-textLight font-medium text-sm">
               <tr>
                 <th className="px-6 py-4 text-start">{t('name')}</th>
                 <th className="px-6 py-4 text-start">{t('contact')}</th>
@@ -120,7 +120,7 @@ const Admins = () => {
                 <th className="px-6 py-4 text-start">{t('actions')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="divide-y divide-border/10">
               {loading ? (
                 <tr><td colSpan="6" className="px-6 py-4 text-center">{t('loading')}</td></tr>
               ) : admins.length === 0 ? (
@@ -128,7 +128,7 @@ const Admins = () => {
               ) : admins.map((admin) => (
                 <tr key={admin.id} className="hover:bg-white/5 transition-colors border-b border-white/5 last:border-0">
                   <td className="px-6 py-4">
-                    <div className="font-medium text-gray-900 dark:text-white flex items-center gap-2">
+                    <div className="font-medium text-textDark dark:text-white flex items-center gap-2">
                         {admin.role === 'Super Admin' && <Shield size={14} className="text-primary" />}
                         {admin.name}
                     </div>

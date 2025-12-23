@@ -20,8 +20,8 @@ const SalesChart = () => {
   return (
     <div className="glass-panel p-6 h-full">
       <div className="flex justify-between items-center mb-6">
-        <h3 className="text-xl font-bold text-white font-heading">Sales Overview</h3>
-        <select className="bg-white/5 border border-white/10 rounded-lg text-sm text-gray-300 px-3 py-1 outline-none">
+        <h3 className="text-xl font-bold text-textDark dark:text-white font-heading">Sales Overview</h3>
+        <select className="bg-background dark:bg-white/5 border border-border/20 dark:border-white/10 rounded-lg text-sm text-textLight dark:text-gray-300 px-3 py-1 outline-none">
           <option>This Year</option>
           <option>Last Year</option>
         </select>
@@ -40,13 +40,13 @@ const SalesChart = () => {
             <XAxis 
               dataKey="name" 
               stroke="#6b7280" 
-              tick={{fill: '#9ca3af', fontSize: 12}} 
+              tick={{fill: 'var(--text-light)', fontSize: 12}} 
               axisLine={false}
               tickLine={false}
             />
             <YAxis 
               stroke="#6b7280" 
-              tick={{fill: '#9ca3af', fontSize: 12}} 
+              tick={{fill: 'var(--text-light)', fontSize: 12}} 
               axisLine={false}
               tickLine={false}
               tickFormatter={(value) => `$${value}`}

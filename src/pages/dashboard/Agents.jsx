@@ -47,7 +47,7 @@ const Agents = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">{t('agents')}</h1>
+        <h1 className="text-2xl font-bold font-heading text-textDark dark:text-white">{t('agents')}</h1>
         <div className="flex gap-3">
           <Button variant="outline" onClick={onExport}>
             <Download size={18} className="me-2" /> {t('export')}
@@ -58,8 +58,8 @@ const Agents = () => {
         </div>
       </div>
 
-      <div className="bg-dark-card border border-white/10 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-background dark:bg-dark-card border border-border/20 rounded-xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-border/20">
           <div className="relative max-w-md">
             <Search size={18} className="absolute inset-y-0 start-3 my-auto text-gray-400" />
             <input 
@@ -78,8 +78,8 @@ const Agents = () => {
           ) : agents.length === 0 ? (
             <div className="text-center col-span-full text-gray-400">{t('noAgentsFound')}</div>
           ) : agents.map((agent) => (
-            <div key={agent.id} className="bg-white/5 border border-white/10 rounded-xl p-6 flex flex-col items-center text-center hover:border-primary/50 transition-colors group">
-              <div className="w-20 h-20 rounded-full bg-gray-800 mb-4 overflow-hidden border-2 border-white/10 group-hover:border-primary/50 transition-colors">
+            <div key={agent.id} className="glass-panel p-6 flex flex-col items-center text-center hover:border-primary/50 transition-colors group">
+              <div className="w-20 h-20 rounded-full bg-primary/10 mb-4 overflow-hidden border-2 border-border/20 group-hover:border-primary/50 transition-colors">
                 <img src={agent.avatar} alt={agent.name} className="w-full h-full object-cover" />
               </div>
               <h3 className="text-lg font-bold text-white mb-1">{agent.name}</h3>

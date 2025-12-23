@@ -57,7 +57,7 @@ const Users = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">{t('users')}</h1>
+        <h1 className="text-2xl font-bold font-heading text-textDark dark:text-white">{t('users')}</h1>
         <div className="flex gap-3">
           <Button variant="outline" onClick={onExport}>
             <Download size={18} className="me-2" /> {t('export')}
@@ -68,12 +68,12 @@ const Users = () => {
         </div>
       </div>
 
-      <div className="bg-dark-card border border-white/10 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-background dark:bg-dark-card border border-border/20 rounded-xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-border/20">
           <input 
             type="text" 
             placeholder={t('searchUsers')}
-            className="w-full max-w-md ps-4 pe-4 py-2 rounded-lg border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-500"
+            className="w-full max-w-md ps-4 pe-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-textDark dark:text-white placeholder-textLight"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -81,7 +81,7 @@ const Users = () => {
 
         <div className="overflow-x-auto">
           <table className="w-full text-left">
-            <thead className="bg-white/5 text-gray-400 font-medium text-sm">
+            <thead className="bg-section/50 text-textLight font-medium text-sm">
               <tr>
                 <th className="px-6 py-4 text-start">{t('user')}</th>
                 <th className="px-6 py-4 text-start">{t('role')}</th>
@@ -90,31 +90,31 @@ const Users = () => {
                 <th className="px-6 py-4 text-start">{t('actions')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="divide-y divide-border/10">
               {loading ? (
                 <tr><td colSpan="5" className="px-6 py-4 text-center">{t('loading')}</td></tr>
               ) : users.length === 0 ? (
                 <tr><td colSpan="5" className="px-6 py-4 text-center">{t('noUsersFound')}</td></tr>
               ) : users.map((user) => (
-                <tr key={user.id} className="hover:bg-white/5 transition-colors border-b border-white/5 last:border-0">
+                <tr key={user.id} className="hover:bg-section dark:hover:bg-white/5 transition-colors border-b border-border/10 dark:border-white/5 last:border-0">
                   <td className="px-6 py-4">
                     <div className="flex items-center">
                       <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center me-3">
                         <User size={16} className="text-gray-400" />
                       </div>
                       <div>
-                        <div className="font-medium text-gray-900 dark:text-white">{user.fullName}</div>
-                        <div className="text-xs text-gray-400">{user.email}</div>
+                        <div className="font-medium text-textDark dark:text-white">{user.fullName}</div>
+                        <div className="text-xs text-textLight dark:text-gray-400">{user.email}</div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4 capitalize text-gray-300">{user.role}</td>
+                  <td className="px-6 py-4 capitalize text-textDark dark:text-gray-300">{user.role}</td>
                   <td className="px-6 py-4">
                     <Badge variant={user.isActive ? 'success' : 'warning'}>
                       {user.isActive ? t('active') : t('pending')}
                     </Badge>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-400">
+                  <td className="px-6 py-4 text-sm text-textLight dark:text-gray-400">
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 flex gap-2">
@@ -163,7 +163,7 @@ const Users = () => {
           <div>
             <label className="block text-sm font-medium text-gray-400 mb-1">{t('role')}</label>
             <select 
-              className="w-full px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary"
+              className="w-full px-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 text-textDark dark:text-white focus:outline-none focus:border-primary"
               name="role"
               value={formData.role}
               onChange={handleInputChange}

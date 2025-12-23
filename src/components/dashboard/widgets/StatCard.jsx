@@ -6,11 +6,11 @@ const StatCard = ({ title, value, change, trend, icon: Icon, color }) => {
     <div className="glass-panel p-6 relative overflow-hidden group hover:bg-white/5 transition-colors">
       <div className="flex justify-between items-start mb-4">
         <div>
-          <p className="text-gray-400 text-sm font-medium mb-1">{title}</p>
-          <h3 className="text-3xl font-bold text-white">{value}</h3>
+          <p className="text-textLight dark:text-gray-400 text-sm font-medium mb-1">{title}</p>
+          <h3 className="text-3xl font-bold text-textDark dark:text-white">{value}</h3>
         </div>
         <div className={`w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br ${color} bg-opacity-10 shadow-lg group-hover:scale-110 transition-transform`}>
-          <Icon size={24} className="text-white" />
+          <Icon size={24} className="text-textDark dark:text-white" />
         </div>
       </div>
       
@@ -19,7 +19,7 @@ const StatCard = ({ title, value, change, trend, icon: Icon, color }) => {
           {trend === 'up' ? <ArrowUp size={16} /> : <ArrowDown size={16} />}
           {change}
         </span>
-        <span className="text-gray-500 text-xs">vs last month</span>
+        <span className="text-textLight dark:text-gray-500 text-xs">vs last month</span>
       </div>
       
       {/* Decorative Glow */}

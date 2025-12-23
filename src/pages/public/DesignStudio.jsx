@@ -18,10 +18,10 @@ const DesignStudio = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl md:text-6xl font-bold font-heading text-white mb-6 drop-shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+          <h1 className="text-4xl md:text-6xl font-bold font-heading text-textDark dark:text-white mb-6 drop-shadow-md">
             {t('designStudio')}
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-textLight dark:text-gray-300 max-w-2xl mx-auto">
             {t('designStudioDesc')}
           </p>
         </motion.div>
@@ -51,8 +51,8 @@ const DesignStudio = () => {
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center text-primary">
                 <item.icon size={24} />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">{t(item.title)}</h3>
-              <p className="text-gray-400 text-sm">{t(item.desc)}</p>
+              <h3 className="text-lg font-bold text-textDark dark:text-white mb-2">{t(item.title)}</h3>
+              <p className="text-textLight dark:text-gray-400 text-sm">{t(item.desc)}</p>
             </motion.div>
           ))}
         </div>

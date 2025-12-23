@@ -9,10 +9,10 @@ const CategoryCard = ({ icon: Icon, title, onClick }) => (
     onClick={onClick}
     className="category-item opacity-0 flex flex-col items-center justify-center p-6 glass-panel rounded-2xl hover:bg-white/10 transition-all duration-300 cursor-pointer group hover:-translate-y-2 border border-white/5 active:scale-95"
   >
-    <div className="w-14 h-14 mb-4 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-[0_0_15px_rgba(0,240,255,0.2)] group-hover:shadow-[0_0_25px_rgba(0,240,255,0.5)]">
+    <div className="w-14 h-14 mb-4 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-md">
       <Icon size={28} />
     </div>
-    <span className="font-bold text-gray-300 group-hover:text-white transition-colors text-sm text-center tracking-wide">{title}</span>
+    <span className="font-bold text-textLight dark:text-gray-300 group-hover:text-primary dark:group-hover:text-white transition-colors text-sm text-center tracking-wide">{title}</span>
   </div>
 );
 
@@ -46,8 +46,8 @@ const CategoryGrid = () => {
 
   return (
     <section className="py-16 relative z-10 -mt-10">
-      <div className="container mx-auto px-4 md:px-6">
-        <h2 className="text-2xl md:text-3xl font-bold font-heading text-white mb-8 pl-2 border-l-4 border-primary">
+      <div className="w-full max-w-[1920px] mx-auto px-4 md:px-12">
+        <h2 className="text-2xl md:text-3xl font-bold font-heading text-textDark dark:text-white mb-8 pl-2 border-l-4 border-primary">
           {t('whatAreYouLookingFor')}
         </h2>
         

@@ -50,8 +50,8 @@ const Sell = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-center mb-12"
           >
-            <h1 className="text-4xl font-bold font-heading text-white mb-4">{t('sellYourUnit')}</h1>
-            <p className="text-gray-400 text-lg">{t('sellYourUnitDesc') || "List your property with us and reach thousands of potential buyers."}</p>
+            <h1 className="text-4xl font-bold font-heading text-textDark dark:text-white mb-4">{t('sellYourUnit')}</h1>
+            <p className="text-textLight dark:text-gray-400 text-lg">{t('sellYourUnitDesc') || "List your property with us and reach thousands of potential buyers."}</p>
           </motion.div>
 
           <motion.div
@@ -64,14 +64,14 @@ const Sell = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Property Type */}
                 <div className="space-y-2">
-                  <label className="text-gray-300 text-sm font-medium">{t('propertyType')}</label>
+                  <label className="text-textLight dark:text-gray-300 text-sm font-medium">{t('propertyType')}</label>
                   <div className="relative">
-                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+                    <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 text-textLight dark:text-gray-400" size={18} />
                     <select
                       name="propertyType"
                       value={formData.propertyType}
                       onChange={handleChange}
-                      className="w-full bg-white/5 border border-white/10 rounded-lg py-3 pl-10 pr-4 text-white focus:outline-none focus:border-primary transition-colors appearance-none"
+                      className="w-full bg-white dark:bg-white/5 border border-border/20 dark:border-white/10 rounded-lg py-3 pl-10 pr-4 text-textDark dark:text-white focus:outline-none focus:border-primary transition-colors appearance-none"
                     >
                       <option value="apartment">{t('apartment')}</option>
                       <option value="villa">{t('villa')}</option>
@@ -92,7 +92,7 @@ const Sell = () => {
                       value={formData.location}
                       onChange={handleChange}
                       placeholder={t('enterLocation') || "e.g. Downtown Dubai"}
-                      className="w-full bg-white/5 border border-white/10 rounded-lg py-3 pl-10 pr-4 text-white focus:outline-none focus:border-primary transition-colors"
+                      className="w-full bg-white dark:bg-white/5 border border-border/20 dark:border-white/10 rounded-lg py-3 pl-10 pr-4 text-textDark dark:text-white focus:outline-none focus:border-primary transition-colors"
                       required
                     />
                   </div>
@@ -109,7 +109,7 @@ const Sell = () => {
                       value={formData.price}
                       onChange={handleChange}
                       placeholder="0.00"
-                      className="w-full bg-white/5 border border-white/10 rounded-lg py-3 pl-10 pr-4 text-white focus:outline-none focus:border-primary transition-colors"
+                      className="w-full bg-white dark:bg-white/5 border border-border/20 dark:border-white/10 rounded-lg py-3 pl-10 pr-4 text-textDark dark:text-white focus:outline-none focus:border-primary transition-colors"
                       required
                     />
                   </div>
@@ -124,7 +124,7 @@ const Sell = () => {
                     value={formData.area}
                     onChange={handleChange}
                     placeholder="e.g. 150"
-                    className="w-full bg-white/5 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-primary transition-colors"
+                    className="w-full bg-white dark:bg-white/5 border border-border/20 dark:border-white/10 rounded-lg py-3 px-4 text-textDark dark:text-white focus:outline-none focus:border-primary transition-colors"
                     required
                   />
                 </div>
@@ -139,12 +139,12 @@ const Sell = () => {
                   onChange={handleChange}
                   rows={4}
                   placeholder={t('propertyDescriptionPlaceholder') || "Describe the key features and selling points..."}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-primary transition-colors"
+                  className="w-full bg-white dark:bg-white/5 border border-border/20 dark:border-white/10 rounded-lg py-3 px-4 text-textDark dark:text-white focus:outline-none focus:border-primary transition-colors"
                 ></textarea>
               </div>
 
-              <div className="pt-4 border-t border-white/10">
-                <h3 className="text-white font-bold mb-4">{t('contactInformation')}</h3>
+              <div className="pt-4 border-t border-border/20 dark:border-white/10">
+                <h3 className="text-textDark dark:text-white font-bold mb-4">{t('contactInformation')}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <input
                     type="text"
@@ -152,7 +152,7 @@ const Sell = () => {
                     value={formData.name}
                     onChange={handleChange}
                     placeholder={t('fullName')}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-primary transition-colors"
+                    className="w-full bg-white dark:bg-white/5 border border-border/20 dark:border-white/10 rounded-lg py-3 px-4 text-textDark dark:text-white focus:outline-none focus:border-primary transition-colors"
                     required
                   />
                   <input
@@ -161,7 +161,7 @@ const Sell = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     placeholder={t('phoneNumber')}
-                    className="w-full bg-white/5 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-primary transition-colors"
+                    className="w-full bg-white dark:bg-white/5 border border-border/20 dark:border-white/10 rounded-lg py-3 px-4 text-textDark dark:text-white focus:outline-none focus:border-primary transition-colors"
                     required
                   />
                 </div>

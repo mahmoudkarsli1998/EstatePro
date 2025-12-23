@@ -24,7 +24,7 @@ const Navbar = () => {
     { name: t('home'), path: '/' },
     { name: t('projects'), path: '/projects' },
     { name: t('location'), path: '/locations' },
-    { name: t('designStudio'), path: '/design' },
+    // { name: t('designStudio'), path: '/design' },
     { name: t('sell'), path: '/sell' },
     { name: t('aboutUs'), path: '/about' },
     { name: t('contact'), path: '/contact' },
@@ -34,17 +34,17 @@ const Navbar = () => {
     <nav
       className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 w-[95%] md:w-[90%] max-w-7xl rounded-2xl ${
         isScrolled
-          ? 'bg-dark-card/80 backdrop-blur-xl border border-white/10 shadow-[0_0_30px_rgba(0,240,255,0.1)] py-3'
+          ? 'bg-background/90 dark:bg-section/90 backdrop-blur-md border border-border/50 shadow-lg py-3'
           : 'bg-transparent py-4'
       }`}
     >
       <div className="px-6 flex items-center justify-between">
         {/* Logo */}
-        <Link to="/" className="text-2xl font-bold font-heading text-white flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-            <span className="text-white text-lg">E</span>
+        <Link to="/" className="text-2xl font-bold font-heading text-textDark dark:text-white flex items-center gap-2">
+          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
+            <span className="text-white text-lg font-bold">E</span>
           </div>
-          <span>Estate<span className="text-primary">Pro</span></span>
+          <span>Estate<span className="text-primary dark:text-accent">Pro</span></span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -54,11 +54,11 @@ const Navbar = () => {
               key={link.name}
               to={link.path}
               className={`font-medium transition-all duration-300 relative group ${
-                location.pathname === link.path ? 'text-primary' : 'text-gray-300 hover:text-white'
+                location.pathname === link.path ? 'text-primary dark:text-accent' : 'text-textLight hover:text-primary dark:hover:text-accent'
               }`}
             >
               {link.name}
-              <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full ${
+              <span className={`absolute -bottom-1 left-0 w-0 h-0.5 bg-accent transition-all duration-300 group-hover:w-full ${
                 location.pathname === link.path ? 'w-full' : ''
               }`}></span>
             </Link>
@@ -69,11 +69,11 @@ const Navbar = () => {
         <div className="hidden md:flex items-center space-x-4">
           <LanguageSwitcher />
           <ThemeToggle />
-          <button className="p-2 text-gray-300 hover:text-primary transition-colors">
+          <button className="p-2 text-textLight hover:text-primary transition-colors">
             <Search size={20} />
           </button>
           <Link to="/login">
-            <Button variant="primary" size="sm" className="shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+            <Button variant="primary" size="sm" className="shadow-md hover:shadow-lg">
               <User size={16} className="mr-2 rtl:ml-2 rtl:mr-0" />
               {t('login')}
             </Button>
@@ -82,7 +82,7 @@ const Navbar = () => {
 
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden p-2 text-white"
+          className="md:hidden p-2 text-textDark dark:text-white"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -91,18 +91,18 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 mt-2 bg-dark-card/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl p-4 flex flex-col space-y-4 mx-4">
+        <div className="md:hidden absolute top-full left-0 right-0 mt-2 bg-background/95 dark:bg-section/95 backdrop-blur-md border border-border/50 rounded-2xl shadow-xl p-4 flex flex-col space-y-4 mx-4">
           {navLinks.map((link) => (
             <Link
               key={link.name}
               to={link.path}
-              className="text-gray-300 font-medium py-2 hover:text-primary transition-colors"
+              className="text-textLight hover:text-primary dark:text-gray-300 dark:hover:text-white font-medium py-2 transition-colors"
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {link.name}
             </Link>
           ))}
-          <div className="pt-4 border-t border-white/10 flex flex-col space-y-3">
+          <div className="pt-4 border-t border-border/10 flex flex-col space-y-3">
             <Link to="/login" onClick={() => setIsMobileMenuOpen(false)}>
               <Button className="w-full">{t('login')}</Button>
             </Link>

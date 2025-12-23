@@ -11,10 +11,7 @@
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
-    "@react-spring/three": "^10.0.3",
     "@react-spring/web": "^10.0.3",
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.4.2",
     "@tailwindcss/postcss": "^4.1.17",
     "firebase": "^12.6.0",
     "framer-motion": "^12.23.24",
@@ -22,13 +19,14 @@
     "i18next": "^25.7.1",
     "i18next-browser-languagedetector": "^8.2.0",
     "i18next-http-backend": "^3.0.2",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.555.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-i18next": "^16.4.0",
+    "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.9.6",
-    "recharts": "^3.5.1",
-    "three": "^0.181.2"
+    "recharts": "^3.5.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",

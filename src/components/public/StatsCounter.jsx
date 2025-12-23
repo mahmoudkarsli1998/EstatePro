@@ -36,7 +36,7 @@ const StatItem = ({ number, label, suffix = '' }) => {
       >
         <Counter value={parseInt(number)} suffix={suffix} />
       </motion.div>
-      <div className="text-gray-400 font-medium uppercase tracking-wider text-sm">
+      <div className="text-textLight dark:text-gray-400 font-medium uppercase tracking-wider text-sm">
         {label}
       </div>
     </div>
@@ -45,7 +45,7 @@ const StatItem = ({ number, label, suffix = '' }) => {
 
 const StatsCounter = () => {
   return (
-    <section className="py-16 bg-dark-card/30 border-y border-white/5 relative overflow-hidden">
+    <section className="py-16 bg-section dark:bg-dark-card/30 border-y border-border/10 dark:border-white/5 relative overflow-hidden">
       {/* Background Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full max-w-4xl bg-primary/5 blur-[100px] rounded-full pointer-events-none"></div>
       

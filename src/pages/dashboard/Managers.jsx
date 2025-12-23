@@ -66,7 +66,7 @@ const Managers = () => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <div>
-           <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">{t('managers')}</h1>
+           <h1 className="text-2xl font-bold font-heading text-textDark dark:text-white">{t('managers')}</h1>
            <p className="text-gray-400 text-sm mt-1">{t('manageManagers')}</p>
         </div>
         <div className="flex gap-3">
@@ -79,14 +79,14 @@ const Managers = () => {
         </div>
       </div>
 
-      <div className="bg-dark-card border border-white/10 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+      <div className="bg-background dark:bg-dark-card border border-border/20 rounded-xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-border/20 flex justify-between items-center">
           <div className="relative max-w-md w-full">
             <Search size={18} className="absolute inset-y-0 start-3 my-auto text-gray-400" />
             <input 
               type="text" 
               placeholder={t('searchManagers')}
-              className="w-full ps-10 pe-4 py-2 rounded-lg border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-500"
+              className="w-full ps-10 pe-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-textDark dark:text-white placeholder-textLight"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -94,7 +94,7 @@ const Managers = () => {
           <div className="flex items-center gap-2">
             <Filter size={18} className="text-gray-400" />
             <select 
-              className="bg-white/5 border border-white/10 rounded-lg text-white px-3 py-2 outline-none text-sm focus:border-primary"
+              className="bg-background dark:bg-white/5 border border-border/20 dark:border-white/10 rounded-lg text-textDark dark:text-white px-3 py-2 outline-none text-sm focus:border-primary"
               value={departmentFilter}
               onChange={(e) => setDepartmentFilter(e.target.value)}
             >
@@ -109,7 +109,7 @@ const Managers = () => {
 
         <div className="overflow-x-auto">
           <table className="w-full text-start">
-            <thead className="bg-white/5 text-gray-400 font-medium text-sm">
+            <thead className="bg-section/50 text-textLight font-medium text-sm">
               <tr>
                 <th className="px-6 py-4 text-start">{t('name')}</th>
                 <th className="px-6 py-4 text-start">{t('contact')}</th>
@@ -119,28 +119,28 @@ const Managers = () => {
                 <th className="px-6 py-4 text-start">{t('actions')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="divide-y divide-border/10">
               {loading ? (
                 <tr><td colSpan="6" className="px-6 py-4 text-center">{t('loading')}</td></tr>
               ) : managers.length === 0 ? (
                 <tr><td colSpan="6" className="px-6 py-4 text-center">{t('noManagersFound')}</td></tr>
               ) : managers.map((manager) => (
-                <tr key={manager.id} className="hover:bg-white/5 transition-colors border-b border-white/5 last:border-0">
+                <tr key={manager.id} className="hover:bg-section dark:hover:bg-white/5 transition-colors border-b border-border/10 dark:border-white/5 last:border-0">
                   <td className="px-6 py-4">
-                    <div className="font-medium text-gray-900 dark:text-white">{manager.name}</div>
+                    <div className="font-medium text-textDark dark:text-white">{manager.name}</div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col space-y-1">
-                      <div className="flex items-center text-sm text-gray-300">
+                      <div className="flex items-center text-sm text-textLight dark:text-gray-300">
                         <Mail size={12} className="me-2 text-gray-500" /> {manager.email}
                       </div>
-                      <div className="flex items-center text-sm text-gray-300">
+                      <div className="flex items-center text-sm text-textLight dark:text-gray-300">
                         <Phone size={12} className="me-2 text-gray-500" /> {manager.phone}
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="bg-white/10 px-2 py-1 rounded text-xs text-gray-300">
+                    <span className="bg-background dark:bg-white/10 px-2 py-1 rounded text-xs text-textLight dark:text-gray-300 border border-border/20 dark:border-transparent">
                         {manager.department}
                     </span>
                   </td>
@@ -149,7 +149,7 @@ const Managers = () => {
                       {manager.status}
                     </Badge>
                   </td>
-                  <td className="px-6 py-4 text-gray-300 text-sm">
+                  <td className="px-6 py-4 text-textLight dark:text-gray-300 text-sm">
                     {formatDate(manager.joinDate)}
                   </td>
                   <td className="px-6 py-4 flex gap-2">
@@ -201,9 +201,9 @@ const Managers = () => {
              onChange={handleInputChange}
           />
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">{t('department')}</label>
+            <label className="block text-sm font-medium text-textLight dark:text-gray-400 mb-1">{t('department')}</label>
             <select 
-              className="w-full px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary"
+              className="w-full px-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 text-textDark dark:text-white focus:outline-none focus:border-primary"
               name="department"
               value={formData.department}
               onChange={handleInputChange}
@@ -217,9 +217,9 @@ const Managers = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-400 mb-1">{t('status')}</label>
+            <label className="block text-sm font-medium text-textLight dark:text-gray-400 mb-1">{t('status')}</label>
             <select 
-              className="w-full px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary"
+              className="w-full px-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 text-textDark dark:text-white focus:outline-none focus:border-primary"
               name="status"
               value={formData.status}
               onChange={handleInputChange}

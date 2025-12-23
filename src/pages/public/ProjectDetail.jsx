@@ -100,7 +100,7 @@ const ProjectDetail = () => {
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         {/* Breadcrumb */}
         <div className="mb-6">
-          <Link to="/projects" className="inline-flex items-center text-gray-400 hover:text-primary transition-colors">
+          <Link to="/projects" className="inline-flex items-center text-textLight hover:text-primary transition-colors">
             <div className={`inline-block ${i18n.dir() === 'rtl' ? 'rotate-180' : ''}`}><ArrowLeft size={16} className="me-2" /></div> {t('backToProjects')}
           </Link>
         </div>
@@ -113,17 +113,17 @@ const ProjectDetail = () => {
           className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4"
         >
           <div>
-            <h1 className="text-3xl md:text-5xl font-bold font-heading text-white mb-2">
+            <h1 className="text-3xl md:text-5xl font-bold font-heading text-textDark dark:text-white mb-2">
               {project.name}
             </h1>
-            <div className="flex items-center text-gray-400">
+            <div className="flex items-center text-textLight">
               <MapPin size={18} className="mr-2 text-primary" />
               {project.address}
             </div>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-end">
-              <p className="text-sm text-gray-400">{t('startingFrom')}</p>
+              <p className="text-sm text-textLight">{t('startingFrom')}</p>
               <p className="text-2xl font-bold text-primary" style={{ direction: 'ltr' }}>
                 ${(project.priceRange.min / 1000).toFixed(0)}k
               </p>
@@ -157,7 +157,7 @@ const ProjectDetail = () => {
                     key={index}
                     onClick={() => setActiveImage(index)}
                     className={`flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden border-2 transition-all ${
-                      activeImage === index ? 'border-primary shadow-[0_0_15px_rgba(0,240,255,0.5)]' : 'border-transparent opacity-70 hover:opacity-100'
+                      activeImage === index ? 'border-primary shadow-md' : 'border-transparent opacity-70 hover:opacity-100'
                     }`}
                   >
                     <img src={img} alt={`View ${index + 1}`} className="w-full h-full object-cover" />
@@ -174,8 +174,8 @@ const ProjectDetail = () => {
               variants={fadeInUp}
               className="glass-panel p-8"
             >
-              <h2 className="text-2xl font-bold font-heading text-white mb-4">{t('overview')}</h2>
-              <p className="text-gray-300 leading-relaxed mb-6">
+              <h2 className="text-2xl font-bold font-heading text-textDark dark:text-white mb-4">{t('overview')}</h2>
+              <p className="text-textLight dark:text-gray-300 leading-relaxed mb-6">
                 {project.description}
               </p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -184,8 +184,8 @@ const ProjectDetail = () => {
                     <Building size={24} />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400">Type</p>
-                    <p className="font-bold text-white capitalize">{project.type}</p>
+                    <p className="text-xs text-textLight">Type</p>
+                    <p className="font-bold text-textDark dark:text-white capitalize">{project.type}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -193,8 +193,8 @@ const ProjectDetail = () => {
                     <Ruler size={24} />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400">{t('units')}</p>
-                    <p className="font-bold text-white">{project.stats.totalUnits}</p>
+                    <p className="text-xs text-textLight">{t('units')}</p>
+                    <p className="font-bold text-textDark dark:text-white">{project.stats.totalUnits}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -202,8 +202,8 @@ const ProjectDetail = () => {
                     <Calendar size={24} />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-400">{t('completion')}</p>
-                    <p className="font-bold text-white">2025</p>
+                    <p className="text-xs text-textLight">{t('completion')}</p>
+                    <p className="font-bold text-textDark dark:text-white">2025</p>
                   </div>
                 </div>
               </div>
@@ -217,10 +217,10 @@ const ProjectDetail = () => {
               variants={fadeInUp}
               className="glass-panel p-8"
             >
-              <h2 className="text-2xl font-bold font-heading text-white mb-6">{t('amenities')}</h2>
+              <h2 className="text-2xl font-bold font-heading text-textDark dark:text-white mb-6">{t('amenities')}</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {project.amenities.map((amenity, index) => (
-                  <div key={index} className="flex items-center gap-3 text-gray-300">
+                  <div key={index} className="flex items-center gap-3 text-textLight dark:text-gray-300">
                     <div className="w-6 h-6 rounded-full bg-green-500/20 flex items-center justify-center text-green-400">
                       <Check size={14} />
                     </div>
@@ -237,21 +237,21 @@ const ProjectDetail = () => {
               viewport={{ once: true }}
               variants={staggerContainer}
             >
-              <h2 className="text-2xl font-bold font-heading text-white mb-6">{t('availableUnits')}</h2>
+              <h2 className="text-2xl font-bold font-heading text-textDark dark:text-white mb-6">{t('availableUnits')}</h2>
               <div className="space-y-4">
                 {units.map((unit) => (
                   <motion.div 
                     key={unit.id}
                     variants={fadeInUp}
-                    className="glass-panel p-6 flex flex-col md:flex-row items-center justify-between gap-4 hover:bg-white/5 transition-colors"
+                    className="glass-panel p-6 flex flex-col md:flex-row items-center justify-between gap-4 hover:bg-section dark:hover:bg-white/5 transition-colors"
                   >
                     <div className="flex items-center gap-4 w-full md:w-auto">
                       <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
                         <img src={unit.images[0]} alt={unit.number} className="w-full h-full object-cover" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-lg text-white">{t('unitLabel', { number: unit.number })}</h3>
-                        <p className="text-gray-400 text-sm mb-1">
+                        <h3 className="font-bold text-lg text-textDark dark:text-white">{t('unitLabel', { number: unit.number })}</h3>
+                        <p className="text-textLight text-sm mb-1">
                           {unit.features.bedrooms} {t('bed')} • {unit.features.bathrooms} {t('bath')} • {unit.area_m2} m²
                         </p>
                         <Badge variant={unit.status === 'available' ? 'success' : 'neutral'}>
@@ -263,11 +263,11 @@ const ProjectDetail = () => {
                       <span className="text-2xl font-bold text-primary" style={{ direction: 'ltr' }}>${unit.price.toLocaleString()}</span>
                       <div className="flex gap-2 w-full md:w-auto">
                         <Link to={`/units/${unit.id}`} className="flex-1">
-                          <Button variant="outline" size="sm" className="w-full">{t('view3D')}</Button>
+                          <Button variant="outline" size="sm" className="w-full">{t('view')}</Button>
                         </Link>
                         <Button 
                           size="sm" 
-                          className="flex-1 shadow-[0_0_10px_rgba(0,240,255,0.3)]"
+                          className="flex-1 shadow-md"
                           onClick={() => {
                             setSelectedUnit(unit);
                             setIsContactOpen(true);
@@ -292,12 +292,12 @@ const ProjectDetail = () => {
                 transition={{ delay: 0.4, duration: 0.5 }}
               >
                 <Card className="p-6">
-                  <h3 className="text-xl font-bold text-white mb-4">{t('interested')}</h3>
-                  <p className="text-gray-400 mb-6">
+                  <h3 className="text-xl font-bold text-textDark dark:text-white mb-4">{t('interested')}</h3>
+                  <p className="text-textLight mb-6">
                     {t('interestedDesc', { name: project.name })}
                   </p>
                   <Button 
-                    className="w-full mb-3 shadow-[0_0_15px_rgba(0,240,255,0.3)]" 
+                    className="w-full mb-3 shadow-md" 
                     size="lg"
                     onClick={() => {
                       setSelectedUnit(null);
@@ -318,14 +318,14 @@ const ProjectDetail = () => {
                 transition={{ delay: 0.6, duration: 0.5 }}
               >
                 <Card className="p-6">
-                  <h3 className="text-lg font-bold text-white mb-4">{t('agent')}</h3>
+                  <h3 className="text-lg font-bold text-textDark dark:text-white mb-4">{t('agent')}</h3>
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-gray-700 overflow-hidden border border-white/10">
+                    <div className="w-12 h-12 rounded-full bg-gray-700 overflow-hidden border border-border/20 dark:border-white/10">
                       <img src={mockAgent.avatar} alt="Agent" />
                     </div>
                     <div>
-                      <p className="font-bold text-white">{mockAgent.name}</p>
-                      <p className="text-sm text-gray-400">{t('seniorPropertyConsultant')}</p>
+                      <p className="font-bold text-textDark dark:text-white">{mockAgent.name}</p>
+                      <p className="text-sm text-textLight">{t('seniorPropertyConsultant')}</p>
                     </div>
                   </div>
                   <Button 
@@ -367,37 +367,37 @@ const ProjectDetail = () => {
                 <img src={selectedAgent.avatar} alt={selectedAgent.name} className="w-full h-full object-cover" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white mb-1">{selectedAgent.name}</h2>
+                <h2 className="text-2xl font-bold text-textDark dark:text-white mb-1">{selectedAgent.name}</h2>
                 <p className="text-primary font-medium mb-3">{t('seniorPropertyConsultant')}</p>
-                <div className="space-y-1 text-sm text-gray-300">
+                <div className="space-y-1 text-sm text-textLight dark:text-gray-300">
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-500">Email:</span> {selectedAgent.email}
+                    <span className="text-textLight dark:text-gray-500">Email:</span> {selectedAgent.email}
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-500">Phone:</span> {selectedAgent.phone}
+                    <span className="text-textLight dark:text-gray-500">Phone:</span> {selectedAgent.phone}
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-4">
-              <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
-                <div className="text-2xl font-bold text-white mb-1">{selectedAgent.stats.sales}</div>
-                <div className="text-xs text-gray-400 uppercase tracking-wider">{t('totalSales')}</div>
+              <div className="bg-background dark:bg-white/5 rounded-xl p-4 text-center border border-border/20 dark:border-white/10">
+                <div className="text-2xl font-bold text-textDark dark:text-white mb-1">{selectedAgent.stats.sales}</div>
+                <div className="text-xs text-textLight uppercase tracking-wider">{t('totalSales')}</div>
               </div>
-              <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
-                <div className="text-2xl font-bold text-white mb-1">{selectedAgent.stats.listings}</div>
-                <div className="text-xs text-gray-400 uppercase tracking-wider">{t('activeListings')}</div>
+              <div className="bg-background dark:bg-white/5 rounded-xl p-4 text-center border border-border/20 dark:border-white/10">
+                <div className="text-2xl font-bold text-textDark dark:text-white mb-1">{selectedAgent.stats.listings}</div>
+                <div className="text-xs text-textLight uppercase tracking-wider">{t('activeListings')}</div>
               </div>
-              <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
-                <div className="text-2xl font-bold text-white mb-1">{selectedAgent.stats.rating}</div>
-                <div className="text-xs text-gray-400 uppercase tracking-wider">{t('rating')}</div>
+              <div className="bg-background dark:bg-white/5 rounded-xl p-4 text-center border border-border/20 dark:border-white/10">
+                <div className="text-2xl font-bold text-textDark dark:text-white mb-1">{selectedAgent.stats.rating}</div>
+                <div className="text-xs text-textLight uppercase tracking-wider">{t('rating')}</div>
               </div>
             </div>
 
             <div>
-              <h3 className="text-lg font-bold text-white mb-3">{t('about')}</h3>
-              <p className="text-gray-300 leading-relaxed text-sm">
+              <h3 className="text-lg font-bold text-textDark dark:text-white mb-3">{t('about')}</h3>
+              <p className="text-textLight dark:text-gray-300 leading-relaxed text-sm">
                 {selectedAgent.name} is a dedicated real estate professional with over 5 years of experience in the luxury market. 
                 Specializing in high-end residential properties, they have a proven track record of closing complex deals and ensuring client satisfaction.
               </p>

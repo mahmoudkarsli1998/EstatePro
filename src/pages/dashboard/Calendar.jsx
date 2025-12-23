@@ -33,7 +33,7 @@ const Calendar = () => {
     <div className="space-y-6 font-sans">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold font-heading text-white mb-2">{t('calendar')}</h1>
+          <h1 className="text-3xl font-bold font-heading text-textDark dark:text-white mb-2">{t('calendar')}</h1>
           <p className="text-gray-400">{t('manageSchedule')}</p>
         </div>
         <div className="flex gap-3">

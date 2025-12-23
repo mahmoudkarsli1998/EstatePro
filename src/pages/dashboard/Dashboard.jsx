@@ -7,6 +7,7 @@ import { api } from '../../utils/api';
 import StatCard from '../../components/dashboard/widgets/StatCard';
 import ActivityFeed from '../../components/dashboard/widgets/ActivityFeed';
 import Dashboard3D from '../../components/dashboard/Dashboard3D';
+import { ENABLE_3D } from '../../config/performance';
 
 import { useToast } from '../../context/ToastContext';
 
@@ -83,28 +84,15 @@ const Dashboard = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row justify-between items-end gap-4">
         <div>
-          <h1 className="text-3xl font-bold font-heading text-slate-900 dark:text-white mb-2">{t('dashboardOverview')}</h1>
-          <p className="text-gray-400">{t('welcomeMessage')}</p>
+          <h1 className="text-3xl font-bold font-heading text-textDark dark:text-white mb-2">{t('dashboardOverview')}</h1>
+          <p className="text-textLight dark:text-gray-400">{t('welcomeMessage')}</p>
         </div>
         <div className="flex gap-3">
-           <div className="bg-slate-200 dark:bg-dark-card border border-slate-300 dark:border-white/10 rounded-lg p-1 flex">
-             <button 
-               onClick={() => setViewMode('2D')}
-               className={`px-3 py-1.5 rounded-md text-sm flex items-center gap-2 transition-all ${viewMode === '2D' ? 'bg-primary text-black font-bold shadow-lg' : 'text-gray-400 hover:text-white'}`}
-             >
-               <LayoutGrid size={16} /> 2D
-             </button>
-             <button 
-               onClick={() => setViewMode('3D')}
-               className={`px-3 py-1.5 rounded-md text-sm flex items-center gap-2 transition-all ${viewMode === '3D' ? 'bg-primary text-black font-bold shadow-lg' : 'text-gray-400 hover:text-white'}`}
-             >
-               <Box size={16} /> 3D
-             </button>
-           </div>
+           <div></div>
            
            <button 
              onClick={() => toast.success('Report exported successfully!', 3000)}
-             className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold shadow-[0_0_15px_rgba(0,240,255,0.3)] hover:shadow-[0_0_25px_rgba(0,240,255,0.5)] transition-shadow"
+             className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold shadow-md hover:shadow-lg transition-shadow"
            >
              {t('exportReport')}
            </button>
@@ -153,7 +141,7 @@ const Dashboard = () => {
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[500px]">
           <div className="lg:col-span-2 h-full glass-panel p-6 flex flex-col">
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 font-heading">{t('revenueAnalytics')}</h3>
+            <h3 className="text-xl font-bold text-textDark dark:text-white mb-6 font-heading">{t('revenueAnalytics')}</h3>
             <div className="flex-1 w-full min-h-0">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={salesData}>
@@ -178,7 +166,7 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="h-full glass-panel p-6 flex flex-col">
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 font-heading">{t('trafficSources')}</h3>
+            <h3 className="text-xl font-bold text-textDark dark:text-white mb-6 font-heading">{t('trafficSources')}</h3>
             <div className="flex-1 w-full min-h-0">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={salesData}>
@@ -204,11 +192,11 @@ const Dashboard = () => {
         <div className="space-y-8">
           {/* Quick Actions */}
           <div className="glass-panel p-6">
-            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-6 font-heading">{t('quickActions')}</h3>
+            <h3 className="text-xl font-bold text-textDark dark:text-white mb-6 font-heading">{t('quickActions')}</h3>
             <div className="grid grid-cols-2 gap-4">
               <button 
                 onClick={() => navigate('/dashboard/projects', { state: { openCreateModal: true } })}
-                className="p-4 rounded-xl bg-slate-50 dark:bg-white/5 hover:bg-primary/20 dark:hover:bg-primary/20 hover:border-primary/50 border border-slate-200 dark:border-white/10 transition-all group flex flex-col items-center justify-center gap-2"
+                className="p-4 rounded-xl bg-section/30 dark:bg-white/5 hover:bg-primary/20 dark:hover:bg-primary/20 hover:border-primary/50 border border-border/20 transition-all group flex flex-col items-center justify-center gap-2"
               >
                 <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                   <Plus size={20} />
@@ -217,7 +205,7 @@ const Dashboard = () => {
               </button>
               <button 
                 onClick={() => navigate('/dashboard/users', { state: { openCreateModal: true } })}
-                className="p-4 rounded-xl bg-slate-50 dark:bg-white/5 hover:bg-purple-500/20 hover:border-purple-500/50 border border-slate-200 dark:border-white/10 transition-all group flex flex-col items-center justify-center gap-2"
+                className="p-4 rounded-xl bg-section/30 dark:bg-white/5 hover:bg-purple-500/20 hover:border-purple-500/50 border border-border/20 transition-all group flex flex-col items-center justify-center gap-2"
               >
                 <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">
                   <UserPlus size={20} />
@@ -226,7 +214,7 @@ const Dashboard = () => {
               </button>
               <button 
                 onClick={() => navigate('/dashboard/reports')}
-                className="p-4 rounded-xl bg-slate-50 dark:bg-white/5 hover:bg-pink-500/20 hover:border-pink-500/50 border border-slate-200 dark:border-white/10 transition-all group flex flex-col items-center justify-center gap-2"
+                className="p-4 rounded-xl bg-section/30 dark:bg-white/5 hover:bg-pink-500/20 hover:border-pink-500/50 border border-border/20 transition-all group flex flex-col items-center justify-center gap-2"
               >
                 <div className="w-10 h-10 rounded-full bg-pink-500/20 flex items-center justify-center text-pink-400 group-hover:scale-110 transition-transform">
                   <FileText size={20} />
@@ -235,7 +223,7 @@ const Dashboard = () => {
               </button>
               <button 
                  onClick={() => navigate('/dashboard/units')}
-                 className="p-4 rounded-xl bg-slate-50 dark:bg-white/5 hover:bg-green-500/20 hover:border-green-500/50 border border-slate-200 dark:border-white/10 transition-all group flex flex-col items-center justify-center gap-2"
+                 className="p-4 rounded-xl bg-section/30 dark:bg-white/5 hover:bg-green-500/20 hover:border-green-500/50 border border-border/20 transition-all group flex flex-col items-center justify-center gap-2"
               >
                 <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 group-hover:scale-110 transition-transform">
                   <DollarSign size={20} />

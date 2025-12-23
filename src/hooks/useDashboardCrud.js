@@ -27,6 +27,10 @@ export const useDashboardCrud = (
   const [formData, setFormData] = useState(initialFormState);
   const [searchTerm, setSearchTerm] = useState('');
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [activeFilters, setActiveFilters] = useState({});
+
   const loadItems = useCallback(async () => {
     setLoading(true);
     try {
@@ -46,8 +50,6 @@ export const useDashboardCrud = (
   const handleOpenModal = (item = null) => {
     if (item) {
       setEditingItem(item);
-      // Populate form data, assuming item keys match form keys
-      // We merge initialFormState to ensure all keys exist even if item is partial
       setFormData({ ...initialFormState, ...item });
     } else {
       setEditingItem(null);
@@ -78,7 +80,6 @@ export const useDashboardCrud = (
       if (editingItem) {
         if (updater) {
           await updater(editingItem.id, formData);
-          // Optimistic or refresh? Let's refresh for consistency with mock delays
           await loadItems();
         }
       } else {
@@ -99,13 +100,10 @@ export const useDashboardCrud = (
       try {
         if (deleter) {
           await deleter(id);
-          // Optimistic remove
           setItems(prev => prev.filter(item => item.id !== id));
         }
       } catch (error) {
         console.error("Delete failed", error);
-        // Revert on fail? For now just alert
-        alert("Delete failed.");
         loadItems();
       }
     }
@@ -128,26 +126,56 @@ export const useDashboardCrud = (
     document.body.removeChild(link);
   };
 
+  // 1. Filter Logic
   const filteredItems = items.filter(item => {
-    if (searchFilter) return searchFilter(item, searchTerm);
-    
-    if (!searchTerm) return true;
-    
-    // Default search: check all string values
-    return Object.values(item).some(val => 
-      String(val).toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    // A. Search Text
+    const matchesSearch = (() => {
+      if (searchFilter) return searchFilter(item, searchTerm);
+      if (!searchTerm) return true;
+      return Object.values(item).some(val => 
+        String(val).toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    })();
+
+    // B. Advanced Filters (Exact Match for simplicity, or custom logic)
+    const matchesFilters = Object.entries(activeFilters).every(([key, value]) => {
+      if (!value) return true; // Ignore empty filters
+      // Handle nested properties or specific logic if needed
+      return String(item[key]) === String(value);
+    });
+
+    return matchesSearch && matchesFilters;
   });
+
+  // 2. Pagination Logic
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+  const paginatedItems = filteredItems.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, activeFilters]);
 
   return {
     items,
-    filteredItems,
+    filteredItems, // Full filtered list (for stats)
+    paginatedItems, // Current page items (for display)
+    setAllItems: setItems,
     loading,
     isModalOpen,
     editingItem,
     formData,
     searchTerm,
     setSearchTerm,
+    activeFilters,
+    setActiveFilters,
+    currentPage,
+    setCurrentPage,
+    totalPages,
+    itemsPerPage,
     setFormData,
     handleOpenModal,
     handleCloseModal,

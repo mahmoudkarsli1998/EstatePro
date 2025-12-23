@@ -43,7 +43,7 @@ const Developers = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">{t('developers')}</h1>
+        <h1 className="text-2xl font-bold font-heading text-textDark dark:text-white">{t('developers')}</h1>
         <div className="flex gap-3">
           <Button variant="outline" onClick={onExport}>
             <Download size={18} className="me-2" /> {t('export')}
@@ -54,14 +54,14 @@ const Developers = () => {
         </div>
       </div>
 
-      <div className="bg-dark-card border border-white/10 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-background dark:bg-dark-card border border-border/20 rounded-xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-border/20">
           <div className="relative max-w-md">
-            <Search size={18} className="absolute inset-y-0 start-3 my-auto text-gray-400" />
+            <Search size={18} className="absolute inset-y-0 start-3 my-auto text-textLight dark:text-gray-400" />
             <input 
               type="text" 
               placeholder={t('searchDevelopers')}
-              className="w-full ps-10 pe-4 py-2 rounded-lg border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-500"
+              className="w-full ps-10 pe-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-textDark dark:text-white placeholder-textLight"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -74,26 +74,26 @@ const Developers = () => {
           ) : developers.length === 0 ? (
             <div className="text-center col-span-full text-gray-400">{t('noDevelopersFound')}</div>
           ) : developers.map((dev) => (
-            <div key={dev.id} className="bg-white/5 border border-white/10 rounded-xl p-6 flex flex-col items-center text-center hover:border-primary/50 transition-colors group">
-              <div className="w-20 h-20 rounded-full bg-gray-800 mb-4 overflow-hidden border-2 border-white/10 group-hover:border-primary/50 transition-colors">
+            <div key={dev.id} className="glass-panel p-6 flex flex-col items-center text-center hover:border-primary/50 transition-colors group bg-background dark:bg-white/5 border border-border/10 dark:border-white/10">
+              <div className="w-20 h-20 rounded-full bg-primary/10 mb-4 overflow-hidden border-2 border-border/20 group-hover:border-primary/50 transition-colors">
                 <img src={dev.logo} alt={dev.name} className="w-full h-full object-cover" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-1">{dev.name}</h3>
-              <p className="text-sm text-gray-400 mb-4">{dev.contactEmail}</p>
+              <h3 className="text-lg font-bold text-textDark dark:text-white mb-1">{dev.name}</h3>
+              <p className="text-sm text-textLight dark:text-gray-400 mb-4">{dev.contactEmail}</p>
               
-              <div className="flex items-center justify-center space-x-4 w-full mt-auto pt-4 border-t border-white/5">
-                <div className="text-xs text-gray-500">
-                  <span className="block font-bold text-white">{dev.projects?.length || 0}</span> {t('projects')}
+              <div className="flex items-center justify-center space-x-4 w-full mt-auto pt-4 border-t border-border/10 dark:border-white/5">
+                <div className="text-xs text-textLight dark:text-gray-500">
+                  <span className="block font-bold text-textDark dark:text-white">{dev.projects?.length || 0}</span> {t('projects')}
                 </div>
                 <div className="flex gap-2 ms-auto">
                   <button 
-                    className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                    className="p-2 text-blue-500 hover:bg-blue-500/10 rounded-lg transition-colors"
                     onClick={() => handleOpenModal(dev)}
                   >
                     <Edit size={16} />
                   </button>
                   <button 
-                    className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                    className="p-2 text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
                     onClick={() => handleDelete(dev.id)}
                   >
                     <Trash size={16} />

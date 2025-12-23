@@ -6,7 +6,7 @@
 
 :root {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  line-height: 1.6; /* Increased for better readability */
+  line-height: 1.6;
   font-weight: 400;
 
   /* RTL Font Support */
@@ -14,46 +14,48 @@
     font-family: 'Cairo', sans-serif;
   }
   
-  /* Light Mode Variables - Soft Premium Gray Aesthetic */
-  --bg-primary: #eef2f6; /* Cool light gray, not stark white */
-  --bg-card: rgba(255, 255, 255, 0.9);
-  --text-primary: #1e293b; /* Slate 800 */
-  --text-secondary: #64748b; /* Slate 500 */
-  --border-color: rgba(148, 163, 184, 0.3);
-  --primary-color: #00F0FF;
+  /* Light Mode Variables - default */
+  --primary: #0B3C5D;        /* Main brand color for headers, nav, primary buttons */
+  --background: #FAF9F6;     /* Global page background */
+  --accent: #C89B3C;         /* Highlights, CTAs, icons, links */
+  --accent-hover: #B88A2F;   /* Hover states for accent elements */
+  --section-bg: #E6D5B8;     /* Cards, sections, feature blocks */
+  --green: #4F6F52;          /* Success states, tags, confirmations */
+  --text-dark: #2E2E2E;      /* Primary text */
+  --text-light: #555555;     /* Secondary text */
+  --border-color: rgba(11, 60, 93, 0.1); 
   
   color-scheme: light;
-  color: var(--text-primary);
-  background-color: var(--bg-primary);
-  
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 .dark {
   /* Dark Mode Variables */
-  --bg-primary: #020617; /* Deep rich blue-black */
-  --bg-card: rgba(15, 23, 42, 0.7); /* Slightly more opaque for readability */
-  --text-primary: #f8fafc; /* Crisp white */
-  --text-secondary: #94a3b8; /* Lighter gray for better contrast on dark */
-  --border-color: rgba(255, 255, 255, 0.08);
-  
+  --primary: #3A7CA5;        /* Softer blue for dark backgrounds */
+  --background: #0F1418;     /* Main dark background (not pure black) */
+  --accent: #D4AF37;         /* Gold accent (slightly brighter for contrast) */
+  --accent-hover: #C29A2D;   /* Hover states for accent elements */
+  --section-bg: #1A232B;     /* Cards / sections */
+  --green: #6FAF7A;          /* Success / positive states */
+  --text-dark: #EAEAEA;      /* Primary text */
+  --text-light: #A0A6AC;     /* Secondary text */
+  --border-color: rgba(234, 234, 234, 0.1);
+
   color-scheme: dark;
-  color: var(--text-primary);
-  background-color: var(--bg-primary);
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
+  background-color: var(--background);
+  color: var(--text-dark);
   overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
   scroll-behavior: smooth;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -84,9 +86,9 @@ h1, h2, h3, h4, h5, h6 {
 
 @layer components {
   .glass-panel {
-    @apply backdrop-blur-xl rounded-2xl transition-all duration-300 ease-out relative;
-    background: rgba(255, 255, 255, 0.7);
-    border: 1px solid rgba(226, 232, 240, 0.8); /* Slate 200 */
+    @apply backdrop-blur-md rounded-2xl transition-all duration-300 ease-out relative;
+    background: var(--section-bg);
+    border: 1px solid var(--border-color);
     box-shadow: 
       0 1px 3px 0 rgba(0, 0, 0, 0.1),
       0 1px 2px -1px rgba(0, 0, 0, 0.1);
@@ -97,44 +99,47 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 
       0 10px 15px -3px rgba(0, 0, 0, 0.05),
       0 4px 6px -4px rgba(0, 0, 0, 0.05);
-    border-color: rgba(203, 213, 225, 0.8); /* Slate 300 */
+    border-color: var(--accent);
   }
   
   .dark .glass-panel {
-    background: rgba(30, 41, 59, 0.4); /* Slate 800 */
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    background: var(--section-bg);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
   }
 
   .dark .glass-panel:hover {
-    border-color: rgba(255, 255, 255, 0.1);
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+    border-color: var(--accent);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
   }
 
   .glass-button {
     @apply px-6 py-3 rounded-xl font-bold transition-all duration-300 relative overflow-hidden cursor-pointer;
-    background: #ffffff;
-    color: #334155;
-    border: 1px solid #e2e8f0;
+    background: var(--section-bg);
+    color: var(--text-dark);
+    border: 1px solid var(--border-color);
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   }
 
   .glass-button:hover {
-     @apply bg-gray-50 text-slate-900 border-gray-300 shadow-md;
+     @apply shadow-md;
+     background: var(--background);
+     border-color: var(--accent);
+     color: var(--accent);
      transform: translateY(-1px);
   }
 
   .dark .glass-button {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    color: #e2e8f0;
+    background: var(--section-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-dark);
     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
   }
 
   .dark .glass-button:hover {
-    background: rgba(255,255,255,0.1);
-    border-color: rgba(255,255,255,0.2);
-    /* No colored glow */
+    background: var(--background);
+    border-color: var(--accent);
+    color: var(--accent);
     transform: translateY(-1px);
   }
 

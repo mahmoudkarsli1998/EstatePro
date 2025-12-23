@@ -18,6 +18,7 @@ import Login from './pages/dashboard/Login';
 import Dashboard from './pages/dashboard/Dashboard';
 import Projects from './pages/dashboard/Projects';
 import Units from './pages/dashboard/Units';
+import AddUnit from './pages/dashboard/AddUnit';
 import Leads from './pages/dashboard/Leads';
 import Users from './pages/dashboard/Users';
 import Developers from './pages/dashboard/Developers';
@@ -83,6 +84,8 @@ const AnimatedRoutes = () => {
           <Route index element={<Dashboard />} />
           <Route path="projects" element={<Projects />} />
           <Route path="units" element={<Units />} />
+          <Route path="units/add" element={<AddUnit />} />
+          <Route path="units/edit/:id" element={<AddUnit />} />
           <Route path="leads" element={<Leads />} />
           <Route path="users" element={<Users />} />
           <Route path="managers" element={<Managers />} />

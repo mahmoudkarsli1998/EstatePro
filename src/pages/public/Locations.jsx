@@ -18,10 +18,10 @@ const Locations = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl md:text-6xl font-bold font-heading text-white mb-6 drop-shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+          <h1 className="text-4xl md:text-6xl font-bold font-heading text-textDark dark:text-white mb-6 drop-shadow-md">
             {t('exploreLocations')}
           </h1>
-          <p className="text-xl text-gray-300 max-w-2xl mx-auto">
+          <p className="text-xl text-textLight dark:text-gray-300 max-w-2xl mx-auto">
             {t('locationsDesc')}
           </p>
         </motion.div>
@@ -43,18 +43,18 @@ const Locations = () => {
             className="space-y-6"
           >
             <div className="glass-panel p-6">
-              <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+              <h2 className="text-2xl font-bold text-textDark dark:text-white mb-4 flex items-center gap-2">
                 <MapPin className="text-primary" /> {t('maadiDistrict')}
               </h2>
-              <p className="text-gray-400 mb-4">
+              <p className="text-textLight dark:text-gray-400 mb-4">
                 {t('maadiDesc')}
               </p>
               <div className="space-y-3">
-                <div className="flex items-center gap-3 text-gray-300">
+                <div className="flex items-center gap-3 text-textLight dark:text-gray-300">
                   <Building size={18} className="text-secondary" />
                   <span>3 {t('activeProjects')}</span>
                 </div>
-                <div className="flex items-center gap-3 text-gray-300">
+                <div className="flex items-center gap-3 text-textLight dark:text-gray-300">
                   <Navigation size={18} className="text-secondary" />
                   <span>15 {t('minsToDowntown')}</span>
                 </div>
@@ -62,17 +62,17 @@ const Locations = () => {
             </div>
 
             <div className="glass-panel p-6">
-              <h3 className="text-xl font-bold text-white mb-3">{t('upcomingLocations')}</h3>
+              <h3 className="text-xl font-bold text-textDark dark:text-white mb-3">{t('upcomingLocations')}</h3>
               <ul className="space-y-3">
-                <li className="flex items-center justify-between text-gray-400 border-b border-white/5 pb-2">
+                <li className="flex items-center justify-between text-textLight dark:text-gray-400 border-b border-border/20 dark:border-white/5 pb-2">
                   <span>{t('newCairo')}</span>
                   <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">Q4 2026</span>
                 </li>
-                <li className="flex items-center justify-between text-gray-400 border-b border-white/5 pb-2">
+                <li className="flex items-center justify-between text-textLight dark:text-gray-400 border-b border-border/20 dark:border-white/5 pb-2">
                   <span>{t('sheikhZayed')}</span>
                   <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">Q1 2027</span>
                 </li>
-                <li className="flex items-center justify-between text-gray-400">
+                <li className="flex items-center justify-between text-textLight dark:text-gray-400">
                   <span>{t('northCoast')}</span>
                   <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">{t('summer')} 2027</span>
                 </li>

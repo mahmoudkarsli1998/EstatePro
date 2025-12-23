@@ -39,7 +39,7 @@ const InteractiveScene = () => {
 
   return (
     <div ref={containerRef} className="w-full h-[400px] flex items-center justify-center bg-[#050510] relative overflow-hidden rounded-xl border border-white/10">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(0,240,255,0.1),transparent_70%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(59,130,246,0.1),transparent_70%)]"></div>
       
       {/* Rotating Ring */}
       <div 

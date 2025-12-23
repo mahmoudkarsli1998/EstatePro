@@ -148,14 +148,95 @@ export const projects = [
       "https://images.unsplash.com/photo-1505577058444-a3dab90d4253"
     ],
     stats: { totalUnits: 90, available: 90, sold: 0 },
-    amenities: ["Solar Energy", "Desert Garden", "Pool", "Gated Community"],
-    deliveryDate: "2027-01-15",
-    priceRange: { min: 350000, max: 800000 },
-    developer: { id: 1, name: "Premium Developers" },
+    amenities: ["Desert Garden", "Solar Roofs", "Pool", "Hiking Access"],
+    deliveryDate: "2027-01-01",
+    priceRange: { min: 450000, max: 850000 },
+    developer: { id: 3, name: "EcoBuilders" },
     phases: [
-      { id: 9, name: "Phase 1", deliveryDate: "2027-01-15" }
+      { id: 9, name: "Phase 1", deliveryDate: "2027-01-01" }
     ]
   },
+  {
+    id: 8,
+    name: "Marina Heights",
+    slug: "marina-heights",
+    description: "Premium waterfront apartments with yacht club access",
+    address: "100 Marina Blvd, Dubai",
+    location: { lat: 25.0773, lng: 55.1396 },
+    status: "active",
+    type: "keys",
+    images: [
+      "https://images.unsplash.com/photo-1574362848149-11496d93a7c7",
+      "https://images.unsplash.com/photo-1567767292278-a4f21aa2d36e"
+    ],
+    stats: { totalUnits: 250, available: 80, sold: 170 },
+    amenities: ["Yacht Club", "Infinity Pool", "Mall Access", "Concierge"],
+    deliveryDate: "2025-11-30",
+    priceRange: { min: 500000, max: 2000000 },
+    developer: { id: 1, name: "Premium Developers" },
+    phases: [{ id: 10, name: "Tower 1", deliveryDate: "2025-11-30" }]
+  },
+  {
+    id: 9,
+    name: "Hillside Retreat",
+    slug: "hillside-retreat",
+    description: "Secluded villas nestled in the rolling hills",
+    address: "42 Hilltop Rd, Tuscany",
+    location: { lat: 43.7696, lng: 11.2558 },
+    status: "upcoming",
+    type: "developer",
+    images: [
+      "https://images.unsplash.com/photo-1600596542815-2a4d9fddace7",
+      "https://images.unsplash.com/photo-1510798831971-661eb04b3739"
+    ],
+    stats: { totalUnits: 40, available: 40, sold: 0 },
+    amenities: ["Vineyard", "Private Pool", "Gated Community", "Nature Trails"],
+    deliveryDate: "2026-09-15",
+    priceRange: { min: 1200000, max: 3500000 },
+    developer: { id: 2, name: "Coastal Living" },
+    phases: [{ id: 11, name: "Phase 1", deliveryDate: "2026-09-15" }]
+  },
+  {
+    id: 10,
+    name: "Central Park Lofts",
+    slug: "central-park-lofts",
+    description: "Industrial style lofts overlooking the city park",
+    address: "88 Central Ave, London",
+    location: { lat: 51.5074, lng: -0.1278 },
+    status: "resale",
+    type: "invest",
+    images: [
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c",
+      "https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea"
+    ],
+    stats: { totalUnits: 65, available: 12, sold: 53 },
+    amenities: ["Gym", "Rooftop Terrace", "Co-working", "Cafe"],
+    deliveryDate: "2024-06-01",
+    priceRange: { min: 750000, max: 1300000 },
+    developer: { id: 1, name: "Premium Developers" },
+    phases: [{ id: 12, name: "Completed", deliveryDate: "2024-06-01" }]
+  },
+  {
+    id: 11,
+    name: "Golden Sands Resort",
+    slug: "golden-sands",
+    description: "Luxury resort living with private beach access",
+    address: "220 Beach Rd, Gold Coast",
+    location: { lat: -28.0167, lng: 153.4000 },
+    status: "active",
+    type: "offer",
+    images: [
+      "https://images.unsplash.com/photo-1582719508461-905c673771fd",
+      "https://images.unsplash.com/photo-1590490360182-f33cfe293d23"
+    ],
+    stats: { totalUnits: 300, available: 45, sold: 255 },
+    amenities: ["Beach Club", "Water Sports", "Spa", "Kids Club"],
+    deliveryDate: "2025-05-01",
+    priceRange: { min: 400000, max: 950000 },
+    developer: { id: 3, name: "EcoBuilders" },
+    phases: [{ id: 13, name: "Tower A", deliveryDate: "2025-05-01" }]
+  },
+
   {
     id: 8,
     name: "Mountain Retreat",
@@ -221,7 +302,29 @@ export const projects = [
     phases: [
       { id: 12, name: "Phase 1", deliveryDate: "2027-05-01" }
     ]
-  }
+  },
+  // Generated Projects 12-30
+  ...Array.from({ length: 19 }, (_, i) => ({
+    id: 12 + i,
+    name: `Luxury Residence ${12 + i}`,
+    slug: `luxury-residence-${12 + i}`,
+    description: `Experience the epitome of luxury living in Residence ${12 + i}. Featuring state-of-the-art amenities and breathtaking views.`,
+    address: `${100 + i} Exclusive Blvd, Prime City`,
+    location: { lat: 25.0 + (i * 0.1), lng: 55.0 + (i * 0.1) },
+    status: i % 3 === 0 ? "active" : i % 3 === 1 ? "upcoming" : "resale",
+    type: i % 4 === 0 ? "keys" : i % 4 === 1 ? "invest" : i % 4 === 2 ? "offer" : "developer",
+    propertyType: ["apartment", "villa", "penthouse", "studio"][i % 4],
+    images: [
+      `https://images.unsplash.com/photo-${['1600585154340-be6161a56a0c', '1600596542815-2a4d9fddace7', '1600607687939-ce8a6c25118c'][i % 3]}`,
+      `https://images.unsplash.com/photo-${['1512917774080-9991f1c4c750', '1600566753086-00f18fb6b3ea', '1564013799919-ab600027ffc6'][i % 3]}`
+    ],
+    stats: { totalUnits: 100 + (i * 10), available: 20 + i, sold: 80 + (i * 9) },
+    amenities: ["infinity Pool", "Smart Home System", "Private Gym", "24/7 Concierge"],
+    deliveryDate: `202${5 + (i % 3)}-01-01`,
+    priceRange: { min: 500000 + (i * 10000), max: 1500000 + (i * 50000) },
+    developer: { id: (i % 3) + 1, name: ["Premium Developers", "Coastal Living", "EcoBuilders"][i % 3] },
+    phases: [{ id: 20 + i, name: "Phase 1", deliveryDate: `202${5 + (i % 3)}-01-01` }]
+  }))
 ];
 
 // Blocks
@@ -267,9 +370,154 @@ export const units = [
     area_m2: 110,
     price: 320000,
     status: "sold",
+    buildingCode: 'B1',
+    buildingFloors: 12,
+    city: 'new_cairo',
     images: ["https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"],
     features: { bedrooms: 2, bathrooms: 2, parking: 1, view: "Garden View", furnished: true, balcony: true },
     notes: "Sold to Mr. Smith"
+  },
+  {
+    id: 15, // New unit, re-using id 1 from instruction as 15 to avoid conflict
+    number: 'APT-101',
+    projectId: 1,
+    phaseId: 1,
+    blockId: 1,
+    type: 'apartment',
+    status: 'available',
+    floor: 1,
+    area_m2: 150,
+    price: 3500000,
+    buildingCode: 'B1',
+    buildingFloors: 12,
+    city: 'new_cairo',
+    latitude: '30.0444',
+    longitude: '31.2357',
+    images: [
+      'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?auto=format&fit=crop&w=800&q=80'
+    ],
+    features: {
+      bedrooms: 3,
+      bathrooms: 2,
+      parking: true,
+      view: 'garden',
+      furnished: true,
+      balcony: true
+    }
+  },
+  {
+    id: 16, // New unit, re-using id 2 from instruction as 16 to avoid conflict
+    number: 'VL-55',
+    projectId: 2,
+    phaseId: 2,
+    blockId: 2,
+    type: 'villa',
+    status: 'sold',
+    floor: 0,
+    area_m2: 450,
+    price: 12500000,
+    buildingCode: 'V55',
+    buildingFloors: 3,
+    city: 'sheikh_zayed',
+    latitude: '30.0444',
+    longitude: '31.2357',
+    images: [
+      'https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=800&q=80'
+    ],
+    features: {
+      bedrooms: 5,
+      bathrooms: 4,
+      parking: true,
+      view: 'pool',
+      furnished: false,
+      balcony: true
+    }
+  },
+  {
+    id: 17, // New unit, re-using id 3 from instruction as 17 to avoid conflict
+    number: 'APT-205',
+    projectId: 1,
+    phaseId: 1,
+    blockId: 1,
+    type: 'apartment',
+    status: 'rented',
+    floor: 2,
+    area_m2: 120,
+    price: 2800000,
+    buildingCode: 'B2',
+    buildingFloors: 10,
+    city: 'new_cairo',
+    latitude: '30.0074',
+    longitude: '31.4913',
+    images: [
+      'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=800&q=80'
+    ],
+    features: {
+      bedrooms: 2,
+      bathrooms: 2,
+      parking: true,
+      view: 'street',
+      furnished: true,
+      balcony: true
+    }
+  },
+  {
+    id: 18, // New unit, re-using id 4 from instruction as 18 to avoid conflict
+    number: 'OFF-301',
+    projectId: 3,
+    phaseId: 3,
+    blockId: 4,
+    type: 'office',
+    status: 'available',
+    floor: 3,
+    area_m2: 80,
+    price: 1500000,
+    buildingCode: 'O1',
+    buildingFloors: 5,
+    city: 'new_capital',
+    latitude: '30.0131',
+    longitude: '31.7089',
+    images: [
+      'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80'
+    ],
+    features: {
+      bedrooms: 0,
+      bathrooms: 1,
+      parking: true,
+      view: 'city',
+      furnished: true,
+      balcony: false
+    }
+  },
+  {
+    id: 19, // New unit, re-using id 5 from instruction as 19 to avoid conflict
+    number: 'S-22',
+    projectId: 2,
+    phaseId: 2,
+    blockId: 3,
+    type: 'commercial',
+    status: 'available',
+    floor: 0,
+    area_m2: 60,
+    price: 4500000,
+    buildingCode: 'Mall1',
+    buildingFloors: 2,
+    city: 'sheikh_zayed',
+    latitude: '30.0626',
+    longitude: '30.9318',
+    images: [
+      'https://images.unsplash.com/photo-1555617778-02518510b9fa?auto=format&fit=crop&w=800&q=80'
+    ],
+    features: {
+      bedrooms: 0,
+      bathrooms: 0,
+      parking: true,
+      view: 'street',
+      furnished: false,
+      balcony: false
+    }
   },
   {
     id: 3,
@@ -296,6 +544,9 @@ export const units = [
     area_m2: 400,
     price: 3500000,
     status: "available",
+    buildingCode: 'V-01',
+    buildingFloors: 2,
+    city: 'miami',
     images: ["https://images.unsplash.com/photo-1613490493576-7fde63acd811"],
     features: { bedrooms: 5, bathrooms: 5, parking: 3, view: "Ocean Front", furnished: false, balcony: true },
     notes: "Direct beach access"
@@ -770,4 +1021,20 @@ export const leads = [
     createdAt: "2025-11-26T09:00:00Z",
     followUps: []
   }
+];
+// Cities / Locations
+export const cities = [
+  { id: 'cairo', nameAr: 'القاهرة', nameEn: 'Cairo' },
+  { id: 'giza', nameAr: 'الجيزة', nameEn: 'Giza' },
+  { id: 'alexandria', nameAr: 'الإسكندرية', nameEn: 'Alexandria' },
+  { id: 'north_coast', nameAr: 'الساحل الشمالي', nameEn: 'North Coast' },
+  { id: 'sokhna', nameAr: 'العين السخنة', nameEn: 'Ain Sokhna' },
+  { id: 'hurghada', nameAr: 'الغردقة', nameEn: 'Hurghada' },
+  { id: 'sharm', nameAr: 'شرم الشيخ', nameEn: 'Sharm El Sheikh' },
+  { id: 'el_gouna', nameAr: 'الجونة', nameEn: 'El Gouna' },
+  { id: 'maadi', nameAr: 'المعادي', nameEn: 'Maadi' },
+  { id: 'new_cairo', nameAr: 'القاهرة الجديدة', nameEn: 'New Cairo' },
+  { id: 'sheikh_zayed', nameAr: 'الشيخ زايد', nameEn: 'Sheikh Zayed' },
+  { id: 'october', nameAr: '6 أكتوبر', nameEn: '6th of October' },
+  { id: 'new_capital', nameAr: 'العاصمة الإدارية', nameEn: 'New Capital' }
 ];

@@ -47,7 +47,7 @@ const Hero3D = () => {
     <div ref={containerRef} className="relative w-full h-[600px] overflow-hidden bg-[#050510] flex items-center">
       {/* Animated Background */}
       <div ref={bgRef} className="absolute inset-0 z-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,240,255,0.1),transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_70%)]" />
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-[100px] mix-blend-screen animate-pulse" />
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-[100px] mix-blend-screen animate-pulse" style={{ animationDelay: '1s' }} />
         
@@ -58,7 +58,7 @@ const Hero3D = () => {
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         <div className="max-w-2xl">
           <div ref={titleRef} className="opacity-0">
-            <h1 className="text-5xl md:text-7xl font-bold font-heading text-white mb-6 leading-tight drop-shadow-[0_0_15px_rgba(0,240,255,0.3)]">
+            <h1 className="text-5xl md:text-7xl font-bold font-heading text-white mb-6 leading-tight drop-shadow-md">
               Discover Your <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
                 Dream Space
@@ -75,7 +75,7 @@ const Hero3D = () => {
           
           <div ref={buttonsRef} className="flex gap-4 opacity-0">
             <Link to="/projects">
-              <Button size="lg" className="shadow-[0_0_20px_rgba(0,240,255,0.4)] hover:shadow-[0_0_30px_rgba(0,240,255,0.6)] transition-shadow duration-300">
+              <Button size="lg" className="shadow-xl hover:shadow-2xl transition-shadow duration-300">
                 Browse Projects
               </Button>
             </Link>

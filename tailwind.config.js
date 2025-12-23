@@ -8,22 +8,22 @@ export default {
   theme: {
     extend: {
       colors: {
-        primary: {
-          DEFAULT: '#0ea5e9', // Sky 500 - Professional Blue/Cyan
-          hover: '#0284c7',   // Sky 600
-          light: 'rgba(14, 165, 233, 0.1)',
-        },
-        secondary: {
-          DEFAULT: '#8b5cf6', // Violet 500
-          hover: '#7c3aed',
-        },
+        primary: 'var(--primary)',
+        background: 'var(--background)',
         accent: {
-          DEFAULT: '#f43f5e', // Rose 500 - Muted Pink
-          hover: '#e11d48',
+          DEFAULT: 'var(--accent)',
+          hover: 'var(--accent-hover)',
         },
+        section: 'var(--section-bg)',
+        success: 'var(--green)',
+        textDark: 'var(--text-dark)',
+        textLight: 'var(--text-light)',
+        border: 'var(--border-color)',
+        // Backward compatibility mappings
+        secondary: 'var(--text-light)', 
         dark: {
-          bg: 'var(--bg-primary)',
-          card: 'var(--bg-card)',
+          bg: 'var(--background)',
+          card: 'var(--section-bg)',
           border: 'var(--border-color)',
         }
       },

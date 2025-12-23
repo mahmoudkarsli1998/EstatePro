@@ -58,10 +58,10 @@ const ContactForm = ({ isOpen, onClose, project, unit }) => {
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed top-0 right-0 h-full w-full md:w-[450px] bg-dark-card backdrop-blur-xl border-l border-white/10 shadow-2xl z-50 p-6 overflow-y-auto"
+            className="fixed top-0 right-0 h-full w-full md:w-[450px] bg-background dark:bg-dark-card backdrop-blur-xl border-l border-border/20 dark:border-white/10 shadow-2xl z-50 p-6 overflow-y-auto"
           >
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl font-bold font-heading dark:text-white">
+              <h2 className="text-2xl font-bold font-heading text-textDark dark:text-white">
                 {unit ? `Inquire about ${unit.number}` : project ? `Inquire about ${project.name}` : 'Contact Us'}
               </h2>
               <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:text-gray-400">

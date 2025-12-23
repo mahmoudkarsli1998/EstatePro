@@ -145,7 +145,7 @@ const FilterSidebar = ({ filters, setFilters, isOpen, onClose }) => {
 
           {/* Actions */}
           <div className="pt-6 border-t border-white/10 flex flex-col gap-3">
-            <Button onClick={handleApply} className="w-full shadow-[0_0_20px_rgba(0,240,255,0.3)] hover:shadow-[0_0_30px_rgba(0,240,255,0.5)]">
+            <Button onClick={handleApply} className="w-full shadow-md hover:shadow-lg">
               Apply Filters
             </Button>
             <button 

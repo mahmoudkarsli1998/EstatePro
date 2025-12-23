@@ -1,4 +1,4 @@
-import { projects, units, leads, developers, agents, users, blocks, managers, admins } from '../data/mockData';
+import { projects, units, leads, developers, agents, users, blocks, managers, admins, cities } from '../data/mockData';
 
 export const api = {
   // Projects
@@ -11,6 +11,12 @@ export const api = {
         }));
         resolve(optimizedProjects);
       }, 800);
+    });
+  },
+
+  getCities: () => {
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(cities), 500);
     });
   },
   

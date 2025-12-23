@@ -9,7 +9,7 @@ import Badge from '../../components/shared/Badge';
 import Card from '../../components/shared/Card';
 import LiquidBackground from '../../components/shared/LiquidBackground';
 import { api } from '../../utils/api';
-
+import { ENABLE_3D } from '../../config/performance';
 import { useTranslation } from 'react-i18next';
 
 const UnitDetail = () => {
@@ -19,7 +19,7 @@ const UnitDetail = () => {
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isContactOpen, setIsContactOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('3d');
+  const [activeTab, setActiveTab] = useState(ENABLE_3D ? '3d' : 'images');
 
   useEffect(() => {
     setLoading(true);
@@ -48,7 +48,7 @@ const UnitDetail = () => {
     return (
       <div className="min-h-screen pt-24 flex flex-col justify-center items-center relative">
         <LiquidBackground />
-        <h2 className="text-2xl font-bold text-white mb-4">{t('unitNotFound') || "Unit Not Found"}</h2>
+        <h2 className="text-2xl font-bold text-textDark dark:text-white mb-4">{t('unitNotFound') || "Unit Not Found"}</h2>
         <Link to="/projects">
           <Button>{t('backToProjects')}</Button>
         </Link>
@@ -73,7 +73,7 @@ const UnitDetail = () => {
       <div className="container mx-auto px-4 md:px-6 relative z-10">
         {/* Breadcrumb */}
         <div className="mb-6">
-          <Link to={`/projects/${project.id}`} className="inline-flex items-center text-gray-400 hover:text-primary transition-colors">
+          <Link to={`/projects/${project.id}`} className="inline-flex items-center text-textLight hover:text-primary transition-colors">
             <div className={`inline-block ${i18n.dir() === 'rtl' ? 'rotate-180' : ''}`}><ArrowLeft size={16} className="me-2" /></div> {t('backTo')} {project.name}
           </Link>
         </div>
@@ -88,10 +88,10 @@ const UnitDetail = () => {
               className="flex justify-between items-start"
             >
               <div>
-                <h1 className="text-3xl font-bold font-heading text-white mb-2">
+                <h1 className="text-3xl font-bold font-heading text-textDark dark:text-white mb-2">
                   {t('unitLabel', { number: unit.number })}
                 </h1>
-                <p className="text-xl text-gray-400 capitalize">
+                <p className="text-xl text-textLight capitalize">
                   {unit.type} • {unit.floor === 0 ? t('groundFloor') : t('floorTh', { floor: unit.floor })}
                 </p>
               </div>
@@ -102,17 +102,19 @@ const UnitDetail = () => {
 
             {/* Visualizer Tabs */}
             <div className="glass-panel p-1 inline-flex">
+              {ENABLE_3D && (
               <button
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === '3d' ? 'bg-primary text-white shadow-[0_0_10px_rgba(0,240,255,0.3)]' : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  activeTab === '3d' ? 'bg-primary text-white shadow-md' : 'text-textLight hover:text-primary hover:bg-primary/5'
                 }`}
                 onClick={() => setActiveTab('3d')}
               >
                 {t('3dView')}
               </button>
+              )}
               <button
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  activeTab === 'images' ? 'bg-primary text-white shadow-[0_0_10px_rgba(0,240,255,0.3)]' : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  activeTab === 'images' ? 'bg-primary text-white shadow-md' : 'text-textLight hover:text-primary hover:bg-primary/5'
                 }`}
                 onClick={() => setActiveTab('images')}
               >
@@ -125,7 +127,7 @@ const UnitDetail = () => {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.5 }}
-              className="glass-panel p-2 border-white/10"
+              className="glass-panel p-2 border-border/20 dark:border-white/10"
             >
               {activeTab === '3d' ? (
                 <Unit3DViewer unit={unit} />
@@ -143,25 +145,25 @@ const UnitDetail = () => {
               viewport={{ once: true }}
               variants={fadeInUp}
             >
-              <h2 className="text-2xl font-bold font-heading text-white mb-6">
+              <h2 className="text-2xl font-bold font-heading text-textDark dark:text-white mb-6">
                 {t('unitFeatures')}
               </h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <Card className="p-4 text-center">
-                  <div className="text-gray-400 mb-2">{t('bedrooms')}</div>
-                  <div className="text-2xl font-bold text-white">{unit.features.bedrooms}</div>
+                <Card className="p-4 text-center bg-background dark:bg-section border-border/20">
+                  <div className="text-textLight mb-2">{t('bedrooms')}</div>
+                  <div className="text-2xl font-bold text-textDark dark:text-white">{unit.features.bedrooms}</div>
                 </Card>
-                <Card className="p-4 text-center">
-                  <div className="text-gray-400 mb-2">{t('bathrooms')}</div>
-                  <div className="text-2xl font-bold text-white">{unit.features.bathrooms}</div>
+                <Card className="p-4 text-center bg-background dark:bg-section border-border/20">
+                  <div className="text-textLight mb-2">{t('bathrooms')}</div>
+                  <div className="text-2xl font-bold text-textDark dark:text-white">{unit.features.bathrooms}</div>
                 </Card>
-                <Card className="p-4 text-center">
-                  <div className="text-gray-400 mb-2">{t('area')}</div>
-                  <div className="text-2xl font-bold text-white">{unit.area_m2} m²</div>
+                <Card className="p-4 text-center bg-background dark:bg-section border-border/20">
+                  <div className="text-textLight mb-2">{t('area')}</div>
+                  <div className="text-2xl font-bold text-textDark dark:text-white">{unit.area_m2} m²</div>
                 </Card>
-                <Card className="p-4 text-center">
-                  <div className="text-gray-400 mb-2">{t('parking')}</div>
-                  <div className="text-2xl font-bold text-white">{unit.features.parking}</div>
+                <Card className="p-4 text-center bg-background dark:bg-section border-border/20">
+                  <div className="text-textLight mb-2">{t('parking')}</div>
+                  <div className="text-2xl font-bold text-textDark dark:text-white">{unit.features.parking}</div>
                 </Card>
               </div>
             </motion.section>
@@ -174,29 +176,29 @@ const UnitDetail = () => {
               variants={fadeInUp}
               className="glass-panel p-6"
             >
-              <h3 className="text-lg font-bold mb-4 text-white">{t('additionalDetails')}</h3>
+              <h3 className="text-lg font-bold mb-4 text-textDark dark:text-white">{t('additionalDetails')}</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="flex justify-between py-2 border-b border-white/10">
-                  <span className="text-gray-400">{t('view')}</span>
-                  <span className="font-medium text-white">{unit.features.view}</span>
+                <div className="flex justify-between py-2 border-b border-border/20">
+                  <span className="text-textLight">{t('view')}</span>
+                  <span className="font-medium text-textDark dark:text-white">{unit.features.view}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-white/10">
-                  <span className="text-gray-400">{t('furnished')}</span>
-                  <span className="font-medium text-white">{unit.features.furnished ? t('yes') : t('no')}</span>
+                <div className="flex justify-between py-2 border-b border-border/20">
+                  <span className="text-textLight">{t('furnished')}</span>
+                  <span className="font-medium text-textDark dark:text-white">{unit.features.furnished ? t('yes') : t('no')}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-white/10">
-                  <span className="text-gray-400">{t('balcony')}</span>
-                  <span className="font-medium text-white">{unit.features.balcony ? t('yes') : t('no')}</span>
+                <div className="flex justify-between py-2 border-b border-border/20">
+                  <span className="text-textLight">{t('balcony')}</span>
+                  <span className="font-medium text-textDark dark:text-white">{unit.features.balcony ? t('yes') : t('no')}</span>
                 </div>
-                <div className="flex justify-between py-2 border-b border-white/10">
-                  <span className="text-gray-400">{t('project')}</span>
-                  <span className="font-medium text-white">{project.name}</span>
+                <div className="flex justify-between py-2 border-b border-border/20">
+                  <span className="text-textLight">{t('project')}</span>
+                  <span className="font-medium text-textDark dark:text-white">{project.name}</span>
                 </div>
               </div>
               {unit.notes && (
-                <div className="mt-4 pt-4 border-t border-white/10">
-                  <span className="text-gray-400 block mb-2">{t('notes')}</span>
-                  <p className="text-gray-300">{unit.notes}</p>
+                <div className="mt-4 pt-4 border-t border-border/20 dark:border-white/10">
+                  <span className="text-textLight block mb-2">{t('notes')}</span>
+                  <p className="text-textLight dark:text-gray-300">{unit.notes}</p>
                 </div>
               )}
             </motion.section>
@@ -212,14 +214,14 @@ const UnitDetail = () => {
               >
                 <Card className="p-6">
                   <div className="text-center mb-6">
-                    <p className="text-gray-400 mb-1">{t('totalPrice')}</p>
-                    <h2 className="text-4xl font-bold text-primary drop-shadow-[0_0_10px_rgba(0,240,255,0.5)]" style={{ direction: 'ltr' }}>
+                    <p className="text-textLight mb-1">{t('totalPrice')}</p>
+                    <h2 className="text-4xl font-bold text-primary drop-shadow-md" style={{ direction: 'ltr' }}>
                       ${(unit.price).toLocaleString()}
                     </h2>
                   </div>
                   
                   <Button 
-                    className="w-full mb-3 shadow-[0_0_15px_rgba(0,240,255,0.3)]" 
+                    className="w-full mb-3 shadow-md" 
                     size="lg"
                     onClick={() => setIsContactOpen(true)}
                   >
@@ -241,19 +243,19 @@ const UnitDetail = () => {
                 transition={{ delay: 0.6, duration: 0.5 }}
               >
                 <Card className="p-6">
-                  <h3 className="text-lg font-bold mb-4 text-white">{t('paymentCalculator')}</h3>
+                  <h3 className="text-lg font-bold mb-4 text-textDark dark:text-white">{t('paymentCalculator')}</h3>
                   <div className="space-y-4">
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">{t('downPayment')}</span>
-                      <span className="font-medium text-white" style={{ direction: 'ltr' }}>${(unit.price * 0.2).toLocaleString()}</span>
+                      <span className="text-textLight">{t('downPayment')}</span>
+                      <span className="font-medium text-textDark dark:text-white" style={{ direction: 'ltr' }}>${(unit.price * 0.2).toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">{t('loanAmount')}</span>
-                      <span className="font-medium text-white" style={{ direction: 'ltr' }}>${(unit.price * 0.8).toLocaleString()}</span>
+                      <span className="text-textLight">{t('loanAmount')}</span>
+                      <span className="font-medium text-textDark dark:text-white" style={{ direction: 'ltr' }}>${(unit.price * 0.8).toLocaleString()}</span>
                     </div>
-                    <div className="pt-4 border-t border-white/10">
+                    <div className="pt-4 border-t border-border/20">
                       <div className="flex justify-between items-center">
-                        <span className="font-bold text-white">{t('estMonthly')}</span>
+                        <span className="font-bold text-textDark dark:text-white">{t('estMonthly')}</span>
                         <span className="text-xl font-bold text-primary" style={{ direction: 'ltr' }}>
                           ${Math.round((unit.price * 0.8 * 0.05) / 12).toLocaleString()}
                         </span>

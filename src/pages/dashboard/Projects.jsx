@@ -89,7 +89,7 @@ const Projects = () => {
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold font-heading text-gray-900 dark:text-white">{t('projects')}</h1>
+        <h1 className="text-2xl font-bold font-heading text-textDark dark:text-white">{t('projects')}</h1>
         <div className="flex gap-3">
            <Button variant="outline" onClick={onExport}>
             <Download size={18} className="me-2" /> {t('export')}
@@ -100,14 +100,14 @@ const Projects = () => {
         </div>
       </div>
 
-      <div className="bg-dark-card border border-white/10 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="bg-background dark:bg-dark-card border border-border/20 rounded-xl shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-border/20">
           <div className="relative max-w-md">
             <Search size={18} className="absolute inset-y-0 start-3 my-auto text-gray-400" />
             <input 
               type="text" 
               placeholder={t('searchProjects')}
-              className="w-full ps-10 pe-4 py-2 rounded-lg border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-500"
+              className="w-full ps-10 pe-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-textDark dark:text-white placeholder-textLight"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -120,7 +120,7 @@ const Projects = () => {
           ) : projects.length === 0 ? (
             <div className="text-center col-span-full text-gray-400">{t('noProjects')}</div>
           ) : projects.map((project) => (
-            <div key={project.id} className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-primary/50 transition-colors group flex flex-col">
+            <div key={project.id} className="glass-panel overflow-hidden hover:border-primary/50 transition-colors group flex flex-col">
               <div className="h-48 bg-gray-800 relative">
                 <img src={project.images[0]} alt={project.name} className="w-full h-full object-cover" />
                 <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-md px-2 py-1 rounded text-xs text-white uppercase font-bold border border-white/10">
@@ -128,28 +128,28 @@ const Projects = () => {
                 </div>
               </div>
               <div className="p-5 flex-1 flex flex-col">
-                <h3 className="text-xl font-bold text-white mb-2">{project.name}</h3>
-                <div className="flex items-center text-gray-400 mb-4 text-sm">
+                <h3 className="text-xl font-bold text-textDark dark:text-white mb-2">{project.name}</h3>
+                <div className="flex items-center text-textLight dark:text-gray-400 mb-4 text-sm">
                   <MapPin size={14} className="me-1" /> {project.address}
                 </div>
                 
                 <div className="grid grid-cols-3 gap-2 mb-4">
-                  <div className="bg-white/5 p-2 rounded text-center">
-                    <div className="text-lg font-bold text-white">{project.stats.totalUnits}</div>
-                    <div className="text-[10px] text-gray-500 uppercase">{t('units')}</div>
+                  <div className="bg-background dark:bg-white/5 border border-border/10 dark:border-transparent p-2 rounded text-center">
+                    <div className="text-lg font-bold text-textDark dark:text-white">{project.stats.totalUnits}</div>
+                    <div className="text-[10px] text-textLight dark:text-gray-500 uppercase">{t('units')}</div>
                   </div>
-                  <div className="bg-white/5 p-2 rounded text-center">
+                  <div className="bg-background dark:bg-white/5 border border-border/10 dark:border-transparent p-2 rounded text-center">
                     <div className="text-lg font-bold text-primary">{project.stats.available}</div>
-                    <div className="text-[10px] text-gray-500 uppercase">{t('avail')}</div>
+                    <div className="text-[10px] text-textLight dark:text-gray-500 uppercase">{t('avail')}</div>
                   </div>
-                  <div className="bg-white/5 p-2 rounded text-center">
+                  <div className="bg-primary/5 p-2 rounded text-center">
                     <div className="text-lg font-bold text-green-400">{project.stats.sold}</div>
-                    <div className="text-[10px] text-gray-500 uppercase">{t('sold')}</div>
+                    <div className="text-[10px] text-textLight uppercase">{t('sold')}</div>
                   </div>
                 </div>
 
-                <div className="mt-auto flex justify-between items-center pt-4 border-t border-white/5">
-                  <div className="flex items-center text-sm text-gray-400">
+                <div className="mt-auto flex justify-between items-center pt-4 border-t border-border/10 dark:border-white/5">
+                  <div className="flex items-center text-sm text-textLight dark:text-gray-400">
                     <Layers size={14} className="me-2" />
                     {project.phases?.length || 0} {t('phases')}
                   </div>
@@ -197,7 +197,7 @@ const Projects = () => {
               <Maximize size={16} className="inline me-2" /> {t('images')}
             </button>
             <button 
-              className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'phases' ? 'bg-primary/20 text-primary' : 'text-gray-400 hover:text-white'}`}
+              className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-colors ${activeTab === 'phases' ? 'bg-primary/20 text-primary' : 'text-textLight hover:text-primary dark:text-gray-400 dark:hover:text-white'}`}
               onClick={() => setActiveTab('phases')}
               disabled={!editingItem} // Disable for new projects until created
             >
@@ -224,18 +224,18 @@ const Projects = () => {
                     required
                   />
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">{t('description')}</label>
+                    <label className="block text-sm font-medium text-textLight dark:text-gray-400 mb-1">{t('description')}</label>
                     <textarea 
-                      className="w-full px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary h-32 resize-none"
+                      className="w-full px-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 text-textDark dark:text-white focus:outline-none focus:border-primary h-32 resize-none"
                       name="description"
                       value={formData.description}
                       onChange={handleInputChange}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1">{t('status')}</label>
+                    <label className="block text-sm font-medium text-textLight dark:text-gray-400 mb-1">{t('status')}</label>
                     <select 
-                      className="w-full px-4 py-2 rounded-lg border border-white/10 bg-white/5 text-white focus:outline-none focus:border-primary"
+                      className="w-full px-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 text-textDark dark:text-white focus:outline-none focus:border-primary"
                       name="status"
                       value={formData.status}
                       onChange={handleInputChange}
@@ -254,7 +254,7 @@ const Projects = () => {
                    <div className="text-xs text-gray-500 mb-4">(Images are currently read-only mock data)</div>
                   <div className="mt-4 grid grid-cols-2 gap-2">
                     {formData.images?.map((img, i) => (
-                      <img key={i} src={img} alt="preview" className="w-full h-24 object-cover rounded border border-white/10" />
+                      <img key={i} src={img} alt="preview" className="w-full h-24 object-cover rounded border border-border/10 dark:border-white/10" />
                     ))}
                   </div>
                 </div>
@@ -263,7 +263,7 @@ const Projects = () => {
               {activeTab === 'phases' && editingItem && (
                  <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                        <h3 className="text-lg font-bold text-white">Project Phases</h3>
+                        <h3 className="text-lg font-bold text-textDark dark:text-white">Project Phases</h3>
                         <Button type="button" size="sm" onClick={handleAddPhase}>
                             <Plus size={16} className="mr-1" /> Add Phase
                         </Button>
@@ -274,10 +274,10 @@ const Projects = () => {
                             <div className="text-gray-500 text-sm italic py-4 text-center">No phases defined.</div>
                         )}
                         {editingItem.phases?.map((phase, idx) => (
-                            <div key={idx} className="bg-white/5 p-3 rounded-lg border border-white/10 flex justify-between items-center">
+                            <div key={idx} className="bg-background dark:bg-white/5 p-3 rounded-lg border border-border/20 dark:border-white/10 flex justify-between items-center">
                                 <div>
-                                    <div className="font-bold text-white">{phase.name}</div>
-                                    <div className="text-xs text-gray-400">{phase.status} • {phase.deliveryDate}</div>
+                                    <div className="font-bold text-textDark dark:text-white">{phase.name}</div>
+                                    <div className="text-xs text-textLight dark:text-gray-400">{phase.status} • {phase.deliveryDate}</div>
                                 </div>
                                 <button 
                                     type="button"
@@ -290,9 +290,9 @@ const Projects = () => {
                         ))}
                     </div>
 
-                    <div className="mt-8 pt-4 border-t border-white/10">
-                        <h3 className="text-lg font-bold text-white mb-2">Blocks</h3>
-                        <p className="text-sm text-gray-400">Blocks management is context-dependent on Phases.</p>
+                    <div className="mt-8 pt-4 border-t border-border/10 dark:border-white/10">
+                        <h3 className="text-lg font-bold text-textDark dark:text-white mb-2">Blocks</h3>
+                        <p className="text-sm text-textLight dark:text-gray-400">Blocks management is context-dependent on Phases.</p>
                     </div>
                  </div>
               )}

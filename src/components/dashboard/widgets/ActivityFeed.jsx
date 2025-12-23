@@ -24,10 +24,10 @@ const ActivityItem = ({ item, index }) => {
         <Icon size={18} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className="text-sm text-gray-300">
-          <span className="font-bold text-white">{item.user}</span> {item.action} <span className="text-primary">{item.target}</span>
+        <p className="text-sm text-textLight dark:text-gray-300">
+          <span className="font-bold text-textDark dark:text-white">{item.user}</span> {item.action} <span className="text-primary">{item.target}</span>
         </p>
-        <p className="text-xs text-gray-500 mt-1">{item.time}</p>
+        <p className="text-xs text-textLight dark:text-gray-500 mt-1">{item.time}</p>
       </div>
     </motion.div>
   );
@@ -80,7 +80,7 @@ const ActivityFeed = () => {
 
   return (
     <div className="glass-panel p-6 h-full flex flex-col">
-      <h3 className="text-xl font-bold text-white mb-6 font-heading">Recent Activity</h3>
+      <h3 className="text-xl font-bold text-textDark dark:text-white mb-6 font-heading">Recent Activity</h3>
       
       <div className="flex-1 overflow-y-auto space-y-2 min-h-0 custom-scrollbar">
         {loading ? (
@@ -94,7 +94,7 @@ const ActivityFeed = () => {
 
       <button 
         onClick={() => setIsModalOpen(true)}
-        className="w-full mt-4 py-3 text-sm font-bold text-gray-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors border-t border-white/10"
+        className="w-full mt-4 py-3 text-sm font-bold text-textLight dark:text-gray-400 hover:text-primary dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors border-t border-border/10 dark:border-white/10"
       >
         View All Activity
       </button>

@@ -137,11 +137,11 @@ const Leads = () => {
                         initial={{ opacity: 0, scale: 0.95, y: 10 }} 
                         animate={{ opacity: 1, scale: 1, y: 0 }} 
                         exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                        className="relative w-full max-w-md bg-[#0f172a] border border-white/10 rounded-3xl shadow-2xl overflow-hidden z-20"
+                        className="relative w-full max-w-md bg-background dark:bg-[#0f172a] border border-border/20 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden z-20"
                     >
                         <div className="p-8 pb-0">
-                            <h2 className="text-2xl font-black text-white mb-2">{t('assignAgent')}</h2>
-                            <p className="text-sm text-gray-400 font-medium">
+                            <h2 className="text-2xl font-black text-textDark dark:text-white mb-2">{t('assignAgent')}</h2>
+                            <p className="text-sm text-textLight font-medium">
                                 {t('selectAgentToAssign', { name: leadToAssign?.name })}
                             </p>
                         </div>
@@ -151,14 +151,14 @@ const Leads = () => {
                                 <button
                                     key={agent.id}
                                     onClick={() => handleAssignAgent(agent.id)}
-                                    className="w-full flex items-center p-3 rounded-2xl hover:bg-white/5 transition-all group"
+                                    className="w-full flex items-center p-3 rounded-2xl hover:bg-section dark:hover:bg-white/5 transition-all group"
                                 >
-                                    <div className="w-10 h-10 rounded-full bg-slate-800 border-2 border-white/5 group-hover:border-primary/50 overflow-hidden shrink-0">
+                                    <div className="w-10 h-10 rounded-full bg-slate-800 border-2 border-border/20 dark:border-white/5 group-hover:border-primary/50 overflow-hidden shrink-0">
                                         <img src={agent.avatar} alt={agent.name} className="w-full h-full object-cover" />
                                     </div>
                                     <div className="ml-4 flex-1 text-left min-w-0">
-                                        <div className="text-sm font-bold text-white group-hover:text-primary transition-colors truncate">{agent.name}</div>
-                                        <div className="text-xs text-gray-500 truncate mt-0.5">{agent.email}</div>
+                                        <div className="text-sm font-bold text-textDark dark:text-white group-hover:text-primary transition-colors truncate">{agent.name}</div>
+                                        <div className="text-xs text-textLight truncate mt-0.5">{agent.email}</div>
                                     </div>
                                     {leadToAssign?.assignedAgentId === agent.id && (
                                         <CheckCircle2 size={18} className="text-primary ml-2 shrink-0" />
@@ -170,7 +170,7 @@ const Leads = () => {
                         <div className="p-6 pt-0 flex justify-end">
                             <button 
                                 onClick={() => setIsAssignModalOpen(false)}
-                                className="px-6 py-2.5 rounded-xl bg-white/5 text-white font-bold text-sm hover:bg-white/10 transition-colors"
+                                className="px-6 py-2.5 rounded-xl bg-section dark:bg-white/5 text-textDark dark:text-white font-bold text-sm hover:bg-opacity-80 transition-colors"
                             >
                                 {t('cancel')}
                             </button>
@@ -185,34 +185,34 @@ const Leads = () => {
         <div className="pb-10">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 px-1 gap-4">
                 <div>
-                    <h1 className="text-3xl font-black font-heading text-gray-900 dark:text-white tracking-tight">{t('leads')}</h1>
+                    <h1 className="text-3xl font-black font-heading text-textDark dark:text-white tracking-tight">{t('leads')}</h1>
                     <div className="flex items-center gap-2 mt-1">
-                        <p className="text-gray-500 text-sm font-medium">{t('manageLeads')}</p>
-                        <div className="w-1 h-1 rounded-full bg-gray-600"></div>
+                        <p className="text-textLight text-sm font-medium">{t('manageLeads')}</p>
+                        <div className="w-1 h-1 rounded-full bg-textLight/50"></div>
                         <span className="text-primary text-xs font-bold">{leads.length} {t('totalLeads', 'Total')}</span>
                     </div>
                 </div>
                 <div className="flex items-center gap-3 w-full md:w-auto">
-                    <div className="flex bg-white/5 border border-white/10 rounded-xl p-1.5 shadow-inner grow md:grow-0">
+                    <div className="flex bg-background dark:bg-white/5 border border-border/20 dark:border-white/10 rounded-xl p-1.5 shadow-inner grow md:grow-0">
                         <button 
-                            className={`flex-1 md:w-10 h-10 flex items-center justify-center rounded-lg transition-all ${viewMode === 'list' ? 'bg-primary text-white shadow-sm' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                            className={`flex-1 md:w-10 h-10 flex items-center justify-center rounded-lg transition-all ${viewMode === 'list' ? 'bg-primary !text-white shadow-sm' : 'text-textLight hover:text-textDark dark:hover:text-white hover:bg-section dark:hover:bg-white/5'}`}
                             onClick={() => setViewMode('list')}
                             title={t('listView')}
                         >
                             <List size={18} />
                         </button>
                         <button 
-                            className={`flex-1 md:w-10 h-10 flex items-center justify-center rounded-lg transition-all ${viewMode === 'list' ? 'bg-primary text-white shadow-sm' : 'text-gray-400 hover:text-white hover:bg-white/5'}`}
+                            className={`flex-1 md:w-10 h-10 flex items-center justify-center rounded-lg transition-all ${viewMode === 'kanban' ? 'bg-primary !text-white shadow-sm' : 'text-textLight hover:text-textDark dark:hover:text-white hover:bg-section dark:hover:bg-white/5'}`}
                             onClick={() => setViewMode('kanban')}
                             title={t('kanbanView')}
                         >
                             <LayoutGrid size={18} />
                         </button>
                     </div>
-                    <Button variant="outline" onClick={onExport} className="hidden sm:flex h-12 border-white/10 bg-white/5 hover:bg-white/10">
+                    <Button variant="outline" onClick={onExport} className="hidden sm:flex h-12 border-border/20 dark:border-white/10 bg-background dark:bg-white/5 hover:bg-section dark:hover:bg-white/10">
                         <Download size={18} className="me-2" /> {t('export')}
                     </Button>
-                    <Button onClick={() => handleOpenModal()} className="h-12 bg-primary hover:bg-primary/90 shadow-md transition-all active:scale-95 px-6">
+                    <Button onClick={() => handleOpenModal()} className="h-12 bg-primary hover:bg-primary/90 shadow-md transition-all active:scale-95 px-6 !text-white">
                         <Plus size={20} className="me-2" strokeWidth={3} /> {t('addLead')}
                     </Button>
                 </div>
@@ -221,17 +221,17 @@ const Leads = () => {
             {/* Toolbar */}
             <div className="mb-8 flex flex-col sm:flex-row gap-4 px-1">
                  <div className="relative max-w-md w-full group">
-                    <Search size={18} className="absolute inset-y-0 start-4 my-auto text-gray-500 group-focus-within:text-primary transition-colors" />
+                    <Search size={18} className="absolute inset-y-0 start-4 my-auto text-textLight group-focus-within:text-primary transition-colors" />
                     <input 
                         type="text" 
                         placeholder={t('searchLeads')}
-                        className="w-full ps-12 pe-4 py-3.5 rounded-2xl border border-white/10 bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/20 text-white placeholder-gray-600 transition-all font-semibold shadow-inner"
+                        className="w-full ps-12 pe-4 py-3.5 rounded-2xl border border-border/20 bg-background dark:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/20 text-textDark dark:text-white placeholder-textLight/50 transition-all font-semibold shadow-inner"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </div>
                 <div className="flex gap-2 shrink-0">
-                    <button className="h-14 px-5 rounded-2xl border border-white/10 bg-white/5 text-gray-400 hover:text-white hover:border-white/20 transition-all flex items-center shadow-inner">
+                    <button className="h-14 px-5 rounded-2xl border border-border/20 bg-background dark:bg-white/5 text-textLight hover:text-textDark dark:hover:text-white hover:border-primary/20 transition-all flex items-center shadow-inner">
                         <Filter size={18} className="me-2" />
                         <span className="text-sm font-bold">{t('filter')}</span>
                     </button>
@@ -239,10 +239,10 @@ const Leads = () => {
             </div>
 
             {viewMode === 'list' ? (
-                <div className="bg-dark-card border border-white/10 rounded-[2rem] shadow-2xl overflow-hidden backdrop-blur-xl">
+                <div className="bg-white/50 dark:bg-section border border-border/50 rounded-[2rem] shadow-xl overflow-hidden backdrop-blur-md">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
-                            <thead className="bg-[#0f172a]/50 text-gray-500 font-bold text-[10px] uppercase tracking-[0.15em]">
+                            <thead className="bg-section dark:bg-white/5 text-textLight font-bold text-[10px] uppercase tracking-[0.15em]">
                                 <tr>
                                     <th className="px-8 py-6 text-start">{t('name')}</th>
                                     <th className="px-8 py-6 text-start">{t('contact')}</th>
@@ -252,27 +252,27 @@ const Leads = () => {
                                     <th className="px-8 py-6 text-end">{t('actions')}</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/5">
+                            <tbody className="divide-y divide-border/20">
                                 {loading ? (
                                     <tr><td colSpan="6" className="px-8 py-20 text-center text-gray-500 animate-pulse font-bold tracking-widest">{t('loading')}...</td></tr>
                                 ) : leads.length === 0 ? (
                                     <tr><td colSpan="6" className="px-8 py-20 text-center text-gray-600 font-bold italic">{t('noLeadsFound', 'No leads found')}</td></tr>
                                 ) : leads.map((lead) => (
-                                    <tr key={lead.id} className="hover:bg-white/[0.03] transition-colors group">
+                                    <tr key={lead.id} className="hover:bg-primary/5 transition-colors group">
                                         <td className="px-8 py-6">
-                                            <div className="font-extrabold text-white text-base group-hover:text-primary transition-colors leading-tight">{lead.name}</div>
-                                            <div className="text-[10px] text-gray-500 flex items-center mt-1.5 font-bold uppercase tracking-wider">
+                                            <div className="font-extrabold text-textDark dark:text-white text-base group-hover:text-primary transition-colors leading-tight">{lead.name}</div>
+                                            <div className="text-[10px] text-textLight flex items-center mt-1.5 font-bold uppercase tracking-wider">
                                                 <Calendar size={10} className="me-1.5 text-primary/60" />
                                                 {new Date(lead.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                                             </div>
                                         </td>
                                         <td className="px-8 py-6">
                                             <div className="flex flex-col space-y-2">
-                                                <div className="flex items-center text-xs font-semibold text-gray-400 group-hover:text-gray-300 transition-colors">
-                                                    <Mail size={12} className="me-2.5 text-gray-600 group-hover:text-primary transition-colors" /> {lead.email}
+                                                <div className="flex items-center text-xs font-semibold text-textLight group-hover:text-textDark dark:group-hover:text-white transition-colors">
+                                                    <Mail size={12} className="me-2.5 text-textLight group-hover:text-primary transition-colors" /> {lead.email}
                                                 </div>
-                                                <div className="flex items-center text-xs font-semibold text-gray-400 group-hover:text-gray-300 transition-colors">
-                                                    <Phone size={12} className="me-2.5 text-gray-600 group-hover:text-primary transition-colors" /> {lead.phone}
+                                                <div className="flex items-center text-xs font-semibold text-textLight group-hover:text-textDark dark:group-hover:text-white transition-colors">
+                                                    <Phone size={12} className="me-2.5 text-textLight group-hover:text-primary transition-colors" /> {lead.phone}
                                                 </div>
                                             </div>
                                         </td>
@@ -285,7 +285,7 @@ const Leads = () => {
                                             <div className="relative">
                                                 <button 
                                                     onClick={() => openAssignModal(lead)}
-                                                    className={`group/btn p-1 rounded-2xl transition-all duration-300 ${lead.assignedAgentId ? 'bg-white/5 hover:bg-white/10' : 'bg-primary/10 text-primary hover:bg-primary hover:text-white shadow-sm'}`}
+                                                    className={`group/btn p-1 rounded-2xl transition-all duration-300 ${lead.assignedAgentId ? 'bg-section dark:bg-white/5 hover:bg-black/5 dark:hover:bg-white/10' : 'bg-primary/10 text-primary hover:bg-primary hover:text-white shadow-sm'}`}
                                                 >
                                                     {lead.assignedAgentId ? (
                                                         <div className="flex items-center gap-3 pr-4">
@@ -293,7 +293,7 @@ const Leads = () => {
                                                                 <img src={agents.find(a => a.id === lead.assignedAgentId)?.avatar || 'https://via.placeholder.com/30'} alt="Agent" className="w-full h-full object-cover" />
                                                             </div>
                                                             <div className="text-start">
-                                                                <div className="text-[11px] font-black text-white leading-none mb-1 uppercase tracking-tight">{agents.find(a => a.id === lead.assignedAgentId)?.name}</div>
+                                                                <div className="text-[11px] font-black text-textDark dark:text-white leading-none mb-1 uppercase tracking-tight">{agents.find(a => a.id === lead.assignedAgentId)?.name}</div>
                                                                 <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest opacity-60">{t('agent')}</div>
                                                             </div>
                                                         </div>
@@ -354,7 +354,7 @@ const Leads = () => {
                             <div className="flex items-center justify-between pb-5 mb-5 border-b border-white/10">
                                 <div className="flex items-center gap-3">
                                     <div className={`w-3 h-3 rounded-full shadow-lg ${status === 'new' ? 'bg-blue-500 shadow-blue-500/20' : status === 'closed' ? 'bg-green-500 shadow-green-500/20' : 'bg-yellow-500 shadow-yellow-500/20'}`}></div>
-                                    <span className="font-black text-[11px] tracking-[0.15em] text-gray-300 uppercase">{config.label}</span>
+                                    <span className="font-black text-[11px] tracking-[0.15em] text-textLight dark:text-gray-300 uppercase">{config.label}</span>
                                 </div>
                                 <span className="bg-white/5 px-2.5 py-1 rounded-lg text-[10px] font-black text-gray-500 border border-white/5">
                                     {leads.filter(l => l.status === status).length}
@@ -367,11 +367,11 @@ const Leads = () => {
                                         initial={{ opacity: 0, scale: 0.95 }}
                                         animate={{ opacity: 1, scale: 1 }}
                                         key={lead.id} 
-                                        className="bg-slate-900/50 backdrop-blur-md shadow-lg p-5 rounded-3xl border border-white/10 hover:border-primary/20 transition-all cursor-move group relative"
+                                        className="bg-background dark:bg-section backdrop-blur-sm shadow-sm hover:shadow-md p-5 rounded-3xl border border-border/20 hover:border-primary/20 transition-all cursor-move group relative"
                                     >
                                         <div className="flex justify-between items-start mb-4">
                                             <div>
-                                                <h4 className="font-extrabold text-white text-base group-hover:text-primary transition-colors leading-tight mb-1">{lead.name}</h4>
+                                                <h4 className="font-extrabold text-textDark dark:text-white text-base group-hover:text-primary transition-colors leading-tight mb-1">{lead.name}</h4>
                                                 <div className="flex items-center gap-2">
                                                     <span className="px-2 py-0.5 rounded-md bg-white/5 text-[9px] font-bold text-gray-500 border border-white/5 uppercase tracking-wider">{t(lead.source) || lead.source}</span>
                                                 </div>
@@ -387,7 +387,7 @@ const Leads = () => {
                                                     <span>{t('latestActivity')}</span>
                                                     <span className="text-gray-600 text-[8px]">{new Date(lead.followUps[lead.followUps.length - 1].date).toLocaleDateString()}</span>
                                                 </div>
-                                                <p className="text-[11px] text-gray-300 font-medium italic line-clamp-2 leading-relaxed">"{lead.followUps[lead.followUps.length - 1].note}"</p>
+                                                <p className="text-[11px] text-textLight dark:text-gray-300 font-medium italic line-clamp-2 leading-relaxed">"{lead.followUps[lead.followUps.length - 1].note}"</p>
                                             </div>
                                         )}
                                         
@@ -436,23 +436,23 @@ const Leads = () => {
                 title={editingItem ? t('editLead', 'Edit Lead') : t('addLead')}
             >
                 <form onSubmit={handleSubmit} className="space-y-6 p-2">
-                    <Input label={t('name')} name="name" value={formData.name} onChange={handleInputChange} required className="bg-white/5 border-white/10 rounded-2xl h-14" />
+                    <Input label={t('name')} name="name" value={formData.name} onChange={handleInputChange} required className="bg-white dark:bg-background/50 border-border rounded-2xl h-14" />
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        <Input label={t('email')} type="email" name="email" value={formData.email} onChange={handleInputChange} required className="bg-white/5 border-white/10 rounded-2xl h-14" />
-                        <Input label={t('phone')} name="phone" value={formData.phone} onChange={handleInputChange} className="bg-white/5 border-white/10 rounded-2xl h-14" />
+                        <Input label={t('email')} type="email" name="email" value={formData.email} onChange={handleInputChange} required className="bg-white dark:bg-background/50 border-border rounded-2xl h-14" />
+                        <Input label={t('phone')} name="phone" value={formData.phone} onChange={handleInputChange} className="bg-white dark:bg-background/50 border-border rounded-2xl h-14" />
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
-                            <label className="block text-[10px] font-black text-gray-500 mb-3 uppercase tracking-[0.2em] ps-1">{t('source')}</label>
-                            <select className="w-full h-14 px-5 rounded-2xl border border-white/10 bg-[#0f172a] text-white outline-none focus:ring-2 focus:ring-primary/40 transition-all cursor-pointer font-bold appearance-none shadow-inner" name="source" value={formData.source} onChange={handleInputChange}>
+                            <label className="block text-[10px] font-black text-textLight mb-3 uppercase tracking-[0.2em] ps-1">{t('source')}</label>
+                            <select className="w-full h-14 px-5 rounded-2xl border border-border bg-white dark:bg-background text-textDark dark:text-white outline-none focus:ring-2 focus:ring-primary/40 transition-all cursor-pointer font-bold appearance-none shadow-sm" name="source" value={formData.source} onChange={handleInputChange}>
                                 <option value="website">🌐 {t('website')}</option>
                                 <option value="referral">🤝 {t('referral')}</option>
                                 <option value="social_media">📱 {t('socialMedia')}</option>
                             </select>
                         </div>
                         <div>
-                            <label className="block text-[10px] font-black text-gray-500 mb-3 uppercase tracking-[0.2em] ps-1">{t('status')}</label>
-                            <select className="w-full h-14 px-5 rounded-2xl border border-white/10 bg-[#0f172a] text-white outline-none focus:ring-2 focus:ring-primary/40 transition-all cursor-pointer font-bold appearance-none shadow-inner" name="status" value={formData.status} onChange={handleInputChange}>
+                            <label className="block text-[10px] font-black text-textLight mb-3 uppercase tracking-[0.2em] ps-1">{t('status')}</label>
+                            <select className="w-full h-14 px-5 rounded-2xl border border-border bg-white dark:bg-background text-textDark dark:text-white outline-none focus:ring-2 focus:ring-primary/40 transition-all cursor-pointer font-bold appearance-none shadow-sm" name="status" value={formData.status} onChange={handleInputChange}>
                                 {Object.entries(kanbanColumns).map(([key, config]) => (
                                     <option key={key} value={key}>{config.label}</option>
                                 ))}
@@ -461,7 +461,7 @@ const Leads = () => {
                     </div>
                     <div className="flex justify-end pt-6 gap-3">
                          <Button type="button" variant="ghost" onClick={handleCloseModal} className="h-12 px-8 rounded-2xl hover:bg-white/5 font-bold">{t('cancel')}</Button>
-                         <Button type="submit" className="h-12 bg-primary px-10 rounded-2xl shadow-xl shadow-primary/20 font-black tracking-widest uppercase text-xs">{editingItem ? t('update') : t('create')}</Button>
+                         <Button type="submit" className="h-12 bg-primary px-10 rounded-2xl shadow-xl shadow-primary/20 font-black tracking-widest uppercase text-xs !text-white">{editingItem ? t('update') : t('create')}</Button>
                     </div>
                 </form>
             </Modal>
@@ -493,7 +493,7 @@ const Leads = () => {
                                             key={fu.id} 
                                             className="relative ps-14 pb-10 last:pb-2 group"
                                         >
-                                            <div className="absolute left-0 top-0 w-10 h-10 rounded-2xl bg-slate-900 border border-white/10 flex items-center justify-center z-10 group-hover:border-primary/50 transition-colors shadow-xl">
+                                            <div className="absolute left-0 top-0 w-10 h-10 rounded-2xl bg-background border border-white/10 flex items-center justify-center z-10 group-hover:border-primary/50 transition-colors shadow-xl">
                                                 {performer?.avatar ? (
                                                     <img src={performer.avatar} alt={performer.name} className="w-full h-full object-cover rounded-2xl p-0.5" />
                                                 ) : (
@@ -503,10 +503,10 @@ const Leads = () => {
                                                 )}
                                             </div>
                                             
-                                            <div className="bg-[#0f172a] p-5 rounded-[2rem] border border-white/10 group-hover:border-white/20 transition-all shadow-inner">
+                                            <div className="bg-background dark:bg-[#0f172a] p-5 rounded-[2rem] border border-border/20 dark:border-white/10 group-hover:border-primary/20 transition-all shadow-inner">
                                                 <div className="flex justify-between items-start mb-3">
                                                     <div>
-                                                        <div className="text-xs font-black text-white uppercase tracking-tight mb-0.5 group-hover:text-primary transition-colors">{performer?.name || t('user')}</div>
+                                                        <div className="text-xs font-black text-textDark dark:text-white uppercase tracking-tight mb-0.5 group-hover:text-primary transition-colors">{performer?.name || t('user')}</div>
                                                         <div className="flex items-center gap-2">
                                                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
                                                             <span className="text-[9px] font-bold text-gray-500 uppercase tracking-widest">
@@ -520,7 +520,7 @@ const Leads = () => {
                                                         <span className="text-[8px] font-black text-emerald-400 uppercase tracking-widest">{t('logged')}</span>
                                                     </div>
                                                 </div>
-                                                <p className="text-sm text-gray-300 leading-relaxed font-semibold italic">"{fu.note}"</p>
+                                                <p className="text-sm text-textLight dark:text-gray-300 leading-relaxed font-semibold italic">"{fu.note}"</p>
                                             </div>
                                         </motion.div>
                                     );
@@ -536,8 +536,8 @@ const Leads = () => {
                         </div>
                     </div>
 
-                    <form onSubmit={handleAddFollowUp} className="bg-slate-950/50 p-6 rounded-[2.5rem] border border-white/10 space-y-5 shadow-2xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl opacity-20"></div>
+                    <form onSubmit={handleAddFollowUp} className="bg-white dark:bg-section p-6 rounded-[2.5rem] border border-border/50 space-y-5 shadow-xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl opacity-10"></div>
                         
                         <div>
                             <div className="flex items-center justify-between mb-4">
@@ -550,7 +550,7 @@ const Leads = () => {
                                 )}
                             </div>
                             <textarea 
-                                className="w-full px-6 py-5 rounded-[2rem] border border-white/10 bg-[#070b14] text-white outline-none focus:ring-2 focus:ring-primary/40 min-h-[140px] font-bold placeholder-gray-700 transition-all shadow-inner resize-none leading-relaxed"
+                                className="w-full px-6 py-5 rounded-[2rem] border border-border bg-background/50 text-textDark dark:text-white outline-none focus:ring-2 focus:ring-primary/40 min-h-[140px] font-bold placeholder-textLight/50 transition-all shadow-inner resize-none leading-relaxed"
                                 placeholder={t('enterFollowUpNotes', 'Start typing the interaction details here...')}
                                 value={followUpNote}
                                 onChange={(e) => setFollowUpNote(e.target.value)}

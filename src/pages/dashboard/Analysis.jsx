@@ -28,7 +28,7 @@ const Analysis = () => {
     if (active && payload && payload.length) {
       return (
         <div className="glass-panel p-3 !bg-dark-card/90 border-white/10">
-          <p className="text-white font-bold mb-1">{label}</p>
+          <p className="text-textDark dark:text-white font-bold mb-1">{label}</p>
           {payload.map((entry, index) => (
             <p key={index} style={{ color: entry.color }} className="text-sm">
               {entry.name}: ${entry.value.toLocaleString()}
@@ -44,8 +44,8 @@ const Analysis = () => {
     <div className="space-y-8 font-sans">
       <div className="flex justify-between items-end">
         <div>
-          <h1 className="text-3xl font-bold font-heading text-white mb-2">{t('analysisReports')}</h1>
-          <p className="text-gray-400">{t('deepDive')}</p>
+          <h1 className="text-3xl font-bold font-heading text-textDark dark:text-white mb-2">{t('analysisReports')}</h1>
+          <p className="text-textLight dark:text-gray-400">{t('deepDive')}</p>
         </div>
         <div className="flex gap-3">
           <button className="glass-button">{t('downloadPDF')}</button>
@@ -63,15 +63,15 @@ const Analysis = () => {
           <div key={i} className="glass-panel p-6">
             <div className="flex justify-between items-start mb-4">
               <div>
-                <p className="text-gray-400 text-sm">{stat.title}</p>
-                <h3 className="text-2xl font-bold text-white mt-1">{stat.value}</h3>
+                <p className="text-textLight dark:text-gray-400 text-sm">{stat.title}</p>
+                <h3 className="text-2xl font-bold text-textDark dark:text-white mt-1">{stat.value}</h3>
               </div>
               <div className="p-3 bg-white/5 rounded-xl">
                 <stat.icon size={20} className={stat.color} />
               </div>
             </div>
             <span className={`text-sm font-bold ${stat.color}`}>{stat.change}</span>
-            <span className="text-xs text-gray-500 ms-2">{t('vsLastMonth')}</span>
+            <span className="text-xs text-textLight dark:text-gray-500 ms-2">{t('vsLastMonth')}</span>
           </div>
         ))}
       </div>
@@ -79,7 +79,7 @@ const Analysis = () => {
       {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[400px]">
         <div className="lg:col-span-2 glass-panel p-6 flex flex-col">
-          <h3 className="text-xl font-bold text-white mb-6 font-heading">{t('financialOverview')}</h3>
+          <h3 className="text-xl font-bold text-textDark dark:text-white mb-6 font-heading">{t('financialOverview')}</h3>
           <div className="flex-1 w-full min-h-0">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={data}>
@@ -105,7 +105,7 @@ const Analysis = () => {
         </div>
 
         <div className="glass-panel p-6 flex flex-col">
-          <h3 className="text-xl font-bold text-white mb-6 font-heading">{t('propertyDistribution')}</h3>
+          <h3 className="text-xl font-bold text-textDark dark:text-white mb-6 font-heading">{t('propertyDistribution')}</h3>
           <div className="flex-1 w-full min-h-0 relative">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -127,7 +127,7 @@ const Analysis = () => {
             </ResponsiveContainer>
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
-                <p className="text-2xl font-bold text-white">1,200</p>
+                <p className="text-2xl font-bold text-textDark dark:text-white">1,200</p>
                 <p className="text-xs text-gray-400">{t('units', 'Units')}</p>
               </div>
             </div>
@@ -136,7 +136,7 @@ const Analysis = () => {
             {pieData.map((entry, index) => (
               <div key={index} className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
-                <span className="text-xs text-gray-300">{entry.name}</span>
+                <span className="text-xs text-textLight dark:text-gray-300">{entry.name}</span>
               </div>
             ))}
           </div>

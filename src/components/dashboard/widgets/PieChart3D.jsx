@@ -46,9 +46,9 @@ const Sector = ({ startAngle, endAngle, color, label, value, radius = 2 }) => {
       
       {hovered && (
         <Html position={[x, y, 1]} center>
-          <div className="bg-black/80 backdrop-blur text-white px-3 py-1.5 rounded-lg text-xs whitespace-nowrap border border-white/20 pointer-events-none shadow-lg">
+          <div className="bg-black/90 backdrop-blur text-white px-3 py-1.5 rounded-lg text-xs whitespace-nowrap border border-white/20 pointer-events-none shadow-lg">
             <div className="font-bold">{label}</div>
-            <div className="text-primary">{value}%</div>
+            <div className="text-accent">{value}%</div>
           </div>
         </Html>
       )}
