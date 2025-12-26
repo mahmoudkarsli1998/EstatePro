@@ -16,7 +16,8 @@
   
   /* Light Mode Variables - default */
   --primary: #0B3C5D;        /* Main brand color for headers, nav, primary buttons */
-  --background: #FAF9F6;     /* Global page background */
+  --background: #FCF5E5;     /* Global page background (Parchment) */
+  --button-bg: #FAF0E6;      /* Button background (Linen) */
   --accent: #C89B3C;         /* Highlights, CTAs, icons, links */
   --accent-hover: #B88A2F;   /* Hover states for accent elements */
   --section-bg: #E6D5B8;     /* Cards, sections, feature blocks */
@@ -68,18 +69,18 @@ h1, h2, h3, h4, h5, h6 {
   body {
     @apply antialiased;
     /* Clean background, no neon spots */
-    background-color: var(--bg-primary);
+    background-color: var(--background);
   }
   
   .dark body {
     /* Subtle professional gradient or just solid */
-    background: linear-gradient(to bottom, #0f172a, #020617);
-    background-attachment: fixed;
+    background-color: var(--background);
+    background-image: none;
   }
   
   /* Light mode standard background */
   body:not(.dark) {
-    background-color: #f8fafc; /* Slate 50 */
+    background-color: var(--background);
     background-image: none;
   }
 }
@@ -115,7 +116,7 @@ h1, h2, h3, h4, h5, h6 {
 
   .glass-button {
     @apply px-6 py-3 rounded-xl font-bold transition-all duration-300 relative overflow-hidden cursor-pointer;
-    background: var(--section-bg);
+    background: var(--button-bg);
     color: var(--text-dark);
     border: 1px solid var(--border-color);
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);

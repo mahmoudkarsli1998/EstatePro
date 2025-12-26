@@ -48,7 +48,7 @@ const Sidebar = ({ isOpen, onClose }) => {
               to={link.path}
               className={`flex items-center px-4 py-3 rounded-xl transition-all duration-300 ${
                 isActive 
-                  ? 'bg-primary text-white font-bold shadow-md' 
+                  ? 'bg-[var(--button-bg)] text-primary font-bold shadow-md border border-primary/10' 
                   : 'text-slate-500 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-primary dark:hover:text-white hover:translate-x-1 rtl:hover:-translate-x-1'
               }`}
             >

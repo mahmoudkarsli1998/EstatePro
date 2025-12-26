@@ -48,7 +48,7 @@ const LiquidBackground = () => {
           className="absolute bottom-1/4 left-1/2 w-80 h-80 bg-section/30 dark:bg-primary/10 rounded-full mix-blend-multiply dark:mix-blend-screen will-change-transform"
         />
       </div>
-      <div className="absolute inset-0 bg-white/40 dark:bg-[#0F1418]/60 backdrop-blur-[2px]"></div>
+      <div className="absolute inset-0 dark:bg-[#0F1418]/60 backdrop-blur-[0px]"></div>
     </div>
   );
 };

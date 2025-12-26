@@ -4,8 +4,8 @@ const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
-    const savedTheme = localStorage.getItem('theme');
-    return savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    // FORCE LIGHT MODE: Ignoring localStorage and system preference to solve user report
+    return 'light';
   });
 
   useEffect(() => {
