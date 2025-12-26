@@ -13,8 +13,9 @@ const ProjectCard = ({ project }) => {
       <div className="h-full flex flex-col glass-panel overflow-hidden group hover:border-primary/50 transition-all duration-300 relative transform-style-3d">
         <div className="relative h-72 overflow-hidden">
           <img 
-            src={project.images[0]} 
+            src={`${project.images[0]}?w=800&q=80&auto=format`} 
             alt={project.name} 
+            loading="lazy"
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-transparent to-transparent opacity-60"></div>

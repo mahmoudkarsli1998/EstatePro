@@ -238,7 +238,7 @@ export const projects = [
   },
 
   {
-    id: 8,
+    id: 12,
     name: "Mountain Retreat",
     slug: "mountain-retreat",
     description: "Cozy cabins and lodges in the mountains",
@@ -260,7 +260,7 @@ export const projects = [
     ]
   },
   {
-    id: 9,
+    id: 13,
     name: "The Harbor",
     slug: "the-harbor",
     description: "Waterfront apartments with marina access",
@@ -282,7 +282,7 @@ export const projects = [
     ]
   },
   {
-    id: 10,
+    id: 14,
     name: "Royal Gardens",
     slug: "royal-gardens",
     description: "Aristocratic living in expansive gardens",
@@ -303,11 +303,11 @@ export const projects = [
       { id: 12, name: "Phase 1", deliveryDate: "2027-05-01" }
     ]
   },
-  // Generated Projects 12-30
+  // Generated Projects 15-33
   ...Array.from({ length: 19 }, (_, i) => ({
-    id: 12 + i,
-    name: `Luxury Residence ${12 + i}`,
-    slug: `luxury-residence-${12 + i}`,
+    id: 15 + i,
+    name: `Luxury Residence ${15 + i}`,
+    slug: `luxury-residence-${15 + i}`,
     description: `Experience the epitome of luxury living in Residence ${12 + i}. Featuring state-of-the-art amenities and breathtaking views.`,
     address: `${100 + i} Exclusive Blvd, Prime City`,
     location: { lat: 25.0 + (i * 0.1), lng: 55.0 + (i * 0.1) },

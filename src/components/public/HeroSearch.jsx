@@ -44,7 +44,7 @@ const HeroSearch = () => {
   };
 
   return (
-    <div ref={containerRef} className="w-full max-w-5xl mx-auto glass-panel rounded-2xl overflow-hidden border border-white/10 backdrop-blur-xl bg-section/90 dark:bg-black/40">
+    <div ref={containerRef} className="w-full max-w-5xl mx-auto glass-panel rounded-2xl overflow-hidden border border-white/10 backdrop-blur-md bg-section/95 dark:bg-black/60">
       {/* Tabs */}
       <div className="flex border-b border-white/10">
         <button
@@ -91,7 +91,7 @@ const HeroSearch = () => {
               <select 
                 value={propertyType}
                 onChange={(e) => setPropertyType(e.target.value)}
-                className="w-full appearance-none pl-4 pr-10 py-3 rounded-lg border border-border/20 dark:border-white/10 text-textDark dark:text-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer bg-background dark:bg-white/5 backdrop-blur-sm"
+                className="w-full appearance-none pl-4 pr-10 py-3 rounded-lg border border-border/20 dark:border-white/10 text-textDark dark:text-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer bg-background dark:bg-white/5"
               >
 
                 <option value="" className="bg-background dark:bg-dark-bg">{t('propertyTypes')}</option>
@@ -107,7 +107,7 @@ const HeroSearch = () => {
               <select 
                 value={beds}
                 onChange={(e) => setBeds(e.target.value)}
-                className="w-full appearance-none pl-4 pr-10 py-3 rounded-lg border border-border/20 dark:border-white/10 text-textDark dark:text-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer bg-background dark:bg-white/5 backdrop-blur-sm"
+                className="w-full appearance-none pl-4 pr-10 py-3 rounded-lg border border-border/20 dark:border-white/10 text-textDark dark:text-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer bg-background dark:bg-white/5"
               >
 
 
@@ -123,7 +123,7 @@ const HeroSearch = () => {
               <select 
                 value={priceRange}
                 onChange={(e) => setPriceRange(e.target.value)}
-                className="w-full appearance-none pl-4 pr-10 py-3 rounded-lg border border-border/20 dark:border-white/10 text-textDark dark:text-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer bg-background dark:bg-white/5 backdrop-blur-sm"
+                className="w-full appearance-none pl-4 pr-10 py-3 rounded-lg border border-border/20 dark:border-white/10 text-textDark dark:text-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer bg-background dark:bg-white/5"
               >
 
 

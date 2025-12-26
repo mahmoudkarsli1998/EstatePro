@@ -42,6 +42,7 @@ const Home = () => {
             src="/assets/3D-bg.png" 
             alt="Modern Architecture" 
             className="w-full h-full object-cover"
+            fetchPriority="high"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-transparent"></div>
         </div>

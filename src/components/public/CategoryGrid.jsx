@@ -7,9 +7,9 @@ import { useNavigate } from 'react-router-dom';
 const CategoryCard = ({ icon: Icon, title, onClick }) => (
   <div 
     onClick={onClick}
-    className="category-item opacity-0 flex flex-col items-center justify-center p-6 glass-panel rounded-2xl hover:bg-white/10 transition-all duration-300 cursor-pointer group hover:-translate-y-2 border border-white/5 active:scale-95"
+    className="category-item opacity-0 flex flex-col items-center justify-center p-6 bg-white/50 dark:bg-white/5 rounded-2xl hover:bg-white/80 dark:hover:bg-white/10 transition-colors duration-200 cursor-pointer group border border-black/5 dark:border-white/5 active:scale-95 will-change-transform shadow-sm"
   >
-    <div className="w-14 h-14 mb-4 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300 shadow-sm group-hover:shadow-md">
+    <div className="w-14 h-14 mb-4 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-200 shadow-sm">
       <Icon size={28} />
     </div>
     <span className="font-bold text-textLight dark:text-gray-300 group-hover:text-primary dark:group-hover:text-white transition-colors text-sm text-center tracking-wide">{title}</span>

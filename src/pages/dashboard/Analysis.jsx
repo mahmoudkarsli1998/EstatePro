@@ -78,7 +78,7 @@ const Analysis = () => {
 
       {/* Charts Row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[400px]">
-        <div className="lg:col-span-2 glass-panel p-6 flex flex-col">
+        <div className="lg:col-span-2 glass-panel p-6 flex flex-col h-full">
           <h3 className="text-xl font-bold text-textDark dark:text-white mb-6 font-heading">{t('financialOverview')}</h3>
           <div className="flex-1 w-full min-h-0">
             <ResponsiveContainer width="100%" height="100%">
@@ -104,7 +104,7 @@ const Analysis = () => {
           </div>
         </div>
 
-        <div className="glass-panel p-6 flex flex-col">
+        <div className="glass-panel p-6 flex flex-col h-full">
           <h3 className="text-xl font-bold text-textDark dark:text-white mb-6 font-heading">{t('propertyDistribution')}</h3>
           <div className="flex-1 w-full min-h-0 relative">
             <ResponsiveContainer width="100%" height="100%">

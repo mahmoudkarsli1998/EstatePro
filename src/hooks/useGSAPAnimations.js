@@ -141,17 +141,20 @@ export const useHover3D = (options = {}) => {
     const el = ref.current;
     if (!el) return;
 
-    // Use the first child as the 3D target to prevent event flickering
     const target = el.firstElementChild || el;
+    let bounds = { left: 0, top: 0, width: 0, height: 0 };
 
     gsap.set(el, { perspective: perspective });
     gsap.set(target, { transformStyle: 'preserve-3d' });
 
+    const onMouseEnter = () => {
+      bounds = el.getBoundingClientRect();
+    };
+
     const onMouseMove = (e) => {
-      // Calculate relative to the wrapper
-      const { left, top, width, height } = el.getBoundingClientRect();
-      const x = (e.clientX - left) / width - 0.5;
-      const y = (e.clientY - top) / height - 0.5;
+      // Use cached bounds to avoid layout thrashing
+      const x = (e.clientX - bounds.left) / bounds.width - 0.5;
+      const y = (e.clientY - bounds.top) / bounds.height - 0.5;
 
       gsap.to(target, {
         rotationY: x * intensity,
@@ -172,10 +175,12 @@ export const useHover3D = (options = {}) => {
       });
     };
 
+    el.addEventListener('mouseenter', onMouseEnter);
     el.addEventListener('mousemove', onMouseMove);
     el.addEventListener('mouseleave', onMouseLeave);
 
     return () => {
+      el.removeEventListener('mouseenter', onMouseEnter);
       el.removeEventListener('mousemove', onMouseMove);
       el.removeEventListener('mouseleave', onMouseLeave);
     };

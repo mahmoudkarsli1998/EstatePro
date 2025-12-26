@@ -239,7 +239,7 @@ const Units = () => {
                        </div>
                        <div className="w-24 h-24 rounded-lg bg-gray-200 dark:bg-gray-800 overflow-hidden shrink-0 border border-border/20">
                           {unit.images && unit.images.length > 0 ? (
-                             <img src={unit.images[0]} alt="" className="w-full h-full object-cover" />
+                             <img src={unit.images[0]} alt="" className="w-full h-full object-cover" loading="lazy" />
                           ) : (
                              <div className="w-full h-full flex items-center justify-center text-gray-400">
                                 <Home size={24} />
