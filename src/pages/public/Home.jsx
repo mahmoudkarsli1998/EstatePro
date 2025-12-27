@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Shield, Zap, Globe, ArrowRight } from 'lucide-react';
 import Hero3DOverlay from '../../components/public/Hero3DOverlay';
 import FeaturedProjects from '../../components/public/FeaturedProjects';
+import FeaturedUnits from '../../components/public/FeaturedUnits';
 import StatsCounter from '../../components/public/StatsCounter';
 import LiquidBackground from '../../components/shared/LiquidBackground';
 import Button from '../../components/shared/Button';
@@ -97,6 +98,9 @@ const Home = () => {
       <StatsCounter />
 
       <FeaturedProjects />
+
+      <FeaturedUnits />
+
 
       {/* Why Choose Us */}
       <section className="py-24 relative z-10">

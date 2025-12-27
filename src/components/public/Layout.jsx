@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import FloatingChatWidget from './FloatingChatWidget';
 
 const PublicLayout = () => {
   return (
@@ -11,6 +12,7 @@ const PublicLayout = () => {
         <Outlet />
       </main>
       <Footer />
+      <FloatingChatWidget />
     </div>
   );
 };
