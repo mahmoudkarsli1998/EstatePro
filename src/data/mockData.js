@@ -697,6 +697,65 @@ export const units = [
   }
 ];
 
+// Locations
+export const locations = [
+  {
+    id: 1,
+    name: "New Cairo",
+    slug: "new_cairo",
+    city: "Cairo",
+    country: "Egypt",
+    lat: 30.0444,
+    lng: 31.2357,
+    image: "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=800&q=80",
+    description: "A modern city with luxurious compounds and vast green spaces."
+  },
+  {
+    id: 2,
+    name: "Sheikh Zayed",
+    slug: "sheikh_zayed",
+    city: "Giza",
+    country: "Egypt",
+    lat: 30.0444,
+    lng: 30.9318,
+    image: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?auto=format&fit=crop&w=800&q=80",
+    description: "Premium residential area with high-end amenities."
+  },
+  {
+    id: 3,
+    name: "New Capital",
+    slug: "new_capital",
+    city: "Cairo",
+    country: "Egypt",
+    lat: 30.0131,
+    lng: 31.7089,
+    image: "https://images.unsplash.com/photo-1590490360182-f33cfe293d23?auto=format&fit=crop&w=800&q=80",
+    description: "The administrative and financial hub of the future."
+  },
+  {
+    id: 4,
+    name: "North Coast",
+    slug: "north_coast",
+    city: "Alexandria",
+    country: "Egypt",
+    lat: 30.8256,
+    lng: 28.9567,
+    image: "https://images.unsplash.com/photo-1613977257363-707ba9348227?auto=format&fit=crop&w=800&q=80",
+    description: "Beautiful beaches and summer luxury resorts."
+  },
+  {
+    id: 5,
+    name: "Dubai Marina",
+    slug: "dubai_marina",
+    city: "Dubai",
+    country: "UAE",
+    lat: 25.0773,
+    lng: 55.1396,
+    image: "https://images.unsplash.com/photo-1512453979798-5ea936a79402?auto=format&fit=crop&w=800&q=80",
+    description: "Luxury waterfront living in the heart of Dubai."
+  }
+];
+
 // Developers
 export const developers = [
   {

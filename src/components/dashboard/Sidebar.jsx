@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Building, Home, Users, UserCheck, FileText, LogOut, Briefcase, Calendar, BarChart2, X, Shield } from 'lucide-react';
+import { LayoutDashboard, Building, Home, Users, UserCheck, FileText, LogOut, Briefcase, Calendar, BarChart2, X, Shield, MapPin } from 'lucide-react';
 
 const Sidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
@@ -12,6 +12,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Projects', path: '/dashboard/projects', icon: Building },
     { name: 'Units', path: '/dashboard/units', icon: Home },
+    { name: 'Locations', path: '/dashboard/locations', icon: MapPin },
     { name: 'Leads', path: '/dashboard/leads', icon: Users },
     { name: 'Developers', path: '/dashboard/developers', icon: Briefcase },
     { name: 'Managers', path: '/dashboard/managers', icon: Users },

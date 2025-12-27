@@ -1,6 +1,73 @@
-import { projects, units, leads, developers, agents, users, blocks, managers, admins, cities } from '../data/mockData';
+import { projects, units, leads, developers, agents, users, blocks, managers, admins, cities, locations } from '../data/mockData';
 
 export const api = {
+  // Locations
+  getLocations: () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Calculate relevant stats for each location
+        const locationsWithStats = locations.map(loc => {
+           // Simple matching logic: Check if project address or unit city/slug matches location slug/name
+           // This is 'mock' logic. Real logic would use foreign keys.
+           const locProjects = projects.filter(p => 
+             (p.location && typeof p.location === 'object' /* pure coordinate match too hard for mock */) || 
+             (p.address && p.address.toLowerCase().includes(loc.name.toLowerCase())) ||
+             (p.address && p.address.toLowerCase().includes(loc.city.toLowerCase()))
+           );
+           
+           const locUnits = units.filter(u => 
+             (u.city && u.city === loc.slug) ||
+             (locProjects.some(p => p.id === u.projectId))
+           );
+
+           return {
+             ...loc,
+             stats: {
+               projectsCount: locProjects.length,
+               unitsCount: locUnits.length,
+               activeProjects: locProjects.filter(p => p.status === 'active').length
+             }
+           };
+        });
+        resolve(locationsWithStats);
+      }, 600);
+    });
+  },
+
+  createLocation: (data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const newLocation = { 
+          ...data, 
+          id: Date.now(),
+          slug: data.name.toLowerCase().replace(/\s+/g, '_')
+        };
+        locations.push(newLocation);
+        resolve(newLocation);
+      }, 800);
+    });
+  },
+
+  updateLocation: (id, data) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const loc = locations.find(l => l.id === parseInt(id));
+        if (loc) Object.assign(loc, data);
+        resolve(loc);
+      }, 600);
+    });
+  },
+
+  deleteLocation: (id) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const index = locations.findIndex(l => l.id === parseInt(id));
+        if (index > -1) locations.splice(index, 1);
+        resolve({ success: true });
+      }, 600);
+    });
+  },
+
   // Projects
   getProjects: () => {
     return new Promise((resolve) => {

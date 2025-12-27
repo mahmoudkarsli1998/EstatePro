@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit, Trash, Search, Filter, Home, DollarSign, Maximize, Layers, Download, MapPin, Star, Eye, Clock, Crown, Bed, Bath, Car } from 'lucide-react';
+import { Plus, Edit, Trash, Search, Filter, Home, DollarSign, Maximize, Layers, Download, MapPin, Star, Eye, Clock, Crown, Bed, Bath, Car, LayoutTemplate, List } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
@@ -10,112 +10,113 @@ import { api } from '../../utils/api';
 import { useDashboardCrud } from '../../hooks/useDashboardCrud';
 
 const Units = () => {
-  const { t } = useTranslation();
-  const {
-    paginatedItems: units, // Use paginated items
-    filteredItems, // keep full list for count
-    loading,
-    isModalOpen,
-    editingItem,
-    formData,
-    searchTerm,
-    setSearchTerm,
-    activeFilters,
-    setActiveFilters,
-    currentPage,
-    setCurrentPage,
-    totalPages,
-    handleOpenModal,
-    handleCloseModal,
-    handleInputChange,
-    handleSubmit,
-    handleDelete,
-    handleExport,
-    setFormData,
-    setAllItems
-  } = useDashboardCrud(
-    api.getUnits,
-    api.createUnit,
-    api.updateUnit,
-    api.deleteUnit,
-    { 
-      number: '', type: 'residential', floor: '', area_m2: '', 
-      price: '', status: 'available', projectId: '', phaseId: '', blockId: '',
-      features: { bedrooms: 0, bathrooms: 0 },
-      image: null
-    },
-    (unit, term) => 
-      unit.number.toLowerCase().includes(term.toLowerCase()) || 
-      unit.type.toLowerCase().includes(term.toLowerCase())
-  );
-
-  // Dependent Data States
-  const [projects, setProjects] = useState([]);
-  const [phases, setPhases] = useState([]);
-  const [blocks, setBlocks] = useState([]);
-  const [showFilters, setShowFilters] = useState(false); // Toggle for filter panel
-
-  // Load Projects on Mount
-  useEffect(() => {
-    api.getProjects().then(setProjects);
-  }, []);
-
-  // Load Phases/Blocks when Project changes (in Modal)
-  useEffect(() => {
-    if (formData.projectId) {
-      api.getPhases(formData.projectId).then(setPhases);
-      api.getBlocks(formData.projectId).then(setBlocks);
-    } else {
-      setPhases([]);
-      setBlocks([]);
-    }
-  }, [formData.projectId]);
-
-  const onExport = () => {
-    handleExport(
-      "units_export.csv",
-      ["ID", "Number", "Type", "Floor", "Area", "Price", "Status", "Project ID"],
-      u => [u.id, `"${u.number}"`, u.type, u.floor, u.area_m2, u.price, u.status, u.projectId].join(",")
+    const { t } = useTranslation();
+    const [viewMode, setViewMode] = useState('list');
+    const {
+        paginatedItems: units, // Use paginated items
+        filteredItems, // keep full list for count
+        loading,
+        isModalOpen,
+        editingItem,
+        formData,
+        searchTerm,
+        setSearchTerm,
+        activeFilters,
+        setActiveFilters,
+        currentPage,
+        setCurrentPage,
+        totalPages,
+        handleOpenModal,
+        handleCloseModal,
+        handleInputChange,
+        handleSubmit,
+        handleDelete,
+        handleExport,
+        setFormData,
+        setAllItems
+    } = useDashboardCrud(
+        api.getUnits,
+        api.createUnit,
+        api.updateUnit,
+        api.deleteUnit,
+        { 
+        number: '', type: 'residential', floor: '', area_m2: '', 
+        price: '', status: 'available', projectId: '', phaseId: '', blockId: '',
+        features: { bedrooms: 0, bathrooms: 0 },
+        image: null
+        },
+        (unit, term) => 
+        unit.number.toLowerCase().includes(term.toLowerCase()) || 
+        unit.type.toLowerCase().includes(term.toLowerCase())
     );
-  };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'available': return 'success';
-      case 'reserved': return 'warning';
-      case 'sold': return 'danger'; // Red/Neutral for sold
-      default: return 'default';
-    }
-  };
+    // Dependent Data States
+    const [projects, setProjects] = useState([]);
+    const [phases, setPhases] = useState([]);
+    const [blocks, setBlocks] = useState([]);
+    const [showFilters, setShowFilters] = useState(false); // Toggle for filter panel
 
-  const navigate = useNavigate();
+    // Load Projects on Mount
+    useEffect(() => {
+        api.getProjects().then(setProjects);
+    }, []);
 
-  const handleAddUnit = () => {
-    navigate('/dashboard/units/add');
-  };
+    // Load Phases/Blocks when Project changes (in Modal)
+    useEffect(() => {
+        if (formData.projectId) {
+        api.getPhases(formData.projectId).then(setPhases);
+        api.getBlocks(formData.projectId).then(setBlocks);
+        } else {
+        setPhases([]);
+        setBlocks([]);
+        }
+    }, [formData.projectId]);
 
-  const handleToggleFavorite = async (unit) => {
-    // Optimistic update
-    const newStatus = !unit.isFavorite;
-    
-    // Update local state immediately
-    setAllItems(prev => prev.map(u => 
-        u.id === unit.id ? { ...u, isFavorite: newStatus } : u
-    ));
+    const onExport = () => {
+        handleExport(
+        "units_export.csv",
+        ["ID", "Number", "Type", "Floor", "Area", "Price", "Status", "Project ID"],
+        u => [u.id, `"${u.number}"`, u.type, u.floor, u.area_m2, u.price, u.status, u.projectId].join(",")
+        );
+    };
 
-    // Persist to API
-    await api.updateUnit(unit.id, { isFavorite: newStatus });
-  };
+    const getStatusColor = (status) => {
+        switch (status) {
+        case 'available': return 'success';
+        case 'reserved': return 'warning';
+        case 'sold': return 'danger'; // Red/Neutral for sold
+        default: return 'default';
+        }
+    };
 
-  return (
+    const navigate = useNavigate();
+
+    const handleAddUnit = () => {
+        navigate('/dashboard/units/add');
+    };
+
+    const handleToggleFavorite = async (unit) => {
+        // Optimistic update
+        const newStatus = !unit.isFavorite;
+        
+        // Update local state immediately
+        setAllItems(prev => prev.map(u => 
+            u.id === unit.id ? { ...u, isFavorite: newStatus } : u
+        ));
+
+        // Persist to API
+        await api.updateUnit(unit.id, { isFavorite: newStatus });
+    };
+
+    return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold font-heading text-textDark dark:text-white">{t('units', 'Units Management')}</h1>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={() => window.print()}>
-             {t('print')}
-          </Button>
-          <Button variant="outline" onClick={onExport}>
+           <Button variant="outline" onClick={() => window.print()}>
+              {t('print')}
+           </Button>
+           <Button variant="outline" onClick={onExport}>
             <Download size={18} className="me-2" /> {t('export')}
           </Button>
           <Button onClick={handleAddUnit}>
@@ -124,7 +125,7 @@ const Units = () => {
         </div>
       </div>
 
-      <div className="bg-background dark:bg-dark-card border border-border/20 rounded-xl shadow-sm overflow-hidden">
+      <div className="bg-background dark:bg-dark-card border border-border/20 rounded-xl shadow-sm overflow-hidden min-h-[600px] flex flex-col">
         {/* Filter Header */}
         <div className="p-4 border-b border-border/20 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2 w-full md:w-auto">
@@ -143,13 +144,30 @@ const Units = () => {
              </div>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-textLight">{t('sortBy')}: </span>
-            <select className="bg-transparent border border-border/20 rounded px-2 py-1 text-sm outline-none">
+             <div className="flex p-1 bg-gray-100 dark:bg-white/5 rounded-lg border border-border/10 me-4">
+                <button
+                    onClick={() => setViewMode('list')}
+                    className={`p-2 rounded-md transition-all ${viewMode === 'list' ? 'bg-white dark:bg-gray-700 shadow-sm text-primary' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                    title={t('List View')}
+                >
+                    <List size={18} />
+                </button>
+                <button
+                    onClick={() => setViewMode('board')}
+                    className={`p-2 rounded-md transition-all ${viewMode === 'board' ? 'bg-white dark:bg-gray-700 shadow-sm text-primary' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+                    title={t('Board View')}
+                >
+                    <LayoutTemplate size={18} />
+                </button>
+            </div>
+            
+            <span className="text-sm text-textLight hidden md:inline">{t('sortBy')}: </span>
+            <select className="bg-transparent border border-border/20 rounded px-2 py-1 text-sm outline-none hidden md:block">
                 <option>{t('newest')}</option>
                 <option>{t('priceLowToHigh')}</option>
                 <option>{t('priceHighToLow')}</option>
             </select>
-            <div className="flex items-center gap-2 ms-4">
+            <div className="flex items-center gap-2 ms-4 hidden md:flex">
                  <input type="checkbox" id="selectAll" className="rounded border-gray-300 text-primary focus:ring-primary" />
                  <label htmlFor="selectAll" className="text-sm select-none">{t('selectAll')}</label>
             </div>
@@ -199,8 +217,9 @@ const Units = () => {
            </div>
         )}
 
-        {/* Table/List View */}
-        <div className="overflow-x-auto">
+        {/* View Content */}
+        {viewMode === 'list' ? (
+        <div className="overflow-x-auto flex-1">
           <table className="w-full text-left border-collapse">
             <thead className="bg-section/50 text-textLight font-medium text-xs uppercase tracking-wider hidden md:table-header-group">
                 <tr className="border-b border-border/10">
@@ -339,6 +358,56 @@ const Units = () => {
             </tbody>
           </table>
         </div>
+        ) : (
+            <div className="p-6 overflow-x-auto h-full flex-1">
+                <div className="flex gap-6 h-full min-w-max pb-4">
+                    {['available', 'reserved', 'sold', 'rented'].map(status => {
+                        const statusUnits = units.filter(u => status === 'available' ? (u.status === 'active' || u.status === 'available') : u.status === status);
+                        return (
+                            <div key={status} className="w-80 flex flex-col h-full bg-section/30 rounded-xl border border-border/10">
+                                <div className={`p-4 border-b border-border/10 flex justify-between items-center ${
+                                    status === 'available' ? 'border-t-4 border-t-green-500' : 
+                                    status === 'reserved' ? 'border-t-4 border-t-yellow-500' : 
+                                    status === 'sold' ? 'border-t-4 border-t-red-500' : 
+                                    'border-t-4 border-t-blue-500'
+                                } rounded-t-xl bg-background/50`}>
+                                    <h3 className="font-bold text-textDark dark:text-white capitalize">{t(status)}</h3>
+                                    <span className="bg-background dark:bg-white/10 px-2 py-0.5 rounded-full text-xs font-bold">{statusUnits.length}</span>
+                                </div>
+                                <div className="p-4 flex-1 overflow-y-auto space-y-3 max-h-[600px] scrollbar-hide">
+                                    {statusUnits.length === 0 && (
+                                        <div className="text-center text-gray-400 text-sm italic py-4">No units</div>
+                                    )}
+                                    {statusUnits.map(unit => (
+                                        <div key={unit.id} className="bg-background dark:bg-dark-card border border-border/10 p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer group relative">
+                                            <div className="h-32 mb-3 rounded-md overflow-hidden bg-gray-200">
+                                                <img src={unit.images?.[0] || 'https://via.placeholder.com/300x200'} alt="" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
+                                            </div>
+                                            <div className="flex justify-between items-start mb-1">
+                                                <div className="font-bold text-textDark dark:text-white truncate max-w-[150px]">{unit.number}</div>
+                                                <div className="font-bold text-primary text-sm">${(unit.price/1000).toFixed(0)}k</div>
+                                            </div>
+                                            <div className="text-xs text-textLight flex items-center gap-1 mb-2">
+                                                <MapPin size={10} /> {unit.city}
+                                            </div>
+                                            <div className="flex justify-between items-center text-xs text-gray-400 border-t border-border/10 pt-2 mt-2">
+                                                <div className="flex gap-2">
+                                                    <span className="flex items-center gap-0.5"><Bed size={10} /> {unit.features?.bedrooms}</span>
+                                                    <span className="flex items-center gap-0.5"><Maximize size={10} /> {unit.area_m2}m²</span>
+                                                </div>
+                                                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity absolute top-2 right-2 bg-black/50 backdrop-blur rounded p-1">
+                                                    <button onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/units/edit/${unit.id}`); }} className="text-white hover:text-blue-300"><Edit size={12} /></button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )
+                    })}
+                </div>
+            </div>
+        )}
 
         {/* Pagination */}
         <div className="p-4 border-t border-border/20 flex items-center justify-between">

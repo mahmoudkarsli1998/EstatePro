@@ -21,6 +21,7 @@ const Units = React.lazy(() => import('./pages/dashboard/Units'));
 const AddUnit = React.lazy(() => import('./pages/dashboard/AddUnit'));
 const Leads = React.lazy(() => import('./pages/dashboard/Leads'));
 const Users = React.lazy(() => import('./pages/dashboard/Users'));
+const DashboardLocations = React.lazy(() => import('./pages/dashboard/Locations'));
 const Developers = React.lazy(() => import('./pages/dashboard/Developers'));
 const Managers = React.lazy(() => import('./pages/dashboard/Managers'));
 const Admins = React.lazy(() => import('./pages/dashboard/Admins'));
@@ -84,6 +85,7 @@ const AnimatedRoutes = () => {
           }>
             <Route index element={<Dashboard />} />
             <Route path="projects" element={<Projects />} />
+            <Route path="locations" element={<DashboardLocations />} />
             <Route path="units" element={<Units />} />
             <Route path="units/add" element={<AddUnit />} />
             <Route path="units/edit/:id" element={<AddUnit />} />

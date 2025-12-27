@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Plus, Edit, Trash, Search, MapPin, Layers, Download, Home, Maximize } from 'lucide-react';
+import { Plus, Edit, Trash, Search, MapPin, Layers, Download, Home, Maximize, LayoutGrid, List } from 'lucide-react';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import Modal from '../../components/shared/Modal';
@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 
 const Projects = () => {
   const { t } = useTranslation();
+  const [viewMode, setViewMode] = useState('grid');
   const {
     filteredItems: projects,
     loading,
@@ -101,8 +102,8 @@ const Projects = () => {
       </div>
 
       <div className="bg-background dark:bg-dark-card border border-border/20 rounded-xl shadow-sm overflow-hidden">
-        <div className="p-4 border-b border-border/20">
-          <div className="relative max-w-md">
+        <div className="p-4 border-b border-border/20 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="relative max-w-md w-full">
             <Search size={18} className="absolute inset-y-0 start-3 my-auto text-gray-400" />
             <input 
               type="text" 
@@ -112,14 +113,32 @@ const Projects = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+          
+          <div className="flex p-1 bg-gray-100 dark:bg-white/5 rounded-lg border border-border/10">
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`p-2 rounded-md transition-all ${viewMode === 'grid' ? 'bg-white dark:bg-gray-700 shadow-sm text-primary' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+              title={t('Grid View')}
+            >
+              <LayoutGrid size={18} />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={`p-2 rounded-md transition-all ${viewMode === 'list' ? 'bg-white dark:bg-gray-700 shadow-sm text-primary' : 'text-gray-500 hover:text-gray-700 dark:hover:text-gray-300'}`}
+              title={t('List View')}
+            >
+              <List size={18} />
+            </button>
+          </div>
         </div>
 
+        {loading ? (
+             <div className="p-8 text-center text-gray-400">{t('loading')}</div>
+        ) : projects.length === 0 ? (
+             <div className="p-8 text-center text-gray-400">{t('noProjects')}</div>
+        ) : viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-          {loading ? (
-            <div className="text-center col-span-full text-gray-400">{t('loading')}</div>
-          ) : projects.length === 0 ? (
-            <div className="text-center col-span-full text-gray-400">{t('noProjects')}</div>
-          ) : projects.map((project) => (
+            {projects.map((project) => (
             <div key={project.id} className="glass-panel overflow-hidden hover:border-primary/50 transition-colors group flex flex-col">
               <div className="h-48 bg-gray-800 relative">
                 <img src={project.images[0]} alt={project.name} className="w-full h-full object-cover" />
@@ -174,6 +193,84 @@ const Projects = () => {
             </div>
           ))}
         </div>
+        ) : (
+            <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                    <thead>
+                        <tr className="bg-gray-50 dark:bg-white/5 text-textLight dark:text-gray-400 text-sm border-b border-border/20 dark:border-white/10">
+                            <th className="p-4 font-medium">{t('Name')}</th>
+                            <th className="p-4 font-medium">{t('Location')}</th>
+                            <th className="p-4 font-medium text-center">{t('Status')}</th>
+                            <th className="p-4 font-medium text-center">{t('Units')}</th>
+                            <th className="p-4 font-medium text-center">{t('Sold')}</th>
+                            <th className="p-4 font-medium text-center">{t('Phases')}</th>
+                            <th className="p-4 font-medium text-end">{t('Actions')}</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/20 dark:divide-white/5">
+                        {projects.map((project) => (
+                            <tr key={project.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                                <td className="p-4">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-gray-200">
+                                            <img src={project.images[0]} alt="" className="w-full h-full object-cover" />
+                                        </div>
+                                        <div className="font-bold text-textDark dark:text-white">{project.name}</div>
+                                    </div>
+                                </td>
+                                <td className="p-4 text-textDark dark:text-gray-300">
+                                    <div className="flex items-center text-sm gap-1">
+                                        <MapPin size={14} className="text-gray-400" />
+                                        {project.address}
+                                    </div>
+                                </td>
+                                <td className="p-4 text-center">
+                                    <span className={`inline-block px-2 py-1 rounded-md text-xs font-bold uppercase ${
+                                        project.status === 'active' ? 'bg-green-500/10 text-green-500' :
+                                        project.status === 'upcoming' ? 'bg-blue-500/10 text-blue-500' :
+                                        'bg-gray-500/10 text-gray-500'
+                                    }`}>
+                                        {project.status}
+                                    </span>
+                                </td>
+                                <td className="p-4 text-center">
+                                    <div className="flex flex-col items-center">
+                                        <span className="font-bold text-textDark dark:text-white">{project.stats.totalUnits}</span>
+                                        <span className="text-xs text-textLight">{project.stats.available} avail</span>
+                                    </div>
+                                </td>
+                                <td className="p-4 text-center text-green-500 font-bold">
+                                    {project.stats.sold}
+                                </td>
+                                <td className="p-4 text-center text-textLight text-sm">
+                                    <div className="flex items-center justify-center gap-1">
+                                         <Layers size={14} /> {project.phases?.length || 0}
+                                    </div>
+                                </td>
+                                <td className="p-4">
+                                    <div className="flex justify-end gap-2">
+                                        <button 
+                                            className="p-1.5 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                                            onClick={() => handleOpenModal(project)}
+                                            title="Edit"
+                                        >
+                                            <Edit size={16} />
+                                        </button>
+                                        <button 
+                                            className="p-1.5 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                            onClick={() => handleDelete(project.id)}
+                                            title="Delete"
+                                        >
+                                            <Trash size={16} />
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        )}
       </div>
 
       <Modal 
