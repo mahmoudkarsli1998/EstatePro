@@ -19,6 +19,7 @@ const AddUnit = () => {
   const [cities, setCities] = useState([]);
   const [projects, setProjects] = useState([]);
   const [agents, setAgents] = useState([]);
+  const [customAmenityText, setCustomAmenityText] = useState('');
 
   // Load initial data on mount
   useEffect(() => {
@@ -91,8 +92,6 @@ const AddUnit = () => {
              
              amenities: unit.features?.amenities || [],
              nearbyFacilities: unit.features?.nearbyFacilities || [],
-             
-             existingFeatures: unit.features || {},
              
              existingFeatures: unit.features || {},
              
@@ -214,6 +213,20 @@ const AddUnit = () => {
       ...prev,
       images: prev.images.filter((_, i) => i !== index)
     }));
+  };
+
+  const handleAddCustomAmenity = (e) => {
+    e.preventDefault();
+    if (!customAmenityText.trim()) return;
+    
+    // Check if not already exists
+    if (!formData.amenities.includes(customAmenityText.trim())) {
+        setFormData(prev => ({
+            ...prev,
+            amenities: [...prev.amenities, customAmenityText.trim()]
+        }));
+    }
+    setCustomAmenityText('');
   };
 
   const nextStep = (e) => {
@@ -773,6 +786,30 @@ const AddUnit = () => {
                           <span className="capitalize text-sm">{t(item) || item}</span>
                         </label>
                     ))}
+                 </div>
+                 
+                 {/* Custom Amenity Input */}
+                 <div className="flex gap-2 mt-4 items-end max-w-md">
+                    <div className="flex-grow">
+                        <Input 
+                            label={t('addCustomAmenity', 'Add Custom Feature')} 
+                            value={customAmenityText}
+                            onChange={(e) => setCustomAmenityText(e.target.value)}
+                            placeholder="e.g. Private Cinema"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') handleAddCustomAmenity(e);
+                            }}
+                        />
+                    </div>
+                    <Button 
+                        type="button" 
+                        onClick={handleAddCustomAmenity}
+                        className="mb-1"
+                        variant="primary"
+                        disabled={!customAmenityText.trim()}
+                    >
+                        <Upload size={18} className="rotate-90" />
+                    </Button>
                  </div>
                </div>
 

@@ -22,7 +22,7 @@ const CategoryGrid = () => {
   const navigate = useNavigate();
 
   const categories = [
-    { icon: Key, title: t('estateProKeys'), filter: { type: 'keys' } },
+    { icon: Key, title: t('units', 'Units'), filter: { type: 'keys' } },
     { icon: LockOpen, title: t('unlocked'), filter: { status: 'unlocked' } },
     { icon: Building2, title: t('developerUnits'), filter: { type: 'developer' } },
     { icon: RefreshCw, title: t('resaleUnits'), filter: { status: 'resale' } },

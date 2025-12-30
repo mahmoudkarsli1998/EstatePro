@@ -4,6 +4,7 @@ import { Shield, Zap, Globe, ArrowRight } from 'lucide-react';
 import Hero3DOverlay from '../../components/public/Hero3DOverlay';
 import FeaturedProjects from '../../components/public/FeaturedProjects';
 import FeaturedUnits from '../../components/public/FeaturedUnits';
+import TopDevelopers from '../../components/public/TopDevelopers';
 import StatsCounter from '../../components/public/StatsCounter';
 import LiquidBackground from '../../components/shared/LiquidBackground';
 import Button from '../../components/shared/Button';
@@ -36,7 +37,7 @@ const Home = () => {
       <DemoModal isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
       
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20 pb-20">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-32 md:pt-44 lg:pt-52 pb-20">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
@@ -97,9 +98,11 @@ const Home = () => {
 
       <StatsCounter />
 
+      <FeaturedUnits />
+      
       <FeaturedProjects />
 
-      <FeaturedUnits />
+      <TopDevelopers />
 
 
       {/* Why Choose Us */}

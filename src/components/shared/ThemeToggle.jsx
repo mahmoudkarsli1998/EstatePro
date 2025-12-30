@@ -9,7 +9,7 @@ const ThemeToggle = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors relative overflow-hidden group"
+      className="p-2 rounded-full bg-black/5 hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/20 transition-colors relative overflow-hidden group"
       aria-label="Toggle Theme"
     >
       <motion.div

@@ -12,6 +12,9 @@ const Contact = React.lazy(() => import('./pages/public/Contact'));
 const Locations = React.lazy(() => import('./pages/public/Locations'));
 const DesignStudio = React.lazy(() => import('./pages/public/DesignStudio'));
 const Sell = React.lazy(() => import('./pages/public/Sell'));
+const PublicDevelopers = React.lazy(() => import('./pages/public/Developers'));
+const UnitsList = React.lazy(() => import('./pages/public/UnitsList'));
+const DeveloperDetail = React.lazy(() => import('./pages/public/DeveloperDetail'));
 
 const InviteAccept = React.lazy(() => import('./pages/dashboard/InviteAccept'));
 const Login = React.lazy(() => import('./pages/dashboard/Login'));
@@ -35,6 +38,7 @@ import Particles from './components/shared/Particles';
 
 import Preloader from './components/shared/Preloader';
 import RequireAuth from './components/auth/RequireAuth';
+import ScrollToTop from './components/shared/ScrollToTop';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -62,8 +66,7 @@ const AnimatedRoutes = () => {
     <AnimatePresence mode="wait">
       <React.Suspense fallback={<PageLoader />}>
         <Routes location={location} key={location.pathname}>
-          {/* Public Routes */}
-          <Route element={<PublicLayout />}>
+          <Route element={<><ScrollToTop /><PublicLayout /></>}>
             <Route path="/" element={<Home />} />
             <Route path="/projects" element={<ProjectsList />} />
             <Route path="/projects/:id" element={<ProjectDetail />} />
@@ -73,6 +76,10 @@ const AnimatedRoutes = () => {
             <Route path="/locations" element={<Locations />} />
             <Route path="/design" element={<DesignStudio />} />
             <Route path="/sell" element={<Sell />} />
+            <Route path="/developers" element={<PublicDevelopers />} />
+            <Route path="/developers" element={<PublicDevelopers />} />
+            <Route path="/developers/:id" element={<DeveloperDetail />} />
+            <Route path="/units" element={<UnitsList />} />
           </Route>
 
           {/* Dashboard Routes */}

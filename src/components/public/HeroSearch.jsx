@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 
 const HeroSearch = () => {
   const { t } = useTranslation();
-  const [activeTab, setActiveTab] = useState('compounds');
+  const [activeTab, setActiveTab] = useState('compounds'); // 'compounds' | 'units'
   const containerRef = useRef(null);
   const navigate = useNavigate();
 
@@ -25,6 +25,7 @@ const HeroSearch = () => {
     
     // Parse price range logic (mock implementation)
     if (priceRange === '0-1m') {
+      params.append('minPrice', '0');
       params.append('maxPrice', '1000000');
     } else if (priceRange === '1m-5m') {
       params.append('minPrice', '1000000');
@@ -34,13 +35,17 @@ const HeroSearch = () => {
     }
 
     if (activeTab === 'compounds') {
-      params.append('isCompound', 'true'); // Assuming backend supports this
+      navigate({
+        pathname: '/projects',
+        search: params.toString()
+      });
+    } else {
+      // Units search
+      navigate({
+        pathname: '/units',
+        search: params.toString()
+      });
     }
-
-    navigate({
-      pathname: '/projects',
-      search: params.toString()
-    });
   };
 
   return (
@@ -59,13 +64,13 @@ const HeroSearch = () => {
         </button>
         <button
           className={`flex-1 py-4 text-center font-bold text-sm uppercase tracking-wider transition-colors ${
-            activeTab === 'properties'
+            activeTab === 'units'
               ? 'text-primary border-b-2 border-primary bg-primary/10'
               : 'text-textLight dark:text-gray-400 hover:text-textDark dark:hover:text-white hover:bg-white/5'
           }`}
-          onClick={() => setActiveTab('properties')}
+          onClick={() => setActiveTab('units')}
         >
-          {t('properties')}
+          {t('units', 'Units')}
         </button>
       </div>
 

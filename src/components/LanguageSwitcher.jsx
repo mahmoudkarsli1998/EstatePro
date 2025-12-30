@@ -15,7 +15,7 @@ const LanguageSwitcher = () => {
     <div className="flex items-center gap-2">
       <button
         onClick={() => changeLanguage(i18n.language.startsWith('en') ? 'ar' : 'en')}
-        className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/10 transition-colors text-sm font-medium text-white"
+        className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-sm font-medium text-textDark dark:text-white"
       >
         <Globe className="w-4 h-4" />
         <span>{i18n.language.startsWith('en') ? 'العربية' : 'English'}</span>

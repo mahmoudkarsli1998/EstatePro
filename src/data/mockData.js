@@ -8,7 +8,10 @@ export const projects = [
     address: "123 Ocean Drive, Miami Beach",
     location: { lat: 25.7617, lng: -80.1918 },
     status: "ready",
+    status: "ready",
     type: "keys",
+    propertyType: "residential",
+    listingType: "sale",
     images: [
       "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00",
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750"
@@ -31,7 +34,10 @@ export const projects = [
     address: "456 Coastal Hwy, Malibu",
     location: { lat: 34.0259, lng: -118.7798 },
     status: "active",
+    status: "active",
     type: "developer",
+    propertyType: "residential",
+    listingType: "sale",
     images: [
       "https://images.unsplash.com/photo-1613490493576-7fde63acd811",
       "https://images.unsplash.com/photo-1613977257363-707ba9348227"
@@ -53,7 +59,10 @@ export const projects = [
     address: "789 Downtown Ave, New York",
     location: { lat: 40.7128, lng: -74.0060 },
     status: "upcoming",
+    status: "upcoming",
     type: "invest",
+    propertyType: "commercial",
+    listingType: "sale",
     images: [
       "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab",
       "https://images.unsplash.com/photo-1460317442991-0ec209397118"
@@ -76,7 +85,10 @@ export const projects = [
     address: "321 Forest Rd, Portland",
     location: { lat: 45.5152, lng: -122.6784 },
     status: "active",
+    status: "active",
     type: "offer",
+    propertyType: "residential",
+    listingType: "rent",
     images: [
       "https://images.unsplash.com/photo-1564013799919-ab600027ffc6",
       "https://images.unsplash.com/photo-1518780664697-55e3ad937233"
@@ -98,7 +110,10 @@ export const projects = [
     address: "555 High St, Chicago",
     location: { lat: 41.8781, lng: -87.6298 },
     status: "resale",
+    status: "resale",
     type: "keys",
+    propertyType: "commercial",
+    listingType: "sale",
     images: [
       "https://images.unsplash.com/photo-1479839672679-a46483c0e7c8",
       "https://images.unsplash.com/photo-1430285561322-7808604715df"
@@ -120,7 +135,10 @@ export const projects = [
     address: "88 Lakeview Dr, Seattle",
     location: { lat: 47.6062, lng: -122.3321 },
     status: "unlocked",
+    status: "unlocked",
     type: "developer",
+    propertyType: "residential",
+    listingType: "sale",
     images: [
       "https://images.unsplash.com/photo-1580587771525-78b9dba3b91d",
       "https://images.unsplash.com/photo-1516156008625-3a9d6067fab5"
@@ -142,7 +160,10 @@ export const projects = [
     address: "777 Sand Dune Way, Phoenix",
     location: { lat: 33.4484, lng: -112.0740 },
     status: "upcoming",
+    status: "upcoming",
     type: "offer",
+    propertyType: "residential",
+    listingType: "rent",
     images: [
       "https://images.unsplash.com/photo-1513584685908-2274653fa36f",
       "https://images.unsplash.com/photo-1505577058444-a3dab90d4253"
@@ -507,6 +528,7 @@ export const units = [
     city: 'sheikh_zayed',
     latitude: '30.0626',
     longitude: '30.9318',
+    titleAr: 'محل تجاري 60م في مول العرب',
     images: [
       'https://images.unsplash.com/photo-1555617778-02518510b9fa?auto=format&fit=crop&w=800&q=80'
     ],
@@ -526,11 +548,13 @@ export const units = [
     number: "B-501",
     floor: 5,
     type: "penthouse",
-    area_m2: 250,
-    price: 1200000,
+    area_m2: 175,
+    price: 13000000,
     status: "available",
+    titleAr: "شقه 175م جاردن متشطبه في ماونتن فيو هايد بارك",
+    locationAr: "التجمع الخامس",
     images: ["https://images.unsplash.com/photo-1512918760513-95f192972701"],
-    features: { bedrooms: 4, bathrooms: 3, parking: 2, view: "Panoramic Sea", furnished: true, balcony: true },
+    features: { bedrooms: 3, bathrooms: 3, parking: 2, view: "Garden View", furnished: true, balcony: true },
     notes: "Premium finish"
   },
   // Project 2: Ocean Breeze
@@ -541,14 +565,16 @@ export const units = [
     number: "V-01",
     floor: 0,
     type: "villa",
-    area_m2: 400,
-    price: 3500000,
+    area_m2: 150,
+    price: 12000000,
     status: "available",
+    titleAr: "شاليه أرضي في لافيستا 6 - موقع مميز",
+    locationAr: "العين السخنة",
     buildingCode: 'V-01',
     buildingFloors: 2,
     city: 'miami',
     images: ["https://images.unsplash.com/photo-1613490493576-7fde63acd811"],
-    features: { bedrooms: 5, bathrooms: 5, parking: 3, view: "Ocean Front", furnished: false, balcony: true },
+    features: { bedrooms: 3, bathrooms: 2, parking: 1, view: "Sea View", furnished: false, balcony: true },
     notes: "Direct beach access"
   },
   {
@@ -558,11 +584,13 @@ export const units = [
     number: "V-02",
     floor: 0,
     type: "villa",
-    area_m2: 380,
-    price: 3200000,
+    area_m2: 265,
+    price: 41598001,
     status: "reserved",
+    titleAr: "تاون هاوس للبيع في وودفيل 265 م",
+    locationAr: "6 أكتوبر",
     images: ["https://images.unsplash.com/photo-1613977257363-707ba9348227"],
-    features: { bedrooms: 4, bathrooms: 4, parking: 2, view: "Ocean Front", furnished: false, balcony: true },
+    features: { bedrooms: 4, bathrooms: 5, parking: 2, view: "Park View", furnished: false, balcony: true },
     notes: "Reserved by Mrs. Johnson"
   },
   // Project 3: Urban Heights
@@ -781,6 +809,42 @@ export const developers = [
     contactPhone: "+1-555-0300",
     logo: "https://via.placeholder.com/150",
     projects: [4, 6]
+  },
+  {
+    id: 4,
+    name: "Palm Hills Developments",
+    description: "A leading real estate developer in Egypt, creating integrated residential, commercial, and resort communities.",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Palm_Hills_Developments_Logo.jpg/800px-Palm_Hills_Developments_Logo.jpg", // Placeholder or real logic if available
+    contactEmail: "info@palmhills.com",
+    contactPhone: "19014",
+    address: "Smart Village, A-B 28, km 28 Cairo-Alex Desert Road",
+    website: "https://www.palmhillsdevelopments.com",
+    established: "2005",
+    projects: [1, 9] // Assuming linking to some projects
+  },
+  {
+    id: 5,
+    name: "Sodic",
+    description: "SODIC is one of the country's leading real estate development companies, transforming the way people live and work.",
+    logo: "https://upload.wikimedia.org/wikipedia/en/thumb/8/8e/SODIC_Logo.png/220px-SODIC_Logo.png",
+    contactEmail: "sales@sodic.com",
+    contactPhone: "16220",
+    address: "Km 38 Cairo-Alexandria Desert Road, Sheikh Zayed City",
+    website: "https://sodic.com",
+    established: "1996",
+    projects: [10, 11]
+  },
+  {
+    id: 6,
+    name: "Mountain View",
+    description: "Driven by innovation, Mountain View is among Egypt's leading private property development companies.",
+    logo: "https://mountainviewegypt.com/assets/images/logo.png",
+    contactEmail: "info@mountainviewegypt.com",
+    contactPhone: "16201",
+    address: "Cairo Business Plaza, New Cairo",
+    website: "https://mountainviewegypt.com",
+    established: "2005",
+    projects: [12, 13]
   }
 ];
 

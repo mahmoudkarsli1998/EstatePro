@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, ArrowRight, Bed, Bath, Maximize } from 'lucide-react';
+import { MapPin, ArrowRight, Bed, Bath, Maximize, Phone, MessageCircle } from 'lucide-react';
 import Button from '../shared/Button';
 import { api } from '../../utils/api';
 import { useStaggerList, useHover3D } from '../../hooks/useGSAPAnimations';
+import { useTranslation } from 'react-i18next';
 
 const UnitCard = ({ unit }) => {
   const cardRef = useHover3D({ intensity: 10, scale: 1.02 });
+  const { t, i18n } = useTranslation();
+  const isRTL = i18n.dir() === 'rtl';
 
   return (
     <div ref={cardRef} className="h-full stagger-item opacity-0">
@@ -39,38 +42,63 @@ const UnitCard = ({ unit }) => {
           </div>
         </div>
         
-        <div className="p-6 flex-grow flex flex-col relative z-10 bg-gradient-to-b from-transparent to-black/20 translate-z-10">
-          <div className="flex justify-between items-start mb-2">
-            <div>
-              <h3 className="text-xl font-bold font-heading text-textDark dark:text-white line-clamp-1 group-hover:text-primary transition-colors">
-                {unit.titleEn || unit.number}
-              </h3>
-              <div className="flex items-center text-textLight text-xs mt-1">
-                <MapPin size={12} className="mr-1 text-primary" />
-                <span className="line-clamp-1">{unit.city || 'Cairo'}</span>
-              </div>
+        <div className="p-6 flex-grow flex flex-col relative z-10 bg-white dark:bg-gray-900 border-t border-border/10 translate-z-10 text-right">
+          
+          <div className="flex-grow">
+            <h3 className="text-lg md:text-xl font-bold font-heading text-textDark dark:text-white mb-2 leading-tight group-hover:text-primary transition-colors text-right" dir="auto">
+               {unit.titleAr || unit.titleEn || unit.number}
+            </h3>
+            
+            <div className="flex items-center justify-end text-textLight text-sm mb-4">
+              <span className="line-clamp-1">{unit.locationAr || unit.city || 'Cairo'}</span>
+              <MapPin size={14} className="ml-1 text-primary" />
             </div>
-            <span className="text-primary font-bold text-lg bg-primary/10 px-2 py-1 rounded-lg border border-primary/20 whitespace-nowrap">
-              ${(unit.price / 1000).toFixed(0)}k
-            </span>
+            
+            <hr className="border-border/10 mb-4" />
+
+            <div className={`flex items-center justify-end gap-4 text-textLight text-sm mb-4 ${isRTL ? 'flex-row-reverse' : ''}`}>
+               {/* Area */}
+               <div className="flex items-center gap-1">
+                 <span className="font-bold text-textDark dark:text-white">{unit.area_m2 || 0}</span>
+                 <span className="text-xs">{t('m2', 'm²')}</span>
+                 <Maximize size={16} className="text-primary ml-1" />
+               </div>
+               
+               <div className="w-px h-4 bg-border/30"></div>
+
+               {/* Baths */}
+               <div className="flex items-center gap-1">
+                 <span className="font-bold text-textDark dark:text-white">{unit.features?.bathrooms || 0}</span>
+                 <span className="text-xs">{t('baths', 'Baths')}</span>
+                 <Bath size={16} className="text-primary ml-1" />
+               </div>
+
+               <div className="w-px h-4 bg-border/30"></div>
+
+               {/* Beds */}
+               <div className="flex items-center gap-1">
+                  <span className="font-bold text-textDark dark:text-white">{unit.features?.bedrooms || 0}</span>
+                  <span className="text-xs">{t('beds', 'Beds')}</span>
+                  <Bed size={16} className="text-primary ml-1" />
+               </div>
+            </div>
           </div>
           
-          <div className="grid grid-cols-3 gap-2 mt-4 pt-4 border-t border-border/10">
-            <div className="flex flex-col items-center p-2 rounded-lg bg-background/50 dark:bg-white/5 border border-border/10">
-              <Bed size={16} className="text-primary mb-1" />
-              <span className="text-sm font-bold text-textDark dark:text-white">{unit.features?.bedrooms || 0}</span>
-              <span className="text-[10px] text-textLight uppercase">Beds</span>
-            </div>
-            <div className="flex flex-col items-center p-2 rounded-lg bg-background/50 dark:bg-white/5 border border-border/10">
-              <Bath size={16} className="text-primary mb-1" />
-              <span className="text-sm font-bold text-textDark dark:text-white">{unit.features?.bathrooms || 0}</span>
-              <span className="text-[10px] text-textLight uppercase">Baths</span>
-            </div>
-             <div className="flex flex-col items-center p-2 rounded-lg bg-background/50 dark:bg-white/5 border border-border/10">
-              <Maximize size={16} className="text-primary mb-1" />
-              <span className="text-sm font-bold text-textDark dark:text-white">{unit.features?.area_m2 || 0}</span>
-              <span className="text-[10px] text-textLight uppercase">m²</span>
-            </div>
+          <div className="flex items-center justify-between mt-auto pt-4 border-t border-border/10">
+             <div className="flex gap-2">
+                 <button className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition-colors shadow-md hover:shadow-lg hover:scale-110 active:scale-95 duration-200">
+                    <MessageCircle size={20} />
+                 </button>
+                 <button className="w-10 h-10 rounded-full bg-gray-600/80 text-white flex items-center justify-center hover:bg-gray-700 transition-colors shadow-md hover:shadow-lg hover:scale-110 active:scale-95 duration-200">
+                    <Phone size={20} />
+                 </button>
+             </div>
+             <div>
+                <span className="text-[10px] text-textLight block text-left mb-0.5">EGP</span>
+                <span className="text-xl md:text-2xl font-bold text-primary font-heading">
+                  {unit.price?.toLocaleString()}
+                </span>
+             </div>
           </div>
         </div>
       </div>

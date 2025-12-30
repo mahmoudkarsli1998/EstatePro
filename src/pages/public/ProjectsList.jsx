@@ -49,7 +49,21 @@ const ProjectsList = () => {
   const filteredProjects = projects.filter(project => {
     if (filters.search && !project.name.toLowerCase().includes(filters.search.toLowerCase())) return false;
     if (filters.status && project.status !== filters.status) return false;
-    if (filters.type && project.propertyType !== filters.type) return false;
+    
+    // Handle Special "Property Types" from Navbar (Resale, Commercial, Rent)
+    if (filters.type) {
+        if (filters.type === 'resale') {
+             if (project.status !== 'resale') return false;
+        } else if (filters.type === 'rent') {
+             if (project.listingType !== 'rent') return false;
+        } else if (filters.type === 'commercial') {
+             if (project.propertyType !== 'commercial') return false;
+        } else {
+             // Fallback for direct property type match (e.g. residential)
+             if (project.propertyType !== filters.type) return false;
+        }
+    }
+    
     if (filters.minPrice && project.priceRange.min < parseInt(filters.minPrice)) return false;
     if (filters.maxPrice && project.priceRange.max > parseInt(filters.maxPrice)) return false;
     return true;
