@@ -12,6 +12,9 @@ export const projects = [
     type: "keys",
     propertyType: "residential",
     listingType: "sale",
+    createdById: 1, // Default Admin
+    status: "active",
+    privateNotes: [],
     images: [
       "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00",
       "https://images.unsplash.com/photo-1512917774080-9991f1c4c750"
@@ -38,6 +41,9 @@ export const projects = [
     type: "developer",
     propertyType: "residential",
     listingType: "sale",
+    createdById: 1,
+    status: "active",
+    privateNotes: [],
     images: [
       "https://images.unsplash.com/photo-1613490493576-7fde63acd811",
       "https://images.unsplash.com/photo-1613977257363-707ba9348227"
@@ -924,111 +930,148 @@ export const agents = [
   }
 ];
 
-// Users
+// Users with Roles
 export const users = [
-  {
-    id: 1,
-    fullName: "Admin User",
-    email: "admin@company.com",
-    role: "admin",
-    isActive: true,
-    inviteToken: null,
-    inviteExpiresAt: null,
-    createdAt: "2025-01-15T10:00:00Z"
-  },
-  {
-    id: 2,
-    fullName: "Pending Manager",
-    email: "manager@company.com",
-    role: "manager",
-    isActive: false,
-    inviteToken: "abc123def456",
-    inviteExpiresAt: "2025-12-07T10:00:00Z",
-    createdAt: "2025-11-25T10:00:00Z"
-  },
-  {
-    id: 3,
-    fullName: "John Smith",
-    email: "john@company.com",
-    role: "agent",
-    isActive: true,
-    createdAt: "2025-02-01T10:00:00Z"
-  },
-  {
-    id: 4,
-    fullName: "Jane Doe",
-    email: "jane@company.com",
-    role: "agent",
-    isActive: true,
-    createdAt: "2025-02-05T10:00:00Z"
-  },
-  {
-    id: 5,
-    fullName: "Mike Ross",
-    email: "mike@company.com",
-    role: "agent",
-    isActive: true,
-    createdAt: "2025-02-10T10:00:00Z"
-  },
-  {
-    id: 6,
-    fullName: "Sarah Connor",
-    email: "sarah@company.com",
-    role: "manager",
-    isActive: true,
-    createdAt: "2025-03-12T10:00:00Z"
-  },
-  {
-    id: 7,
-    fullName: "Kyle Reese",
-    email: "kyle@company.com",
-    role: "agent",
-    isActive: true,
-    createdAt: "2025-03-15T10:00:00Z"
-  }
-];
-
-export const managers = [
-  {
-    id: 1,
-    name: "Sarah Connor",
-    email: "sarah@company.com",
-    phone: "+1-555-0301",
-    department: "Sales",
-    status: "active",
-    joinDate: "2025-03-12"
-  },
-  {
-    id: 2,
-    name: "Pending Manager",
-    email: "manager@company.com",
-    phone: "+1-555-0302",
-    department: "Marketing",
-    status: "perm_pending", // waiting for permission/invite accept
-    joinDate: "2025-11-25"
-  }
-];
-
-export const admins = [
+  // Admin
   {
     id: 1,
     name: "Admin User",
+    fullName: "Admin User",
     email: "admin@company.com",
-    phone: "+1-555-0000",
-    role: "Super Admin",
+    role: "admin",
     status: "active",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80",
+    joinDate: "2025-01-01",
     lastLogin: "2025-12-07T08:00:00Z"
   },
+  // Manager
   {
     id: 2,
-    name: "Tech Support",
-    email: "support@company.com",
-    phone: "+1-555-0001",
-    role: "Support Admin",
+    name: "Manager User",
+    fullName: "Manager User",
+    email: "manager@company.com",
+    role: "manager",
     status: "active",
-    lastLogin: "2025-12-06T14:30:00Z"
+    department: "Sales",
+    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80",
+    joinDate: "2025-01-15"
+  },
+  // Sales
+  {
+    id: 3,
+    name: "Sales User",
+    fullName: "Sales User",
+    email: "sales@estatepro.com",
+    role: "sales",
+    status: "active",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80",
+    joinDate: "2025-02-01",
+    assignedLeads: 12,
+    activities: [
+      { id: 1, action: "UNIT_CREATED", details: "Created unit 101 in Sunset Towers", date: "2025-01-02T10:00:00Z" },
+      { id: 2, action: "STATUS_UPDATE", details: "Changed status of Unit 205 to Reserved", date: "2025-01-01T14:30:00Z" },
+      { id: 3, action: "NOTE_ADDED", details: "Added private note to Unit 302", date: "2024-12-30T09:15:00Z" },
+      { id: 4, action: "FOLLOW_UP", details: "Call with Sarah Johnson - High Interest", date: "2024-12-29T11:20:00Z" },
+      { id: 5, action: "STATUS_UPDATE", details: "Marked Lead Michael Brown as Contacted", date: "2024-12-28T16:45:00Z" },
+      { id: 6, action: "UNIT_UPDATED", details: "Updated pricing for Ocean Breeze Villas", date: "2024-12-27T10:00:00Z" },
+      { id: 7, action: "FOLLOW_UP", details: "Email sent to Jessica Miller regarding floor plans", date: "2024-12-26T14:30:00Z" },
+      { id: 8, action: "NOTE_ADDED", details: "Internal note: Client prefers corner units", date: "2024-12-25T09:00:00Z" }
+    ]
+  },
+  // Agent
+  {
+    id: 4,
+    name: "Agent User",
+    fullName: "Agent User",
+    email: "agent@estatepro.com",
+    role: "agent",
+    status: "active",
+    avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=150&q=80",
+    joinDate: "2025-02-10",
+    assignedProjects: [1, 2]
+  },
+  // Lead / Guest
+  // Additional Agents
+  {
+    id: 5,
+    name: "Mike Ross",
+    fullName: "Mike Ross",
+    email: "mike@company.com",
+    role: "agent",
+    status: "active",
+    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=256&q=80",
+    joinDate: "2025-02-15"
+  },
+  {
+    id: 6,
+    name: "Sarah Johnson",
+    fullName: "Sarah Johnson",
+    email: "sarah.j@company.com",
+    role: "agent",
+    status: "active",
+    avatar: "https://images.unsplash.com/photo-1580489944761-15a19d654956?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=256&q=80",
+    joinDate: "2025-02-16"
+  },
+  {
+    id: 7,
+    name: "David Chen",
+    fullName: "David Chen",
+    email: "david.c@company.com",
+    role: "agent",
+    status: "active",
+    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=256&q=80",
+    joinDate: "2025-02-17"
+  },
+  {
+    id: 8,
+    name: "Emily Wilson",
+    fullName: "Emily Wilson",
+    email: "emily.w@company.com",
+    role: "agent",
+    status: "active",
+    avatar: "https://images.unsplash.com/photo-1598550874175-4d7112ee7f38?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=256&q=80",
+    joinDate: "2025-02-18"
+  },
+  {
+    id: 9,
+    name: "Robert Taylor",
+    fullName: "Robert Taylor",
+    email: "robert.t@company.com",
+    role: "agent",
+    status: "active",
+    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=256&q=80",
+    joinDate: "2025-02-19"
+  },
+  {
+    id: 10,
+    name: "Jessica Martinez",
+    fullName: "Jessica Martinez",
+    email: "jessica.m@company.com",
+    role: "agent",
+    status: "active",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=256&q=80",
+    joinDate: "2025-02-20"
+  },
+  {
+    id: 11,
+    name: "John Doe",
+    fullName: "John Doe",
+    email: "john@gmail.com",
+    role: "user",
+    status: "active",
+    joinDate: "2025-03-01"
   }
 ];
+
+// Re-export specific groups for backward compatibility
+export const admins = users.filter(u => u.role === 'admin');
+export const managers = users.filter(u => u.role === 'manager');
+// Note: agents array in mockData was more complex, matching userId to agentId. 
+// For simplicity in this mock transition, we'll keep the separate agents array 
+// but ensure the users specific to agents exist in the main users array above if needed.
+// However, the existing 'agents' array (lines 852-925) is separate. 
+// We should probably alias it or leave it be if it's used differently.
+// For now, we leave the 'agents' export from lines 852-925 alone and only replace 'users', 'managers', 'admins'.
 
 // Leads
 export const leads = [
@@ -1040,7 +1083,7 @@ export const leads = [
     email: "sarah@email.com",
     phone: "+1-555-0200",
     message: "I'm interested in viewing this unit",
-    assignedAgentId: 1,
+    assignedAgentId: 3,
     status: "new",
     source: "website",
     createdAt: "2025-11-28T14:30:00Z",
@@ -1054,7 +1097,7 @@ export const leads = [
     email: "michael@email.com",
     phone: "+1-555-0201",
     message: "Is the price negotiable?",
-    assignedAgentId: 2,
+    assignedAgentId: 3,
     status: "contacted",
     source: "referral",
     createdAt: "2025-11-27T09:15:00Z",
@@ -1068,7 +1111,7 @@ export const leads = [
     email: "emily@email.com",
     phone: "+1-555-0202",
     message: "When is the delivery date?",
-    assignedAgentId: 1,
+    assignedAgentId: 3,
     status: "qualified",
     source: "social_media",
     createdAt: "2025-11-26T16:45:00Z",
@@ -1096,7 +1139,7 @@ export const leads = [
     email: "jessica@email.com",
     phone: "+1-555-0204",
     message: "Can I see the floor plan?",
-    assignedAgentId: 1,
+    assignedAgentId: 3,
     status: "new",
     source: "website",
     createdAt: "2025-11-29T10:00:00Z",
@@ -1110,7 +1153,7 @@ export const leads = [
     email: "robert@email.com",
     phone: "+1-555-0205",
     message: "Is there a payment plan?",
-    assignedAgentId: 2,
+    assignedAgentId: 3,
     status: "contacted",
     source: "referral",
     createdAt: "2025-11-28T15:30:00Z",
@@ -1124,7 +1167,7 @@ export const leads = [
     email: "linda@email.com",
     phone: "+1-555-0206",
     message: "I love the mountain view!",
-    assignedAgentId: 2,
+    assignedAgentId: 3,
     status: "qualified",
     source: "social_media",
     createdAt: "2025-11-27T12:00:00Z",

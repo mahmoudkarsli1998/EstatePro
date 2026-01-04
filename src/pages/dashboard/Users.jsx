@@ -1,16 +1,22 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Plus, User, Edit, Trash, Download } from 'lucide-react';
+import { Plus, User, Edit, Trash, Download, Copy, Check } from 'lucide-react';
 import Button from '../../components/shared/Button';
 import Badge from '../../components/shared/Badge';
 import Modal from '../../components/shared/Modal';
 import Input from '../../components/shared/Input';
 import { api } from '../../utils/api';
 import { useDashboardCrud } from '../../hooks/useDashboardCrud';
+import { useAuth } from '../../hooks/useAuth';
 
 const Users = () => {
   const { t } = useTranslation();
+  const { user: currentUser } = useAuth();
+  const isManager = currentUser?.role === 'manager';
+  const [inviteSuccessUser, setInviteSuccessUser] = React.useState(null);
+  const [copied, setCopied] = React.useState(false);
+
   const {
     filteredItems: users,
     loading,
@@ -23,9 +29,10 @@ const Users = () => {
     handleCloseModal,
     handleInputChange,
     handleCustomChange,
-    handleSubmit,
+    handleSubmit: handleCrudSubmit, // Rename hook's submit
     handleDelete,
-    handleExport
+    handleExport,
+    refresh
   } = useDashboardCrud(
     api.getUsers,
     api.inviteUser, // Mapped to creation/invitation
@@ -52,6 +59,34 @@ const Users = () => {
       ["ID", "Name", "Email", "Role", "Status", "Joined"],
       u => [u.id, `"${u.fullName}"`, u.email, u.role, u.isActive ? 'Active' : 'Pending', u.createdAt].join(",")
     );
+  };
+
+  const handleInviteSubmit = async (e) => {
+    e.preventDefault();
+    if (editingItem) {
+      handleCrudSubmit(e);
+    } else {
+      try {
+        const newUser = await api.inviteUser(formData);
+        await refresh();
+        setInviteSuccessUser(newUser);
+      } catch (error) {
+        console.error("Invite failed", error);
+      }
+    }
+  };
+
+  const handleCopyLink = () => {
+    if (!inviteSuccessUser) return;
+    const url = `${window.location.origin}/invite-accept?token=${inviteSuccessUser.inviteToken}`;
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const closeAndReset = () => {
+    setInviteSuccessUser(null);
+    handleCloseModal();
   };
 
   return (
@@ -118,18 +153,22 @@ const Users = () => {
                     {new Date(user.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 flex gap-2">
-                    <button 
-                      className="p-1 text-blue-400 hover:text-blue-300 transition-colors"
-                      onClick={() => handleOpenModal(user)}
-                    >
-                      <Edit size={16} />
-                    </button>
-                    <button 
-                      className="p-1 text-red-500 hover:text-red-400 transition-colors"
-                      onClick={() => handleDelete(user.id)}
-                    >
-                      <Trash size={16} />
-                    </button>
+                    {(!isManager || (user.role !== 'admin' && user.role !== 'manager')) && (
+                      <>
+                        <button 
+                          className="p-1 text-blue-400 hover:text-blue-300 transition-colors"
+                          onClick={() => handleOpenModal(user)}
+                        >
+                          <Edit size={16} />
+                        </button>
+                        <button 
+                          className="p-1 text-red-500 hover:text-red-400 transition-colors"
+                          onClick={() => handleDelete(user.id)}
+                        >
+                          <Trash size={16} />
+                        </button>
+                      </>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -140,10 +179,47 @@ const Users = () => {
 
       <Modal 
         isOpen={isModalOpen} 
-        onClose={handleCloseModal} 
-        title={editingItem ? t('editUser') : t('inviteNewUser')}
+        onClose={closeAndReset} 
+        title={inviteSuccessUser ? t('invitationSent') : (editingItem ? t('editUser') : t('inviteNewUser'))}
       >
-        <form onSubmit={handleSubmit} className="space-y-4">
+        {inviteSuccessUser ? (
+          <div className="text-center py-6">
+            <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4 text-green-500">
+              <Check size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-textDark dark:text-white mb-2">{t('invitationSentSuccess')}</h3>
+            <p className="text-sm text-gray-500 mb-6 px-4">
+              {t('invitationSentDesc', { email: inviteSuccessUser.email })}
+            </p>
+            
+            <div className="bg-section dark:bg-white/5 p-4 rounded-xl border border-border/20 dark:border-white/10 mb-6 text-left">
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 block">
+                {t('simulatedLink', 'Simulated Invitation Link (Demo Mode)')}
+              </label>
+              <div className="flex gap-2">
+                <code className="flex-1 bg-background dark:bg-black/20 p-3 rounded-lg text-xs font-mono text-textDark dark:text-gray-300 break-all border border-border/10">
+                  {`${window.location.origin}/invite-accept?token=${inviteSuccessUser.inviteToken}`}
+                </code>
+                <Button onClick={handleCopyLink} variant="outline" className="shrink-0 h-auto">
+                  {copied ? <Check size={16} /> : <Copy size={16} />}
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex justify-center gap-3">
+               <a 
+                 href={`/invite-accept?token=${inviteSuccessUser.inviteToken}`} 
+                 target="_blank" 
+                 rel="noopener noreferrer"
+                 className="flex items-center px-6 py-3 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 transition-colors"
+               >
+                 {t('openLinkDirectly', 'Open Link Now')}
+               </a>
+               <Button onClick={closeAndReset} variant="ghost">{t('close')}</Button>
+            </div>
+          </div>
+        ) : (
+          <form onSubmit={handleInviteSubmit} className="space-y-4">
           <Input 
             label={t('fullName')} 
             name="fullName"
@@ -162,16 +238,21 @@ const Users = () => {
           />
           <div>
             <label className="block text-sm font-medium text-gray-400 mb-1">{t('role')}</label>
-            <select 
-              className="w-full px-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 text-textDark dark:text-white focus:outline-none focus:border-primary"
-              name="role"
-              value={formData.role}
-              onChange={handleInputChange}
-            >
-              <option value="agent">{t('agent')}</option>
-              <option value="manager">{t('managers')}</option>
-              <option value="admin">{t('admins')}</option>
-            </select>
+              <select 
+                className="w-full px-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 text-textDark dark:text-white focus:outline-none focus:border-primary"
+                name="role"
+                value={formData.role}
+                onChange={handleInputChange}
+              >
+                <option value="agent">{t('agent')}</option>
+                <option value="sales">{t('sales')}</option>
+                {!isManager && (
+                  <>
+                    <option value="manager">{t('managers')}</option>
+                    <option value="admin">{t('admins')}</option>
+                  </>
+                )}
+              </select>
           </div>
           
           <div className="pt-4 flex justify-end gap-3">
@@ -179,6 +260,7 @@ const Users = () => {
             <Button type="submit">{editingItem ? t('updateUser') : t('sendInvitation')}</Button>
           </div>
         </form>
+        )}
       </Modal>
     </div>
   );

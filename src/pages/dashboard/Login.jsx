@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
+import { useAuth } from '../../hooks/useAuth';
 import { api } from '../../utils/api';
 import LoginBackground3D from '../../components/dashboard/LoginBackground3D';
 import { useGSAP } from '@gsap/react';
@@ -30,6 +31,8 @@ const Login = () => {
     }
   }, { scope: containerRef, dependencies: [isLogin] });
 
+  const { login } = useAuth();
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError('');
@@ -40,9 +43,7 @@ const Login = () => {
     setLoading(true);
     try {
       if (isLogin) {
-        const { user, token } = await api.login(formData.email, formData.password);
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('user', JSON.stringify(user));
+        await login(formData.email, formData.password);
         navigate('/dashboard');
       } else {
         // Mock Signup

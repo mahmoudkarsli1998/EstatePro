@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Outlet } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
 import PublicLayout from './components/public/Layout';
 import DashboardLayout from './components/dashboard/Layout';
@@ -32,7 +32,9 @@ const Agents = React.lazy(() => import('./pages/dashboard/Agents'));
 const Calendar = React.lazy(() => import('./pages/dashboard/Calendar'));
 const Analysis = React.lazy(() => import('./pages/dashboard/Analysis'));
 const Reports = React.lazy(() => import('./pages/dashboard/Reports'));
+const Profile = React.lazy(() => import('./pages/dashboard/Profile'));
 import { ThemeProvider } from './context/ThemeContext';
+import { AuthProvider } from './hooks/useAuth';
 import PageLoader from './components/shared/PageLoader';
 import Particles from './components/shared/Particles';
 
@@ -45,16 +47,18 @@ function App() {
 
   return (
     <ThemeProvider>
-      <Particles />
-      <AnimatePresence mode="wait">
-        {loading && <Preloader onComplete={() => setLoading(false)} />}
-      </AnimatePresence>
-      
-      {!loading && (
-        <Router>
-          <AnimatedRoutes />
-        </Router>
-      )}
+      <AuthProvider>
+        <Particles />
+        <AnimatePresence mode="wait">
+          {loading && <Preloader onComplete={() => setLoading(false)} />}
+        </AnimatePresence>
+        
+        {!loading && (
+          <Router>
+            <AnimatedRoutes />
+          </Router>
+        )}
+      </AuthProvider>
     </ThemeProvider>
   );
 }
@@ -91,20 +95,27 @@ const AnimatedRoutes = () => {
             </RequireAuth>
           }>
             <Route index element={<Dashboard />} />
-            <Route path="projects" element={<Projects />} />
-            <Route path="locations" element={<DashboardLocations />} />
+            <Route path="profile" element={<Profile />} />
+            
+            {/* Admin & Manager Routes */}
+            <Route element={<RequireAuth allowedRoles={['admin', 'manager']}><Outlet /></RequireAuth>}>
+              <Route path="projects" element={<Projects />} />
+              <Route path="locations" element={<DashboardLocations />} />
+              <Route path="users" element={<Users />} />
+              <Route path="managers" element={<Managers />} />
+              <Route path="admins" element={<Admins />} />
+              <Route path="developers" element={<Developers />} />
+              <Route path="agents" element={<Agents />} />
+              <Route path="calendar" element={<Calendar />} />
+              <Route path="analysis" element={<Analysis />} />
+              <Route path="reports" element={<Reports />} />
+            </Route>
+
+            {/* Shared Routes (with internal restrictions) */}
+            <Route path="leads" element={<RequireAuth allowedRoles={['admin', 'manager', 'sales']}><Leads /></RequireAuth>} />
             <Route path="units" element={<Units />} />
             <Route path="units/add" element={<AddUnit />} />
             <Route path="units/edit/:id" element={<AddUnit />} />
-            <Route path="leads" element={<Leads />} />
-            <Route path="users" element={<Users />} />
-            <Route path="managers" element={<Managers />} />
-            <Route path="admins" element={<Admins />} />
-            <Route path="developers" element={<Developers />} />
-            <Route path="agents" element={<Agents />} />
-            <Route path="calendar" element={<Calendar />} />
-            <Route path="analysis" element={<Analysis />} />
-            <Route path="reports" element={<Reports />} />
           </Route>
         </Routes>
       </React.Suspense>

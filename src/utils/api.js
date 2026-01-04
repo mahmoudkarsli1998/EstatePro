@@ -1,4 +1,28 @@
-import { projects, units, leads, developers, agents, users, blocks, managers, admins, cities, locations } from '../data/mockData';
+import { projects, units, leads, developers, agents, users as initialUsers, blocks, managers, admins, cities, locations } from '../data/mockData';
+
+// Initialize users from LocalStorage if available, else use mock data
+let users = JSON.parse(localStorage.getItem('mock_users')) || initialUsers;
+
+// Accessor to save back to localStorage whenever users are modified
+const saveUsers = () => {
+  localStorage.setItem('mock_users', JSON.stringify(users));
+};
+
+// Helper to log user activity
+const logActivity = (userId, action, details) => {
+  const user = users.find(u => u.id === parseInt(userId));
+  if (user) {
+    if (!user.activities) user.activities = [];
+    user.activities.unshift({
+      id: Date.now(),
+      action,
+      details,
+      date: new Date().toISOString()
+    });
+    // Keep log size manageable
+    if (user.activities.length > 50) user.activities.pop();
+  }
+};
 
 export const api = {
   // Locations
@@ -165,6 +189,11 @@ export const api = {
           project.stats.available++;
         }
         
+        // Log Activity
+        if (data.createdById) {
+           logActivity(data.createdById, 'UNIT_CREATED', `Created new unit ${newUnit.number || 'Unnamed'}`);
+        }
+
         resolve(newUnit);
       }, 800);
     });
@@ -174,7 +203,24 @@ export const api = {
     return new Promise((resolve) => {
       setTimeout(() => {
         const unit = units.find(u => u.id === parseInt(id));
-        if (unit) Object.assign(unit, data);
+        if (unit) {
+            // Check for status change for activity logging
+            const statusChanged = data.status && data.status !== unit.status;
+            
+            Object.assign(unit, data);
+            
+            if (data.userId || data.createdById) {
+                const userId = data.userId || data.createdById;
+                if (statusChanged) {
+                    logActivity(userId, 'STATUS_UPDATE', `Changed unit ${unit.number} status to ${data.status}`);
+                } else if (data.privateNotes && data.privateNotes.length > (unit.privateNotes || []).length) {
+                    // Assuming last note is new
+                    logActivity(userId, 'NOTE_ADDED', `Added private note to unit ${unit.number}`);
+                } else {
+                    logActivity(userId, 'UNIT_UPDATED', `Updated unit ${unit.number} details`);
+                }
+            }
+        }
         resolve(unit);
       }, 600);
     });
@@ -312,6 +358,10 @@ export const api = {
             date: new Date().toISOString(),
             performedById
           });
+          
+          if (performedById) {
+              logActivity(performedById, 'FOLLOW_UP', `Added follow-up to lead ${lead.name}`);
+          }
         }
         resolve(lead);
       }, 600);
@@ -408,6 +458,15 @@ export const api = {
       setTimeout(() => resolve(users), 500);
     });
   },
+  
+  getUserById: (id) => {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            const user = users.find(u => u.id === parseInt(id));
+            user ? resolve(user) : reject('User not found');
+        }, 500);
+    });
+  },
 
   inviteUser: (data) => {
     return new Promise((resolve) => {
@@ -417,11 +476,40 @@ export const api = {
           id: Date.now(), 
           isActive: false, 
           createdAt: new Date().toISOString(),
+          joinDate: new Date().toISOString().split('T')[0], // Standardize for Profile
+          name: data.fullName, // Standardize for Profile
+          avatar: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?ixlib=rb-4.0.3&auto=format&fit=crop&w=256&q=80", // Default Avatar
           inviteToken: Math.random().toString(36).substring(7)
         };
+        const inviteUrl = `${window.location.origin}/invite-accept?token=${newUser.inviteToken}`;
+        console.log('📧 [SIMULATED EMAIL] Invitation sent to:', newUser.email);
+        console.log('🔗 [SIMULATED LINK] Click here to accept:', inviteUrl);
+        
         users.push(newUser);
+        saveUsers(); // Persist
         resolve(newUser);
       }, 800);
+    });
+  },
+
+  acceptInvite: (data) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const userIndex = users.findIndex(u => u.inviteToken === data.token);
+        if (userIndex > -1) {
+          users[userIndex] = {
+            ...users[userIndex],
+            fullName: data.fullName || users[userIndex].fullName,
+            password: data.password, 
+            isActive: true,
+            inviteToken: null // Consume token
+          };
+          saveUsers(); // Persist
+          resolve(users[userIndex]);
+        } else {
+          reject("Invalid token");
+        }
+      }, 500);
     });
   },
 
@@ -429,7 +517,10 @@ export const api = {
     return new Promise((resolve) => {
       setTimeout(() => {
         const user = users.find(u => u.id === parseInt(id));
-        if (user) Object.assign(user, data);
+        if (user) {
+          Object.assign(user, data);
+          saveUsers(); // Persist
+        }
         resolve(user);
       }, 600);
     });
@@ -439,7 +530,10 @@ export const api = {
     return new Promise((resolve) => {
       setTimeout(() => {
         const index = users.findIndex(u => u.id === parseInt(id));
-        if (index > -1) users.splice(index, 1);
+        if (index > -1) {
+          users.splice(index, 1);
+          saveUsers(); // Persist
+        }
         resolve({ success: true });
       }, 600);
     });

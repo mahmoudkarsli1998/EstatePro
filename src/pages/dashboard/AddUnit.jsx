@@ -2,16 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { 
-  Building2, MapPin, Image, Phone, Check, ChevronLeft, ChevronRight, Upload, X, Save, Star 
+  Building2, MapPin, Image, Phone, Check, ChevronLeft, ChevronRight, Upload, X, Save, Star, FileText, Lock
 } from 'lucide-react';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import LocationPicker from '../../components/shared/LocationPicker';
+import { useAuth } from '../../hooks/useAuth';
 import { api } from '../../utils/api';
 
 const AddUnit = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { user } = useAuth(); // Get user
   const { id } = useParams();
   const isEditMode = !!id;
   const [currentStep, setCurrentStep] = useState(1);
@@ -20,6 +22,7 @@ const AddUnit = () => {
   const [projects, setProjects] = useState([]);
   const [agents, setAgents] = useState([]);
   const [customAmenityText, setCustomAmenityText] = useState('');
+  const [noteText, setNoteText] = useState(''); // State for new note input
 
   // Load initial data on mount
   useEffect(() => {
@@ -97,7 +100,8 @@ const AddUnit = () => {
              
              projectId: unit.projectId || '',
              agentId: unit.agentId || '',
-             isFavorite: unit.isFavorite || false
+             isFavorite: unit.isFavorite || false,
+             privateNotes: unit.privateNotes || []
           });
         }
         setLoading(false);
@@ -164,6 +168,9 @@ const AddUnit = () => {
     amenities: [],
     nearbyFacilities: [],
     
+    // Private Notes (Sales only)
+    privateNotes: [],
+
     // Internal state to preserve existing data
     existingFeatures: {}
   });
@@ -257,6 +264,21 @@ const AddUnit = () => {
     await saveUnit('draft');
   };
 
+  const handleAddNote = (e) => {
+    e.preventDefault();
+    if (!noteText.trim()) return;
+    setFormData(prev => ({
+        ...prev,
+        privateNotes: [...prev.privateNotes, {
+            text: noteText,
+            date: new Date().toISOString(),
+            author: user?.name,
+            authorId: user?.id
+        }]
+    }));
+    setNoteText('');
+  };
+
   const saveUnit = async (statusOverride) => {
     setLoading(true);
     try {
@@ -279,9 +301,9 @@ const AddUnit = () => {
       };
 
       if (isEditMode) {
-        await api.updateUnit(parseInt(id), apiData);
+        await api.updateUnit(parseInt(id), { ...apiData, userId: user?.id });
       } else {
-        await api.createUnit(apiData);
+        await api.createUnit({ ...apiData, createdById: user?.id });
       }
       navigate('/dashboard/units');
     } catch (error) {
@@ -734,9 +756,45 @@ const AddUnit = () => {
                         placeholder="Enter unit description in English..."
                         className="w-full px-4 py-3 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 text-textDark dark:text-white outline-none focus:border-primary resize-none"
                       />
-                    </div>
+                     </div>
                   </div>
                </div>
+
+                <hr className="border-border/10" />
+
+               {/* Private Notes Section (Sales Only) */}
+               {user?.role === 'sales' && (
+                 <div className="space-y-4">
+                    <h3 className="text-lg font-bold text-primary flex items-center gap-2">
+                        <FileText size={20} /> {t('privateNotes')}
+                    </h3>
+                    <div className="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-700/30 rounded-lg p-4">
+                        <p className="text-xs text-yellow-700 dark:text-yellow-400 mb-4 flex items-center gap-2">
+                            <Lock size={12} /> {t('privateNotesWarning', 'These notes are visible ONLY to you.')}
+                        </p>
+                        
+                        <div className="space-y-3 mb-4 max-h-40 overflow-y-auto">
+                            {formData.privateNotes.map((note, idx) => (
+                                <div key={idx} className="bg-white dark:bg-black/20 p-3 rounded border border-yellow-100 dark:border-yellow-900/20 text-sm">
+                                    <p className="text-slate-800 dark:text-gray-200">{note.text}</p>
+                                    <span className="text-xs text-slate-400 mt-1 block">{new Date(note.date).toLocaleString()}</span>
+                                </div>
+                            ))}
+                            {formData.privateNotes.length === 0 && <p className="text-sm text-gray-400 italic">No notes added yet.</p>}
+                        </div>
+
+                        <div className="flex gap-2">
+                            <Input 
+                                value={noteText}
+                                onChange={(e) => setNoteText(e.target.value)}
+                                placeholder="Add a private note..."
+                                className="flex-grow text-sm"
+                            />
+                            <Button size="sm" onClick={handleAddNote} disabled={!noteText.trim()}>Add Note</Button>
+                        </div>
+                    </div>
+                 </div>
+               )}
             </div>
           )}
 

@@ -414,5 +414,14 @@
   "contactUs": "Contact Us",
   "rightsReserved": "All rights reserved.",
   "privacyPolicy": "Privacy Policy",
-  "termsOfService": "Terms of Service"
+  "termsOfService": "Terms of Service",
+  "myProfile": "My Profile",
+  "manageYourProfileAndSettings": "Manage your profile and account settings",
+  "editProfile": "Edit Profile",
+  "leaveBlankToKeepCurrent": "Leave blank to keep current password",
+  "confirmNewPassword": "Confirm New Password",
+  "newPassword": "New Password",
+  "saveChanges": "Save Changes",
+  "emailCannotBeChanged": "Email address cannot be changed",
+  "profileUpdatedSuccess": "Profile updated successfully!"
 }

@@ -5,6 +5,7 @@ import { Check, AlertCircle } from 'lucide-react';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import LiquidBackground from '../../components/shared/LiquidBackground';
+import { api } from '../../utils/api';
 
 const InviteAccept = () => {
   const { t } = useTranslation();
@@ -43,8 +44,13 @@ const InviteAccept = () => {
 
     setLoading(true);
     
-    // Simulate API call to accept invite
-    setTimeout(() => {
+    try {
+      await api.acceptInvite({
+        token,
+        password: formData.password,
+        fullName: formData.fullName
+      });
+
       setLoading(false);
       setSuccess(true);
       
@@ -52,7 +58,11 @@ const InviteAccept = () => {
       setTimeout(() => {
         navigate('/login');
       }, 2000);
-    }, 1500);
+    } catch (err) {
+      console.error(err);
+      setError(t('invitationProcessError', 'Failed to process invitation'));
+      setLoading(false);
+    }
   };
 
   if (!token) {

@@ -8,10 +8,27 @@ import Modal from '../../components/shared/Modal';
 import Badge from '../../components/shared/Badge';
 import { api } from '../../utils/api';
 import { useDashboardCrud } from '../../hooks/useDashboardCrud';
-import { agents } from '../../data/mockData';
+import { useAuth } from '../../hooks/useAuth';
+import { users as staticUsers } from '../../data/mockData'; // Renamed to avoid usage
 
 const Leads = () => {
     const { t } = useTranslation();
+    const [assignableStaff, setAssignableStaff] = useState([]);
+    
+    // Fetch users dynamically to include new invites
+    useEffect(() => {
+        const fetchStaff = async () => {
+            try {
+                const allUsers = await api.getUsers();
+                const staff = allUsers.filter(u => u.role === 'agent' || u.role === 'sales');
+                setAssignableStaff(staff);
+            } catch (error) {
+                console.error("Failed to fetch staff", error);
+            }
+        };
+        fetchStaff();
+    }, []);
+
     const [viewMode, setViewMode] = useState('list');
     const [selectedLead, setSelectedLead] = useState(null);
     const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
@@ -25,6 +42,19 @@ const Leads = () => {
             setCurrentUser(JSON.parse(user));
         }
     }, []);
+
+    const { user: useAuthUser } = useAuth(); // Renamed to avoid name collision with useEffect logic? 
+    // Actually Leads.jsx uses 'currentUser' from localStorage. I should switch to useAuth entirely if possible but let's just get the role.
+    const isSales = useAuthUser?.role === 'sales';
+
+    // Secure Fetcher
+    const secureGetLeads = React.useCallback(async () => {
+        const data = await api.getLeads();
+        if (isSales) {
+            return data.filter(l => l.assignedAgentId === useAuthUser?.id);
+        }
+        return data;
+    }, [isSales, useAuthUser?.id]);
 
     const {
         filteredItems: leads,
@@ -42,7 +72,7 @@ const Leads = () => {
         handleExport,
         refresh
     } = useDashboardCrud(
-        api.getLeads,
+        secureGetLeads,
         api.createLead,
         api.updateLead,
         api.deleteLead,
@@ -73,8 +103,8 @@ const Leads = () => {
         if (!followUpNote.trim() || !selectedLead) return;
 
         // Use assigned agent ID if available, otherwise fallback to current user info (mapped to agent or user id)
-        const agentForAttribution = agents.find(a => a.userId === currentUser?.id);
-        const performedById = selectedLead.assignedAgentId || agentForAttribution?.id || currentUser?.id || 1;
+        const agentForAttribution = assignableStaff.find(a => a.id === currentUser?.id);
+        const performedById = currentUser?.id || 1;
 
         try {
             await api.addFollowUp(selectedLead.id, { note: followUpNote }, performedById);
@@ -147,7 +177,7 @@ const Leads = () => {
                         </div>
                         
                         <div className="p-4 max-h-[400px] overflow-y-auto custom-scrollbar my-4 space-y-1">
-                            {agents.map(agent => (
+                            {assignableStaff.map(agent => (
                                 <button
                                     key={agent.id}
                                     onClick={() => handleAssignAgent(agent.id)}
@@ -212,9 +242,14 @@ const Leads = () => {
                     <Button variant="outline" onClick={onExport} className="hidden sm:flex h-12 border-border/20 dark:border-white/10 bg-background dark:bg-white/5 hover:bg-section dark:hover:bg-white/10">
                         <Download size={18} className="me-2" /> {t('export')}
                     </Button>
-                    <Button onClick={() => handleOpenModal()} className="h-12 bg-primary hover:bg-primary/90 shadow-md transition-all active:scale-95 px-6 !text-white">
-                        <Plus size={20} className="me-2" strokeWidth={3} /> {t('addLead')}
+                    <Button variant="outline" onClick={onExport} className="hidden sm:flex h-12 border-border/20 dark:border-white/10 bg-background dark:bg-white/5 hover:bg-section dark:hover:bg-white/10">
+                        <Download size={18} className="me-2" /> {t('export')}
                     </Button>
+                    {!isSales && (
+                        <Button onClick={() => handleOpenModal()} className="h-12 bg-primary hover:bg-primary/90 shadow-md transition-all active:scale-95 px-6 !text-white">
+                            <Plus size={20} className="me-2" strokeWidth={3} /> {t('addLead')}
+                        </Button>
+                    )}
                 </div>
             </div>
 
@@ -245,9 +280,9 @@ const Leads = () => {
                             <thead className="bg-section dark:bg-white/5 text-textLight font-bold text-[10px] uppercase tracking-[0.15em]">
                                 <tr>
                                     <th className="px-8 py-6 text-start">{t('name')}</th>
-                                    <th className="px-8 py-6 text-start">{t('contact')}</th>
+                                    {!isSales && <th className="px-8 py-6 text-start">{t('contact')}</th>}
                                     <th className="px-8 py-6 text-start">{t('status')}</th>
-                                    <th className="px-8 py-6 text-start">{t('assignedTo')}</th>
+                                    {!isSales && <th className="px-8 py-6 text-start">{t('assignedTo')}</th>}
                                     <th className="px-8 py-6 text-start">{t('latestFollowUp')}</th>
                                     <th className="px-8 py-6 text-end">{t('actions')}</th>
                                 </tr>
@@ -266,46 +301,50 @@ const Leads = () => {
                                                 {new Date(lead.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                                             </div>
                                         </td>
-                                        <td className="px-8 py-6">
-                                            <div className="flex flex-col space-y-2">
-                                                <div className="flex items-center text-xs font-semibold text-textLight group-hover:text-textDark dark:group-hover:text-white transition-colors">
-                                                    <Mail size={12} className="me-2.5 text-textLight group-hover:text-primary transition-colors" /> {lead.email}
+                                        {!isSales && (
+                                            <td className="px-8 py-6">
+                                                <div className="flex flex-col space-y-2">
+                                                    <div className="flex items-center text-xs font-semibold text-textLight group-hover:text-textDark dark:group-hover:text-white transition-colors">
+                                                        <Mail size={12} className="me-2.5 text-textLight group-hover:text-primary transition-colors" /> {lead.email}
+                                                    </div>
+                                                    <div className="flex items-center text-xs font-semibold text-textLight group-hover:text-textDark dark:group-hover:text-white transition-colors">
+                                                        <Phone size={12} className="me-2.5 text-textLight group-hover:text-primary transition-colors" /> {lead.phone}
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center text-xs font-semibold text-textLight group-hover:text-textDark dark:group-hover:text-white transition-colors">
-                                                    <Phone size={12} className="me-2.5 text-textLight group-hover:text-primary transition-colors" /> {lead.phone}
-                                                </div>
-                                            </div>
-                                        </td>
+                                            </td>
+                                        )}
                                         <td className="px-8 py-6">
                                             <Badge variant={lead.status === 'new' ? 'primary' : lead.status === 'closed' ? 'success' : lead.status === 'lost' ? 'danger' : 'warning'} className="px-4 py-1.5 font-black uppercase text-[9px] shadow-sm tracking-widest">
                                                 {t(lead.status) || lead.status}
                                             </Badge>
                                         </td>
-                                        <td className="px-8 py-6">
-                                            <div className="relative">
-                                                <button 
-                                                    onClick={() => openAssignModal(lead)}
-                                                    className={`group/btn p-1 rounded-2xl transition-all duration-300 ${lead.assignedAgentId ? 'bg-section dark:bg-white/5 hover:bg-black/5 dark:hover:bg-white/10' : 'bg-primary/10 text-primary hover:bg-primary hover:text-white shadow-sm'}`}
-                                                >
-                                                    {lead.assignedAgentId ? (
-                                                        <div className="flex items-center gap-3 pr-4">
-                                                            <div className="w-10 h-10 rounded-xl border-2 border-white/10 group-hover/btn:border-primary/50 overflow-hidden shadow-2xl transition-all">
-                                                                <img src={agents.find(a => a.id === lead.assignedAgentId)?.avatar || 'https://via.placeholder.com/30'} alt="Agent" className="w-full h-full object-cover" />
+                                        {!isSales && (
+                                            <td className="px-8 py-6">
+                                                <div className="relative">
+                                                    <button 
+                                                        onClick={() => openAssignModal(lead)}
+                                                        className={`group/btn p-1 rounded-2xl transition-all duration-300 ${lead.assignedAgentId ? 'bg-section dark:bg-white/5 hover:bg-black/5 dark:hover:bg-white/10' : 'bg-primary/10 text-primary hover:bg-primary hover:text-white shadow-sm'}`}
+                                                    >
+                                                        {lead.assignedAgentId ? (
+                                                            <div className="flex items-center gap-3 pr-4">
+                                                                <div className="w-10 h-10 rounded-xl border-2 border-white/10 group-hover/btn:border-primary/50 overflow-hidden shadow-2xl transition-all">
+                                                                    <img src={assignableStaff.find(a => a.id === lead.assignedAgentId)?.avatar || 'https://via.placeholder.com/30'} alt="Agent" className="w-full h-full object-cover" />
+                                                                </div>
+                                                                <div className="text-start">
+                                                                    <div className="text-[11px] font-black text-textDark dark:text-white leading-none mb-1 uppercase tracking-tight">{assignableStaff.find(a => a.id === lead.assignedAgentId)?.name}</div>
+                                                                    <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest opacity-60">{t(assignableStaff.find(a => a.id === lead.assignedAgentId)?.role || 'agent')}</div>
+                                                                </div>
                                                             </div>
-                                                            <div className="text-start">
-                                                                <div className="text-[11px] font-black text-textDark dark:text-white leading-none mb-1 uppercase tracking-tight">{agents.find(a => a.id === lead.assignedAgentId)?.name}</div>
-                                                                <div className="text-[9px] text-gray-500 font-bold uppercase tracking-widest opacity-60">{t('agent')}</div>
+                                                        ) : (
+                                                            <div className="flex items-center px-4 py-2 text-[10px] font-black uppercase tracking-[0.1em]">
+                                                                <UserPlus size={14} strokeWidth={3} className="me-2" />
+                                                                {t('assign')}
                                                             </div>
-                                                        </div>
-                                                    ) : (
-                                                        <div className="flex items-center px-4 py-2 text-[10px] font-black uppercase tracking-[0.1em]">
-                                                            <UserPlus size={14} strokeWidth={3} className="me-2" />
-                                                            {t('assign')}
-                                                        </div>
-                                                    )}
-                                                </button>
-                                            </div>
-                                        </td>
+                                                        )}
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        )}
                                         <td className="px-8 py-6">
                                             {lead.followUps?.length > 0 ? (
                                                 <div className="max-w-[200px]">
@@ -336,9 +375,11 @@ const Leads = () => {
                                                 <button className="w-10 h-10 flex items-center justify-center text-blue-500 bg-blue-500/5 hover:bg-blue-500 hover:text-white rounded-xl transition-all shadow-sm" onClick={() => handleOpenModal(lead)}>
                                                     <Edit size={18} strokeWidth={2.5} />
                                                 </button>
-                                                <button className="w-10 h-10 flex items-center justify-center text-red-500 bg-red-500/5 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-sm" onClick={() => handleDelete(lead.id)}>
-                                                    <Trash size={18} strokeWidth={2.5} />
-                                                </button>
+                                                {!isSales && (
+                                                    <button className="w-10 h-10 flex items-center justify-center text-red-500 bg-red-500/5 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-sm" onClick={() => handleDelete(lead.id)}>
+                                                        <Trash size={18} strokeWidth={2.5} />
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
@@ -436,21 +477,25 @@ const Leads = () => {
                 title={editingItem ? t('editLead', 'Edit Lead') : t('addLead')}
             >
                 <form onSubmit={handleSubmit} className="space-y-6 p-2">
-                    <Input label={t('name')} name="name" value={formData.name} onChange={handleInputChange} required className="bg-white dark:bg-background/50 border-border rounded-2xl h-14" />
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        <Input label={t('email')} type="email" name="email" value={formData.email} onChange={handleInputChange} required className="bg-white dark:bg-background/50 border-border rounded-2xl h-14" />
-                        <Input label={t('phone')} name="phone" value={formData.phone} onChange={handleInputChange} className="bg-white dark:bg-background/50 border-border rounded-2xl h-14" />
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        <div>
-                            <label className="block text-[10px] font-black text-textLight mb-3 uppercase tracking-[0.2em] ps-1">{t('source')}</label>
-                            <select className="w-full h-14 px-5 rounded-2xl border border-border bg-white dark:bg-background text-textDark dark:text-white outline-none focus:ring-2 focus:ring-primary/40 transition-all cursor-pointer font-bold appearance-none shadow-sm" name="source" value={formData.source} onChange={handleInputChange}>
-                                <option value="website">🌐 {t('website')}</option>
-                                <option value="referral">🤝 {t('referral')}</option>
-                                <option value="social_media">📱 {t('socialMedia')}</option>
-                            </select>
+                    <Input label={t('name')} name="name" value={formData.name} onChange={handleInputChange} required className="bg-white dark:bg-background/50 border-border rounded-2xl h-14" disabled={isSales} />
+                    {!isSales && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <Input label={t('email')} type="email" name="email" value={formData.email} onChange={handleInputChange} required className="bg-white dark:bg-background/50 border-border rounded-2xl h-14" />
+                            <Input label={t('phone')} name="phone" value={formData.phone} onChange={handleInputChange} className="bg-white dark:bg-background/50 border-border rounded-2xl h-14" />
                         </div>
-                        <div>
+                    )}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        {!isSales && (
+                            <div>
+                                <label className="block text-[10px] font-black text-textLight mb-3 uppercase tracking-[0.2em] ps-1">{t('source')}</label>
+                                <select className="w-full h-14 px-5 rounded-2xl border border-border bg-white dark:bg-background text-textDark dark:text-white outline-none focus:ring-2 focus:ring-primary/40 transition-all cursor-pointer font-bold appearance-none shadow-sm" name="source" value={formData.source} onChange={handleInputChange}>
+                                    <option value="website">🌐 {t('website')}</option>
+                                    <option value="referral">🤝 {t('referral')}</option>
+                                    <option value="social_media">📱 {t('socialMedia')}</option>
+                                </select>
+                            </div>
+                        )}
+                        <div className={isSales ? "col-span-2" : ""}>
                             <label className="block text-[10px] font-black text-textLight mb-3 uppercase tracking-[0.2em] ps-1">{t('status')}</label>
                             <select className="w-full h-14 px-5 rounded-2xl border border-border bg-white dark:bg-background text-textDark dark:text-white outline-none focus:ring-2 focus:ring-primary/40 transition-all cursor-pointer font-bold appearance-none shadow-sm" name="status" value={formData.status} onChange={handleInputChange}>
                                 {Object.entries(kanbanColumns).map(([key, config]) => (
@@ -484,7 +529,7 @@ const Leads = () => {
                         <div className="space-y-0 relative before:content-[''] before:absolute before:left-[19px] before:top-2 before:bottom-2 before:w-px before:bg-white/10">
                             {selectedLead?.followUps?.length > 0 ? (
                                 selectedLead.followUps.slice().reverse().map((fu, idx) => {
-                                    const performer = agents.find(a => a.id === fu.performedById);
+                                    const performer = users.find(a => a.id === fu.performedById);
                                     return (
                                         <motion.div 
                                             initial={{ opacity: 0, x: -10 }}

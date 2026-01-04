@@ -9,9 +9,20 @@ import Badge from '../../components/shared/Badge';
 import { api } from '../../utils/api';
 import { useDashboardCrud } from '../../hooks/useDashboardCrud';
 
+import { useAuth } from '../../hooks/useAuth';
+
 const Units = () => {
     const { t } = useTranslation();
+    const { user } = useAuth();
     const [viewMode, setViewMode] = useState('list');
+    // Secure Fetcher to enforce Draft Privacy
+    const secureGetUnits = React.useCallback(async () => {
+        const data = await api.getUnits();
+        // Filter: Hide drafts if not owner. Hide 'sold' if sales user didn't create it? No, only drafts are private.
+        // Spec: "Draft units are private... visible only to creator"
+        return data.filter(u => u.status !== 'draft' || u.createdById === user?.id);
+    }, [user?.id]);
+
     const {
         paginatedItems: units, // Use paginated items
         filteredItems, // keep full list for count
@@ -35,7 +46,7 @@ const Units = () => {
         setFormData,
         setAllItems
     } = useDashboardCrud(
-        api.getUnits,
+        secureGetUnits,
         api.createUnit,
         api.updateUnit,
         api.deleteUnit,
@@ -226,7 +237,7 @@ const Units = () => {
                     <th className="px-4 py-3 text-start w-10"></th>
                     <th className="px-4 py-3 text-end">{t('unit')}</th>
                     <th className="px-4 py-3 text-end">{t('details')}</th>
-                    <th className="px-4 py-3 text-center">{t('user')}</th>
+                    {user?.role !== 'sales' && <th className="px-4 py-3 text-center">{t('user')}</th>}
                     <th className="px-4 py-3 text-center">{t('status')}</th>
                     <th className="px-4 py-3 text-center">{t('stats', 'Stats')}</th>
                     <th className="px-4 py-3 text-center">{t('actions')}</th>
@@ -292,6 +303,7 @@ const Units = () => {
                   </td>
 
                   {/* User / Agent */}
+                  {user?.role !== 'sales' && (
                   <td className="px-4 py-4 align-middle text-center">
                      <div className="flex flex-col items-center gap-1">
                         <div className="font-medium text-sm text-textDark dark:text-white flex items-center gap-1">
@@ -300,6 +312,7 @@ const Units = () => {
                         <div className="text-xs text-textLight">Rent Department</div>
                      </div>
                   </td>
+                  )}
 
                   {/* Status */}
                   <td className="px-4 py-4 align-middle text-center">
@@ -323,13 +336,17 @@ const Units = () => {
                   {/* Actions */}
                   <td className="px-4 py-4 align-middle text-center">
                     <div className="flex items-center justify-center gap-3">
-                      <button 
-                        className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                        onClick={() => handleDelete(unit.id)}
-                        title={t('delete')}
-                      >
-                        <Trash size={18} />
-                      </button>
+                      {/* Delete: Restricted for Sales */}
+                      {user?.role !== 'sales' && (
+                        <button 
+                          className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                          onClick={() => handleDelete(unit.id)}
+                          title={t('delete')}
+                        >
+                          <Trash size={18} />
+                        </button>
+                      )}
+                      
                       <button 
                         className={`p-2 transition-colors ${unit.isFavorite ? 'text-yellow-500' : 'text-gray-400 hover:text-yellow-500'}`}
                         onClick={() => handleToggleFavorite(unit)}
@@ -337,13 +354,18 @@ const Units = () => {
                       >
                          <Star size={18} fill={unit.isFavorite ? "currentColor" : "none"} />
                       </button>
-                      <button 
-                        className="p-2 text-gray-400 hover:text-blue-500 transition-colors"
-                        onClick={() => navigate(`/dashboard/units/edit/${unit.id}`)}
-                        title={t('edit')}
-                      >
-                        <Edit size={18} />
-                      </button>
+                      
+                      {/* Edit: Restricted for Sales unless they own it (mock logic: if createdById matches) */}
+                      {/* For now, blocking Edit for Sales on existing mock units which don't have createdById */}
+                      {(user?.role !== 'sales' || unit.createdById === user.id) && (
+                        <button 
+                          className="p-2 text-gray-400 hover:text-blue-500 transition-colors"
+                          onClick={() => navigate(`/dashboard/units/edit/${unit.id}`)}
+                          title={t('edit')}
+                        >
+                          <Edit size={18} />
+                        </button>
+                      )}
                       <button 
                          className="p-2 text-gray-400 hover:text-primary transition-colors"
                          title={t('view')}
@@ -396,7 +418,9 @@ const Units = () => {
                                                     <span className="flex items-center gap-0.5"><Maximize size={10} /> {unit.area_m2}m²</span>
                                                 </div>
                                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity absolute top-2 right-2 bg-black/50 backdrop-blur rounded p-1">
-                                                    <button onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/units/edit/${unit.id}`); }} className="text-white hover:text-blue-300"><Edit size={12} /></button>
+                                                    {(user?.role !== 'sales' || unit.createdById === user.id) && (
+                                                      <button onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/units/edit/${unit.id}`); }} className="text-white hover:text-blue-300"><Edit size={12} /></button>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>

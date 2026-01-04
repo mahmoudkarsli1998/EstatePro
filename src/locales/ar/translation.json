@@ -402,5 +402,14 @@
   "contactUs": "اتصل بنا",
   "rightsReserved": "جميع الحقوق محفوظة.",
   "privacyPolicy": "سياسة الخصوصية",
-  "termsOfService": "شروط الخدمة"
+  "termsOfService": "شروط الخدمة",
+  "myProfile": "ملفي الشخصي",
+  "manageYourProfileAndSettings": "إدارة ملفك الشخصي وإعدادات الحساب",
+  "editProfile": "تعديل الملف الشخصي",
+  "leaveBlankToKeepCurrent": "اتركها فارغة للاحتفاظ بكلمة المرور الحالية",
+  "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+  "newPassword": "كلمة المرور الجديدة",
+  "saveChanges": "حفظ التغييرات",
+  "emailCannotBeChanged": "لا يمكن تغيير البريد الإلكتروني",
+  "profileUpdatedSuccess": "تم تحديث الملف الشخصي بنجاح!"
 }
