@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, CheckCircle } from 'lucide-react';
 import Button from '../shared/Button';
 import Input from '../shared/Input';
-import { api } from '../../utils/api';
+import { crmService } from '../../services/crmService';
 
 const ContactForm = ({ isOpen, onClose, project, unit }) => {
   const [formData, setFormData] = useState({
@@ -24,7 +24,7 @@ const ContactForm = ({ isOpen, onClose, project, unit }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await api.createLead({
+      await crmService.createLead({
         ...formData,
         projectId: project?.id,
         unitId: unit?.id,

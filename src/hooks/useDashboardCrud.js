@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { api } from '../utils/api';
+
 
 /**
  * Custom hook for standard Dashboard CRUD operations.
@@ -77,7 +77,7 @@ export const useDashboardCrud = (
     if (e) e.preventDefault();
     
     try {
-      if (editingItem) {
+      if (editingItem && editingItem.id) {
         if (updater) {
           await updater(editingItem.id, formData);
           await loadItems();
@@ -91,7 +91,10 @@ export const useDashboardCrud = (
       handleCloseModal();
     } catch (error) {
       console.error("Operation failed", error);
-      alert("Operation failed. Please try again.");
+      const msg = error.response?.data?.message || error.message || "Operation failed. Please try again.";
+      // Note: This hook cannot use React context hooks directly.
+      // Components using this hook should handle toast notifications if needed.
+      alert(`Error: ${msg}`);
     }
   };
 

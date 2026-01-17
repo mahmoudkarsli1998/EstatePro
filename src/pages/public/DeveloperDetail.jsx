@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { api } from '../../utils/api';
+import { commonService } from '../../services/commonService';
+import { estateService } from '../../services/estateService';
 import PageLoader from '../../components/shared/PageLoader';
 import { Building2, MapPin, Mail, Phone, Globe, ArrowLeft, ArrowRight } from 'lucide-react';
 import Button from '../../components/shared/Button';
@@ -9,7 +10,7 @@ import { useStaggerList } from '../../hooks/useGSAPAnimations';
 
 // Temporary Project Card for reuse (ideally import from FeaturedProjects if exported, but creating a simplified one here)
 const ProjectCardSimple = ({ project }) => (
-  <Link to={`/projects/${project.id}`} className="group block h-full">
+  <Link to={`/projects/${project.id || project._id}`} className="group block h-full">
     <div className="h-full bg-white dark:bg-white/5 border border-border/20 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col">
        <div className="h-48 overflow-hidden relative">
           <img 
@@ -47,15 +48,38 @@ const DeveloperDetail = () => {
         const fetchData = async () => {
             try {
                 setLoading(true);
-                const devs = await api.getDevelopers();
-                const dev = devs.find(d => d.id === parseInt(id));
-                const allProjects = await api.getProjects();
+                const devs = await commonService.getDevelopers();
+                const dev = devs.find(d => String(d.id || d._id) === id);
+                const allProjects = await estateService.getProjects();
                 
                 if (dev) {
                     setDeveloper(dev);
                     // Filter projects for this developer
-                    // Assuming project.developer.id relates to developer.id
-                    const devProjects = allProjects.filter(p => p.developer && p.developer.id === parseInt(id));
+                    // Relies on project.developer being either ID string, object with ID, or Name string
+                    const devProjects = allProjects.filter(p => {
+                        let pDev = p.developer;
+                        const devId = dev.id || dev._id;
+                        
+                        // 1. If project developer is an object
+                        if (pDev && typeof pDev === 'object') {
+                            const pDevId = pDev.id || pDev._id || pDev.developerId;
+                            if (pDevId && devId && String(pDevId) === String(devId)) return true;
+                            if (pDev.name && dev.name && pDev.name.toLowerCase() === dev.name.toLowerCase()) return true;
+                            return false;
+                        }
+                        
+                        // 2. If primitive
+                        const pDevStr = String(pDev);
+                        const devIdStr = String(devId);
+                        
+                        // Match ID
+                        if (devId && pDevStr === devIdStr) return true;
+                        
+                        // Match Name
+                        if (dev.name && pDevStr.toLowerCase() === dev.name.toLowerCase()) return true;
+                        
+                        return false;
+                    });
                     setProjects(devProjects);
                 }
             } catch (error) {

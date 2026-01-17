@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useLocation } from 'react-router-dom';
 import { Filter, Map as MapIcon, Grid } from 'lucide-react';
 import Card from '../../components/shared/Card';
 import Badge from '../../components/shared/Badge';
 import Button from '../../components/shared/Button';
 import FilterSidebar from '../../components/public/FilterSidebar';
 import LiquidBackground from '../../components/shared/LiquidBackground';
-import { api } from '../../utils/api';
+import EntityImage from '../../components/shared/EntityImage';
+import { estateService } from '../../services/estateService';
 import { useStaggerList } from '../../hooks/useGSAPAnimations';
-
+import { useCurrency } from '../../context/CurrencyContext';
 import { useTranslation } from 'react-i18next';
 
 const ProjectsList = () => {
   const { t, i18n } = useTranslation();
+  const { formatRange, formatCompact } = useCurrency();
+  const location = useLocation();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -40,11 +43,14 @@ const ProjectsList = () => {
     };
     setFilters(prev => ({ ...prev, ...initialFilters }));
 
-    api.getProjects().then(data => {
+    estateService.getProjects().then(data => {
       setProjects(data);
       setLoading(false);
+    }).catch(err => {
+      console.error("Failed to load projects:", err);
+      setLoading(false);
     });
-  }, [searchParams]);
+  }, [searchParams, location.key]);
 
   const filteredProjects = projects.filter(project => {
     if (filters.search && !project.name.toLowerCase().includes(filters.search.toLowerCase())) return false;
@@ -158,16 +164,17 @@ const ProjectsList = () => {
                 <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   {currentProjects.map(project => (
                     <div
-                      key={project.id}
+                      key={project.id || project._id}
                       className="project-item opacity-0"
                     >
-                      <Link to={`/projects/${project.id}`}>
+                      <Link to={`/projects/${project.id || project._id}`}>
                         <Card hover className="h-full flex flex-col group">
                           {/* Minimized Height: Smaller Image */}
                           <div className="relative h-40 overflow-hidden rounded-t-2xl">
-                            <img 
-                              src={project.images[0]} 
-                              alt={project.name} 
+                            <EntityImage 
+                              src={project.images?.[0]} 
+                              alt={project.name}
+                              type="project"
                               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             />
                             <div className="absolute inset-0 bg-gradient-to-t from-dark-bg/80 to-transparent opacity-60"></div>
@@ -184,15 +191,22 @@ const ProjectsList = () => {
                                 {project.name}
                               </h3>
                             </div>
-                            <p className="text-textLight dark:text-gray-400 text-sm mb-3 line-clamp-1">
+                            <p className="text-textLight dark:text-gray-400 text-sm mb-1 line-clamp-1">
                               {project.address}
                             </p>
+                            {(project.location?.name || project.locationId?.name) && (
+                              <p className="text-primary text-xs mb-3">
+                                📍 {project.location?.name || project.locationId?.name}
+                              </p>
+                            )}
                             <div className="mt-auto pt-3 border-t border-white/10 flex justify-between items-center">
                               <span className="text-primary font-bold text-lg" style={{ direction: 'ltr' }}>
-                                ${(project.priceRange.min / 1000).toFixed(0)}k - ${(project.priceRange.max / 1000).toFixed(0)}k
+                                {(project.priceRange?.min || 0) > 0 
+                                    ? formatRange(project.priceRange.min, project.priceRange.max, { compact: true })
+                                    : t('contactForPrice', 'Contact for Price')}
                               </span>
                               <span className="text-xs text-textLight dark:text-gray-400 bg-background dark:bg-white/5 px-2 py-1 rounded">
-                                {project.stats.available} {t('unitsLeft')}
+                                {project.stats?.available || 0} {t('unitsLeft')}
                               </span>
                             </div>
                           </div>
@@ -243,7 +257,7 @@ const ProjectsList = () => {
                 {/* Map Pins */}
                 {filteredProjects.map((project, index) => (
                   <div 
-                    key={project.id}
+                    key={project.id || project._id}
                     className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group/pin"
                     style={{ 
                       top: `${30 + (index * 15)}%`, 
@@ -259,7 +273,7 @@ const ProjectsList = () => {
                           <img src={project.images[0]} alt={project.name} className="w-full h-full object-cover" />
                         </div>
                         <div className="font-bold text-sm text-white">{project.name}</div>
-                        <div className="text-xs text-primary font-bold">${(project.priceRange.min / 1000).toFixed(0)}k+</div>
+                        <div className="text-xs text-primary font-bold">{formatCompact(project.priceRange.min)}+</div>
                       </div>
                     </div>
                   </div>

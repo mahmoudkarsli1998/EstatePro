@@ -1,27 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Plus, Edit, Trash, Search, Filter, Home, DollarSign, Maximize, Layers, Download, MapPin, Star, Eye, Clock, Crown, Bed, Bath, Car, LayoutTemplate, List } from 'lucide-react';
+import { Plus, Edit, Trash, Search, Filter, Home, DollarSign, Maximize, Layers, Download, MapPin, Star, Eye, Clock, Crown, Bed, Bath, Car, LayoutTemplate, List, Users } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import Modal from '../../components/shared/Modal';
 import Badge from '../../components/shared/Badge';
-import { api } from '../../utils/api';
+import EntityImage from '../../components/shared/EntityImage';
+import { estateService } from '../../services/estateService';
 import { useDashboardCrud } from '../../hooks/useDashboardCrud';
-
+import { useCurrency } from '../../context/CurrencyContext';
 import { useAuth } from '../../hooks/useAuth';
+import { useNotifications } from '../../context/NotificationsContext';
+import UnitStatusControl from '../../components/dashboard/UnitStatusControl';
 
 const Units = () => {
     const { t } = useTranslation();
     const { user } = useAuth();
+    const { format, formatCompact } = useCurrency();
+    const { createNotification } = useNotifications();
     const [viewMode, setViewMode] = useState('list');
     // Secure Fetcher to enforce Draft Privacy
+    const [projects, setProjects] = useState([]);
+
+    // Load Projects on Mount
+    useEffect(() => {
+        estateService.getProjects().then(setProjects);
+    }, []);
+
     const secureGetUnits = React.useCallback(async () => {
-        const data = await api.getUnits();
+        const data = await estateService.getUnits();
         // Filter: Hide drafts if not owner. Hide 'sold' if sales user didn't create it? No, only drafts are private.
         // Spec: "Draft units are private... visible only to creator"
         return data.filter(u => u.status !== 'draft' || u.createdById === user?.id);
     }, [user?.id]);
+
+    const getProjectName = (projectId) => {
+        if (!projectId && !projects.length) return '';
+        // Handle both 'project' (ID string) and 'projectId'
+        const id = typeof projectId === 'object' ? projectId?._id || projectId?.id : projectId;
+        const proj = projects.find(p => (p.id === id || p._id === id));
+        return proj ? proj.name : '';
+    };
 
     const {
         paginatedItems: units, // Use paginated items
@@ -47,47 +67,132 @@ const Units = () => {
         setAllItems
     } = useDashboardCrud(
         secureGetUnits,
-        api.createUnit,
-        api.updateUnit,
-        api.deleteUnit,
+        estateService.createUnit,
+        estateService.updateUnit,
+        estateService.deleteUnit,
         { 
         number: '', type: 'residential', floor: '', area_m2: '', 
         price: '', status: 'available', projectId: '', phaseId: '', blockId: '',
         features: { bedrooms: 0, bathrooms: 0 },
         image: null
         },
-        (unit, term) => 
-        unit.number.toLowerCase().includes(term.toLowerCase()) || 
-        unit.type.toLowerCase().includes(term.toLowerCase())
+        (unit, term) => {
+            const termLower = term.toLowerCase();
+            const projName = getProjectName(unit.project || unit.projectId).toLowerCase();
+            return (
+                unit.number?.toLowerCase().includes(termLower) || 
+                unit.titleEn?.toLowerCase().includes(termLower) ||
+                unit.type?.toLowerCase().includes(termLower) ||
+                projName.includes(termLower)
+            );
+        }
     );
 
     // Dependent Data States
-    const [projects, setProjects] = useState([]);
     const [phases, setPhases] = useState([]);
     const [blocks, setBlocks] = useState([]);
     const [showFilters, setShowFilters] = useState(false); // Toggle for filter panel
+    
+    // User Mapping State
+    const [usersMap, setUsersMap] = useState({});
 
-    // Load Projects on Mount
+    // Fetch and Map Users/Agents
     useEffect(() => {
-        api.getProjects().then(setProjects);
-    }, []);
+        const fetchUsers = async () => {
+            try {
+                // Fetch all potential creators: Users, Managers, Admins, Agents
+                // To keep it efficient, we can fetch 'assignable' (Agents+Sales) and 'users' (Admins/Managers)
+                // But crmService.getAssignableUsers only returns Agents/Sales. 
+                // We might need a broader list if Units are created by Admins.
+                // Best effort: Get assignable users + current user (if admin)
+                // For full coverage we might needs crmService.getUsers() if accessible
+                
+                const [assignable, allUsers] = await Promise.all([
+                    crmService.getAssignableUsers().catch(() => []),
+                    crmService.getUsers().catch(() => []) 
+                ]);
+
+                const map = {};
+                
+                // Process all users
+                [...allUsers, ...assignable].forEach(u => {
+                    const id = u.id || u._id;
+                    if (id) {
+                        map[id] = {
+                            name: u.fullName || u.name || 'Unknown',
+                            role: u.role || 'user',
+                            avatar: u.avatar || u.image
+                        };
+                    }
+                });
+
+                // Also ensure current user is in map
+                if (user && (user.id || user._id)) {
+                    map[user.id || user._id] = {
+                         name: user.fullName || user.name,
+                         role: user.role,
+                         avatar: user.avatar || user.image
+                    };
+                }
+
+                setUsersMap(map);
+            } catch (err) {
+                console.error("Error fetching users for mapping:", err);
+            }
+        };
+        fetchUsers();
+    }, [user]);
 
     // Load Phases/Blocks when Project changes (in Modal)
     useEffect(() => {
         if (formData.projectId) {
-        api.getPhases(formData.projectId).then(setPhases);
-        api.getBlocks(formData.projectId).then(setBlocks);
+        estateService.getProjectPhases(formData.projectId).then(setPhases);
+        estateService.getProjectBlocks(formData.projectId).then(setBlocks);
         } else {
         setPhases([]);
         setBlocks([]);
         }
     }, [formData.projectId]);
 
+    // Stats Calculation
+    const stats = React.useMemo(() => {
+        const sourceData = filteredItems || [];
+        const total = sourceData.length;
+        
+        const totalValue = sourceData.reduce((sum, u) => {
+             // Robust price parsing: handle strings with commas, currency symbols, etc.
+             const priceString = String(u.price || 0);
+             const cleanPrice = priceString.replace(/[^0-9.-]+/g,"");
+             return sum + (Number(cleanPrice) || 0);
+        }, 0);
+
+        const available = sourceData.filter(u => String(u.status).toLowerCase() === 'available').length;
+        const sold = sourceData.filter(u => String(u.status).toLowerCase() === 'sold').length;
+        
+        return { total, totalValue, available, sold };
+    }, [filteredItems]);
+
     const onExport = () => {
         handleExport(
         "units_export.csv",
-        ["ID", "Number", "Type", "Floor", "Area", "Price", "Status", "Project ID"],
-        u => [u.id, `"${u.number}"`, u.type, u.floor, u.area_m2, u.price, u.status, u.projectId].join(",")
+        ["ID", "Number/Title", "Project", "Type", "Area", "Price", "Status", "Created By"],
+        u => {
+            const creatorId = typeof u.createdById === 'object' 
+                ? (u.createdById?.id || u.createdById?._id) 
+                : u.createdById;
+            const creator = usersMap[creatorId] || (typeof u.createdById === 'object' ? u.createdById : {});
+            
+            return [
+                u.id, 
+                `"${u.number || u.titleEn}"`, 
+                `"${getProjectName(u.project || u.projectId)}"`,
+                u.type, 
+                u.area_m2, 
+                u.price, 
+                u.status,
+                `"${creator.name || creator.fullName || 'System'}"`
+            ].join(",")
+        }
         );
     };
 
@@ -116,7 +221,18 @@ const Units = () => {
         ));
 
         // Persist to API
-        await api.updateUnit(unit.id, { isFavorite: newStatus });
+        await estateService.updateUnit(unit.id, { isFavorite: newStatus });
+    };
+
+    const handleUnitUpdate = async (result) => {
+        if (result?.deleted) {
+            // If deleted, remove from local state immediately
+            setAllItems(prev => prev.filter(u => String(u.id) !== String(id) && String(u._id) !== String(id)));
+            return;
+        }
+        // Otherwise simple refresh by re-fetching all items
+        const freshUnits = await secureGetUnits();
+        setAllItems(freshUnits);
     };
 
     return (
@@ -134,6 +250,26 @@ const Units = () => {
              <Plus size={20} className="me-2" /> {t('addNewUnit')} ({units.length})
           </Button>
         </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <div className="bg-white dark:bg-white/5 p-4 rounded-xl border border-border/20 shadow-sm">
+             <div className="text-xs text-textLight uppercase font-bold tracking-wider mb-1">{t('totalUnits', 'Total Units')}</div>
+             <div className="text-2xl font-black text-textDark dark:text-white">{stats.total}</div>
+          </div>
+          <div className="bg-white dark:bg-white/5 p-4 rounded-xl border border-border/20 shadow-sm">
+             <div className="text-xs text-textLight uppercase font-bold tracking-wider mb-1">{t('totalValue', 'Total Value')}</div>
+             <div className="text-2xl font-black text-primary">{formatCompact(stats.totalValue)}</div>
+          </div>
+          <div className="bg-white dark:bg-white/5 p-4 rounded-xl border border-border/20 shadow-sm">
+             <div className="text-xs text-textLight uppercase font-bold tracking-wider mb-1">{t('available', 'Available')}</div>
+             <div className="text-2xl font-black text-green-500">{stats.available}</div>
+          </div>
+          <div className="bg-white dark:bg-white/5 p-4 rounded-xl border border-border/20 shadow-sm">
+             <div className="text-xs text-textLight uppercase font-bold tracking-wider mb-1">{t('sold', 'Sold')}</div>
+             <div className="text-2xl font-black text-red-500">{stats.sold}</div>
+          </div>
       </div>
 
       <div className="bg-background dark:bg-dark-card border border-border/20 rounded-xl shadow-sm overflow-hidden min-h-[600px] flex flex-col">
@@ -218,7 +354,7 @@ const Units = () => {
               >
                  <option value="">{t('allProjects', 'All Projects')}</option>
                  {projects.map(p => (
-                   <option key={p.id} value={p.id}>{p.name}</option>
+                   <option key={p.id || p._id} value={p.id || p._id}>{p.name}</option>
                  ))}
               </select>
 
@@ -248,8 +384,16 @@ const Units = () => {
                 <tr><td colSpan="7" className="px-6 py-12 text-center text-textLight">{t('loading')}...</td></tr>
               ) : units.length === 0 ? (
                 <tr><td colSpan="7" className="px-6 py-12 text-center text-textLight">{t('noUnitsFound')}</td></tr>
-              ) : units.map((unit) => (
-                <tr key={unit.id} className="group hover:bg-section dark:hover:bg-white/5 transition-all duration-200">
+              ) : units.map((unit) => {
+                const creatorId = typeof unit.createdById === 'object' 
+                    ? (unit.createdById?.id || unit.createdById?._id) 
+                    : unit.createdById;
+                const creator = usersMap[creatorId] || (typeof unit.createdById === 'object' ? unit.createdById : {});
+                
+                const creatorName = creator?.name || creator?.fullName || 'System';
+                const creatorRole = creator?.role || 'Admin';
+                return (
+                <tr key={unit.id || unit._id} className="group hover:bg-section dark:hover:bg-white/5 transition-all duration-200">
                   {/* Checkbox */}
                   <td className="px-4 py-4 text-center align-middle">
                     <input type="checkbox" className="w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary" />
@@ -263,18 +407,25 @@ const Units = () => {
                              {unit.titleEn || unit.number}
                           </h3>
                           <span className="text-xs text-textLight font-mono bg-section dark:bg-white/10 px-1 rounded">{unit.number}</span>
+                          
+                          {/* Project Name Badge */}
+                          {getProjectName(unit.project || unit.projectId) && (
+                            <span className="text-xs text-secondary font-medium bg-secondary/10 px-2 py-0.5 rounded mt-0.5">
+                                {getProjectName(unit.project || unit.projectId)}
+                            </span>
+                          )}
+
                           <span className="text-xs text-primary bg-primary/10 px-2 py-0.5 rounded-full mt-1">
                              {t(unit.category) || 'For Sale'}
                           </span>
                        </div>
                        <div className="w-24 h-24 rounded-lg bg-gray-200 dark:bg-gray-800 overflow-hidden shrink-0 border border-border/20">
-                          {unit.images && unit.images.length > 0 ? (
-                             <img src={unit.images[0]} alt="" className="w-full h-full object-cover" loading="lazy" />
-                          ) : (
-                             <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                <Home size={24} />
-                             </div>
-                          )}
+                          <EntityImage 
+                            src={unit.images?.[0]} 
+                            alt={unit.number}
+                            type="unit"
+                            className="w-full h-full object-cover"
+                          />
                        </div>
                     </div>
                   </td>
@@ -282,7 +433,7 @@ const Units = () => {
                   {/* Details: Price + Location + Features */}
                   <td className="px-4 py-4 align-top w-[250px]">
                     <div className="flex flex-col items-end gap-2 text-end">
-                        <div className="text-primary font-bold text-lg">${(unit.price || 0).toLocaleString()}</div>
+                        <div className="text-primary font-bold text-lg">{format(unit.price || 0)}</div>
                         <div className="text-sm text-textDark dark:text-gray-300 capitalize">{t(unit.type)}</div>
                         <div className="flex items-center gap-1 text-xs text-textLight">
                              <span>{unit.city || 'Cairo'}</span>
@@ -290,10 +441,10 @@ const Units = () => {
                         </div>
                         <div className="flex items-center gap-2 mt-2 text-gray-400">
                             <span className="flex items-center gap-1 text-xs" title="Bedrooms">
-                                {unit.features?.bedrooms || 0} <Bed size={12} />
+                                {unit.features?.bedrooms || unit.bedrooms || 0} <Bed size={12} />
                             </span>
                             <span className="flex items-center gap-1 text-xs" title="Bathrooms">
-                                {unit.features?.bathrooms || 0} <Bath size={12} />
+                                {unit.features?.bathrooms || unit.bathrooms || 0} <Bath size={12} />
                             </span>
                              <span className="flex items-center gap-1 text-xs" title="Area">
                                 {unit.area_m2}m² <Maximize size={12} />
@@ -307,9 +458,14 @@ const Units = () => {
                   <td className="px-4 py-4 align-middle text-center">
                      <div className="flex flex-col items-center gap-1">
                         <div className="font-medium text-sm text-textDark dark:text-white flex items-center gap-1">
-                             Admin <Crown size={12} className="text-yellow-500 fill-yellow-500" />
+                             {creatorName} 
+                             {creatorRole === 'admin' ? (
+                                <Crown size={12} className="text-yellow-500 fill-yellow-500" />
+                             ) : (
+                                <Users size={12} className="text-blue-500" />
+                             )}
                         </div>
-                        <div className="text-xs text-textLight">Rent Department</div>
+                        <div className="text-xs text-textLight capitalize">{creatorRole}</div>
                      </div>
                   </td>
                   )}
@@ -325,10 +481,18 @@ const Units = () => {
                   <td className="px-4 py-4 align-top text-center">
                     <div className="flex flex-col items-center gap-1 text-xs text-textLight">
                         <span className="flex items-center gap-1">
-                            <Eye size={12} /> {Math.floor(Math.random() * 100)}
+                            <Eye size={12} /> {unit.views || 0}
                         </span>
-                        <span className="flex items-center gap-1 mt-1">
-                            <Clock size={12} /> {t('2daysAgo', '2d ago')}
+                        <span className="flex items-center gap-1 mt-1" title={new Date(unit.updatedAt || unit.createdAt).toLocaleString()}>
+                            <Clock size={12} /> {
+                                (() => {
+                                    const date = new Date(unit.updatedAt || unit.createdAt || Date.now());
+                                    const diff = Math.floor((new Date() - date) / (1000 * 60 * 60 * 24));
+                                    if (diff === 0) return t('today');
+                                    if (diff === 1) return t('yesterday');
+                                    return `${diff}d ago`;
+                                })()
+                            }
                         </span>
                     </div>
                   </td>
@@ -340,7 +504,7 @@ const Units = () => {
                       {user?.role !== 'sales' && (
                         <button 
                           className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                          onClick={() => handleDelete(unit.id)}
+                          onClick={() => handleDelete(unit.id || unit._id)}
                           title={t('delete')}
                         >
                           <Trash size={18} />
@@ -355,12 +519,10 @@ const Units = () => {
                          <Star size={18} fill={unit.isFavorite ? "currentColor" : "none"} />
                       </button>
                       
-                      {/* Edit: Restricted for Sales unless they own it (mock logic: if createdById matches) */}
-                      {/* For now, blocking Edit for Sales on existing mock units which don't have createdById */}
                       {(user?.role !== 'sales' || unit.createdById === user.id) && (
                         <button 
                           className="p-2 text-gray-400 hover:text-blue-500 transition-colors"
-                          onClick={() => navigate(`/dashboard/units/edit/${unit.id}`)}
+                          onClick={() => navigate(`/dashboard/units/edit/${unit.id || unit._id}`)}
                           title={t('edit')}
                         >
                           <Edit size={18} />
@@ -369,17 +531,19 @@ const Units = () => {
                       <button 
                          className="p-2 text-gray-400 hover:text-primary transition-colors"
                          title={t('view')}
-                         onClick={() => navigate(`/units/${unit.id}`)} 
+                         onClick={() => navigate(`/units/${unit.id || unit._id}`)} 
                        >
                          <Eye size={18} />
                        </button>
                     </div>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         </div>
+
         ) : (
             <div className="p-6 overflow-x-auto h-full flex-1">
                 <div className="flex gap-6 h-full min-w-max pb-4">
@@ -401,27 +565,41 @@ const Units = () => {
                                         <div className="text-center text-gray-400 text-sm italic py-4">No units</div>
                                     )}
                                     {statusUnits.map(unit => (
-                                        <div key={unit.id} className="bg-background dark:bg-dark-card border border-border/10 p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer group relative">
+                                        <div key={unit.id || unit._id} className="bg-background dark:bg-dark-card border border-border/10 p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer group relative">
                                             <div className="h-32 mb-3 rounded-md overflow-hidden bg-gray-200">
-                                                <img src={unit.images?.[0] || 'https://via.placeholder.com/300x200'} alt="" className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500" />
+                                                <EntityImage 
+                                                  src={unit.images?.[0]} 
+                                                  alt={unit.number}
+                                                  type="unit"
+                                                  className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+                                                />
                                             </div>
                                             <div className="flex justify-between items-start mb-1">
                                                 <div className="font-bold text-textDark dark:text-white truncate max-w-[150px]">{unit.number}</div>
-                                                <div className="font-bold text-primary text-sm">${(unit.price/1000).toFixed(0)}k</div>
+                                                <div className="font-bold text-primary text-sm">{formatCompact(unit.price)}</div>
                                             </div>
                                             <div className="text-xs text-textLight flex items-center gap-1 mb-2">
                                                 <MapPin size={10} /> {unit.city}
                                             </div>
-                                            <div className="flex justify-between items-center text-xs text-gray-400 border-t border-border/10 pt-2 mt-2">
+                                            <div className="flex justify-between items-center text-xs text-gray-400 border-t border-border/10 pt-2 mt-2 mb-3">
                                                 <div className="flex gap-2">
                                                     <span className="flex items-center gap-0.5"><Bed size={10} /> {unit.features?.bedrooms}</span>
                                                     <span className="flex items-center gap-0.5"><Maximize size={10} /> {unit.area_m2}m²</span>
                                                 </div>
                                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity absolute top-2 right-2 bg-black/50 backdrop-blur rounded p-1">
                                                     {(user?.role !== 'sales' || unit.createdById === user.id) && (
-                                                      <button onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/units/edit/${unit.id}`); }} className="text-white hover:text-blue-300"><Edit size={12} /></button>
+                                                      <button onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/units/edit/${unit.id || unit._id}`); }} className="text-white hover:text-blue-300"><Edit size={12} /></button>
                                                     )}
                                                 </div>
+                                            </div>
+                                            {/* Status Quick Controls */}
+                                            <div className="mt-2" onClick={e => e.stopPropagation()}>
+                                                <UnitStatusControl 
+                                                    unit={unit} 
+                                                    onUpdate={handleUnitUpdate} 
+                                                    size="sm"
+                                                    layout="horizontal"
+                                                />
                                             </div>
                                         </div>
                                     ))}

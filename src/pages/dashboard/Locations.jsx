@@ -1,52 +1,170 @@
-import React, { useState } from 'react';
-import { Plus, Edit, Trash, Search, MapPin, Building, Home, Map, LayoutGrid, List } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Plus, Edit, Trash, Search, MapPin, Building, Home, Map, LayoutGrid, List, Upload, Image, Eye, ExternalLink, Download } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import Modal from '../../components/shared/Modal';
-import { api } from '../../utils/api';
+import { locationsService } from '../../services/locationsService';
 import { useDashboardCrud } from '../../hooks/useDashboardCrud';
 import { useTranslation } from 'react-i18next';
+import { estateService } from '../../services/estateService';
+import { uploadService } from '../../services/uploadService';
+import EntityImage from '../../components/shared/EntityImage';
 
 const Locations = () => {
   const { t } = useTranslation();
   const [viewMode, setViewMode] = useState('grid');
+  const [projects, setProjects] = useState([]);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState('');
+  
   const {
     filteredItems: locations,
     loading,
     isModalOpen,
     editingItem,
     formData,
+    setFormData,
     searchTerm,
     setSearchTerm,
-    handleOpenModal,
-    handleCloseModal,
+    handleOpenModal: baseOpenModal,
+    handleCloseModal: baseCloseModal,
     handleInputChange,
-    handleSubmit,
-    handleDelete
+    handleSubmit: baseSubmit,
+    handleDelete,
+    handleExport,
+    refresh
   } = useDashboardCrud(
-    api.getLocations,
-    api.createLocation,
-    api.updateLocation,
-    api.deleteLocation,
+    locationsService.getLocations,
+    locationsService.createLocation,
+    locationsService.updateLocation,
+    locationsService.deleteLocation,
     { 
       name: '', 
+      slug: '',
       city: '', 
       country: '',
       description: '', 
       image: '',
       lat: '',
-      lng: ''
+      lng: '',
+      projectIds: []
     },
-    (loc, term) => loc.name.toLowerCase().includes(term.toLowerCase()) || loc.city.toLowerCase().includes(term.toLowerCase())
+    (loc, term) => (loc.name?.toLowerCase().includes(term.toLowerCase()) || loc.city?.toLowerCase().includes(term.toLowerCase()))
   );
+
+  // Load projects for selection
+  useEffect(() => {
+    estateService.getProjects().then(setProjects).catch(console.error);
+  }, []);
+
+  // Handle file selection
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
+  };
+
+  // Custom open modal to reset file state
+  const handleOpenModal = (item = null) => {
+    setImageFile(null);
+    setImagePreview(item?.image || '');
+    baseOpenModal(item);
+  };
+
+  // Custom close modal to reset file state
+  const handleCloseModal = () => {
+    setImageFile(null);
+    setImagePreview('');
+    baseCloseModal();
+  };
+
+  // Generate slug from name
+  const generateSlug = (name) => {
+    return name
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+  };
+
+  const onExport = () => {
+    handleExport(
+      "locations_export.csv",
+      ["ID", "Name", "City", "Country", "Projects", "Units"],
+      l => [
+        l.id || l._id, 
+        `"${l.name}"`, 
+        l.city, 
+        l.country, 
+        l.projectsCount || l.projects?.length || 0,
+        l.unitsCount || l.units?.length || 0
+      ].join(",")
+    );
+  };
+
+  // Custom submit using uploadService
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      let finalImage = formData.image;
+
+      // 1. Upload new image if selected
+      if (imageFile) {
+          try {
+              const uploadResult = await uploadService.uploadFile(imageFile);
+              finalImage = uploadResult.url || uploadResult; // Handle variable return format
+          } catch (uploadErr) {
+              console.error("Image upload failed:", uploadErr);
+              // You might want to show a toast here
+              return;
+          }
+      }
+
+      // 2. Build JSON payload
+      // Note: We switch from FormData to JSON because we are handling the upload separately.
+      // Ensure backend accepts JSON for this endpoint (typically yes with most modern stacks).
+      const payload = {
+        name: formData.name || '',
+        city: formData.city || '',
+        country: formData.country || '',
+        description: formData.description || '',
+        slug: formData.slug || (formData.name ? generateSlug(formData.name) : ''),
+        lat: formData.lat || null,
+        lng: formData.lng || null,
+        image: finalImage,
+        projectIds: formData.projectIds || []
+      };
+      
+      // Save (create or update)
+      if (editingItem) {
+        await locationsService.saveLocation(payload, editingItem._id);
+      } else {
+        await locationsService.saveLocation(payload);
+      }
+      
+      handleCloseModal();
+      refresh();
+    } catch (error) {
+      console.error('Error saving location:', error);
+    }
+  };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold font-heading text-textDark dark:text-white">{t('Locations')}</h1>
-        <Button onClick={() => handleOpenModal()}>
-          <Plus size={20} className="me-2" /> {t('Add Location')}
-        </Button>
+        <div className="flex gap-3">
+          <Button variant="outline" onClick={onExport}>
+            <Download size={18} className="me-2" /> {t('export')}
+          </Button>
+          <Button onClick={() => handleOpenModal()}>
+            <Plus size={20} className="me-2" /> {t('Add Location')}
+          </Button>
+        </div>
       </div>
 
       <div className="bg-background dark:bg-dark-card border border-border/20 rounded-xl shadow-sm overflow-hidden">
@@ -87,9 +205,14 @@ const Locations = () => {
         ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
             {locations.map((location) => (
-                <div key={location.id} className="glass-panel overflow-hidden hover:border-primary/50 transition-colors group flex flex-col">
+                <div key={location._id} className="glass-panel overflow-hidden hover:border-primary/50 transition-colors group flex flex-col">
                 <div className="h-48 bg-gray-800 relative">
-                    <img src={location.image || 'https://via.placeholder.com/400x200'} alt={location.name} className="w-full h-full object-cover" />
+                    <EntityImage 
+                      src={location.image} 
+                      alt={location.name} 
+                      type="location"
+                      className="w-full h-full object-cover" 
+                    />
                     <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-md px-2 py-1 rounded text-xs text-white uppercase font-bold border border-white/10">
                     {location.city}, {location.country}
                     </div>
@@ -101,12 +224,12 @@ const Locations = () => {
                     <div className="grid grid-cols-2 gap-2 mb-4">
                     <div className="bg-background dark:bg-white/5 border border-border/10 dark:border-transparent p-2 rounded text-center">
                         <div className="flex items-center justify-center text-primary mb-1"><Building size={16} /></div>
-                        <div className="text-lg font-bold text-textDark dark:text-white">{location.stats?.projectsCount || 0}</div>
+                        <div className="text-lg font-bold text-textDark dark:text-white">{location.projectsCount || location.projects?.length || location.stats?.projectsCount || 0}</div>
                         <div className="text-[10px] text-textLight dark:text-gray-500 uppercase">{t('Projects')}</div>
                     </div>
                     <div className="bg-background dark:bg-white/5 border border-border/10 dark:border-transparent p-2 rounded text-center">
                         <div className="flex items-center justify-center text-green-400 mb-1"><Home size={16} /></div>
-                        <div className="text-lg font-bold text-textDark dark:text-white">{location.stats?.unitsCount || 0}</div>
+                        <div className="text-lg font-bold text-textDark dark:text-white">{location.unitsCount || location.units?.length || location.stats?.unitsCount || 0}</div>
                         <div className="text-[10px] text-textLight dark:text-gray-500 uppercase">{t('Units')}</div>
                     </div>
                     </div>
@@ -117,6 +240,14 @@ const Locations = () => {
                         {location.lat?.toString().slice(0,6)}, {location.lng?.toString().slice(0,6)}
                     </div>
                     <div className="flex space-x-2">
+                        <Link 
+                        to={`/projects?location=${location._id}`}
+                        target="_blank"
+                        className="p-2 text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"
+                        title={t('View Projects')}
+                        >
+                        <ExternalLink size={16} />
+                        </Link>
                         <button 
                         className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
                         onClick={() => handleOpenModal(location)}
@@ -126,7 +257,7 @@ const Locations = () => {
                         </button>
                         <button 
                         className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                        onClick={() => handleDelete(location.id)}
+                        onClick={() => handleDelete(location._id)}
                         title="Delete"
                         >
                         <Trash size={16} />
@@ -152,11 +283,16 @@ const Locations = () => {
                     </thead>
                     <tbody className="divide-y divide-border/20 dark:divide-white/5">
                         {locations.map((location) => (
-                            <tr key={location.id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+                            <tr key={location._id} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
                                 <td className="p-4">
                                     <div className="flex items-center gap-3">
                                         <div className="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-gray-200">
-                                            <img src={location.image || 'https://via.placeholder.com/100'} alt="" className="w-full h-full object-cover" />
+                                            <EntityImage 
+                                              src={location.image} 
+                                              alt={location.name} 
+                                              type="location"
+                                              className="w-full h-full object-cover" 
+                                            />
                                         </div>
                                         <div>
                                             <div className="font-bold text-textDark dark:text-white">{location.name}</div>
@@ -169,12 +305,12 @@ const Locations = () => {
                                 </td>
                                 <td className="p-4 text-center">
                                     <span className="inline-block px-2 py-1 rounded-md bg-primary/10 text-primary font-bold text-sm">
-                                        {location.stats?.projectsCount || 0}
+                                        {location.projectsCount || location.projects?.length || location.stats?.projectsCount || 0}
                                     </span>
                                 </td>
                                 <td className="p-4 text-center">
                                     <span className="inline-block px-2 py-1 rounded-md bg-green-500/10 text-green-500 font-bold text-sm">
-                                        {location.stats?.unitsCount || 0}
+                                        {location.unitsCount || location.units?.length || location.stats?.unitsCount || 0}
                                     </span>
                                 </td>
                                 <td className="p-4 text-center text-xs text-mono text-textLight dark:text-gray-500">
@@ -182,6 +318,14 @@ const Locations = () => {
                                 </td>
                                 <td className="p-4">
                                     <div className="flex justify-end gap-2">
+                                        <Link 
+                                            to={`/projects?location=${location._id}`}
+                                            target="_blank"
+                                            className="p-1.5 text-green-400 hover:bg-green-500/10 rounded-lg transition-colors"
+                                            title={t('View Projects')}
+                                        >
+                                            <ExternalLink size={16} />
+                                        </Link>
                                         <button 
                                             className="p-1.5 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
                                             onClick={() => handleOpenModal(location)}
@@ -191,7 +335,7 @@ const Locations = () => {
                                         </button>
                                         <button 
                                             className="p-1.5 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
-                                            onClick={() => handleDelete(location.id)}
+                                            onClick={() => handleDelete(location._id)}
                                             title="Delete"
                                         >
                                             <Trash size={16} />
@@ -237,13 +381,28 @@ const Locations = () => {
                 value={formData.country}
                 onChange={handleInputChange}
               />
-              <Input 
-                label={t('Image URL')} 
-                name="image"
-                value={formData.image}
-                onChange={handleInputChange}
-                placeholder="https://..."
-              />
+              
+              {/* File Upload */}
+              <div>
+                <label className="block text-sm font-medium text-textLight dark:text-gray-400 mb-1">{t('Image')}</label>
+                <div className="flex items-center gap-3">
+                  <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-lg border-2 border-dashed border-border/30 dark:border-white/20 bg-background dark:bg-white/5 text-textDark dark:text-white cursor-pointer hover:border-primary/50 transition-colors">
+                    <Upload size={18} className="text-gray-400" />
+                    <span className="text-sm text-gray-400">{imageFile ? imageFile.name : t('Choose file...')}</span>
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={handleFileChange} 
+                      className="hidden" 
+                    />
+                  </label>
+                  {(imagePreview || formData.image) && (
+                    <div className="w-12 h-12 rounded-lg overflow-hidden bg-gray-200 dark:bg-gray-700 flex-shrink-0">
+                      <img src={imagePreview || formData.image} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                </div>
+              </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -273,6 +432,24 @@ const Locations = () => {
               value={formData.description}
               onChange={handleInputChange}
             />
+          </div>
+
+          {/* Project Selection */}
+          <div>
+            <label className="block text-sm font-medium text-textLight dark:text-gray-400 mb-1">{t('Assign Projects')}</label>
+            <select
+              multiple
+              value={formData.projectIds || []}
+              onChange={(e) => setFormData({ ...formData, projectIds: Array.from(e.target.selectedOptions, opt => opt.value) })}
+              className="w-full px-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 text-textDark dark:text-white focus:outline-none focus:border-primary min-h-[100px]"
+            >
+              {projects.map(p => (
+                <option key={p._id} value={p._id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">{t('Hold Ctrl/Cmd to select multiple projects')}</p>
           </div>
 
           <div className="pt-4 flex justify-end space-x-3 border-t border-white/5 mt-4">

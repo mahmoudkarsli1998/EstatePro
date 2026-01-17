@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#E6D5B8"/>
+  <g transform="translate(160, 90)">
+    <!-- Map pin icon -->
+    <path d="M40 0 C62 0 80 18 80 40 C80 70 40 100 40 100 C40 100 0 70 0 40 C0 18 18 0 40 0 Z" fill="#0B3C5D" opacity="0.4"/>
+    <circle cx="40" cy="38" r="15" fill="#FCF5E5"/>
+  </g>
+  <text x="200" y="220" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" fill="#555555">No Location Image</text>
+</svg>

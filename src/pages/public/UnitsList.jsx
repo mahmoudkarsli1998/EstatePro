@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams, Link } from 'react-router-dom';
+import { useSearchParams, Link, useLocation } from 'react-router-dom';
 import { Filter, Grid, Map as MapIcon, Bed, Bath, Maximize, MapPin, Phone, MessageCircle } from 'lucide-react';
 import Card from '../../components/shared/Card';
 import Button from '../../components/shared/Button';
 import PageLoader from '../../components/shared/PageLoader';
 import LiquidBackground from '../../components/shared/LiquidBackground';
-import { api } from '../../utils/api';
+import EntityImage from '../../components/shared/EntityImage';
+import { estateService } from '../../services/estateService';
 import { useStaggerList, useHover3D } from '../../hooks/useGSAPAnimations';
+import { useCurrency } from '../../context/CurrencyContext';
 
 // Reusing UnitCard Logic internally for this page or importing if exported. 
 // Since FeaturedUnits has it internally, I'll recreate a robust one here.
@@ -15,17 +17,18 @@ import { useStaggerList, useHover3D } from '../../hooks/useGSAPAnimations';
 const UnitCard = ({ unit }) => {
   const cardRef = useHover3D({ intensity: 10, scale: 1.02 });
   const { t, i18n } = useTranslation();
+  const { format } = useCurrency();
   const isRTL = i18n.dir() === 'rtl';
 
   return (
     <div ref={cardRef} className="h-full stagger-item opacity-0">
-      <Link to={`/units/${unit.id}`} className="block h-full group">
+      <Link to={`/units/${unit.id || unit._id}`} className="block h-full group">
         <div className="h-full flex flex-col glass-panel overflow-hidden group hover:border-primary/50 transition-all duration-300 relative transform-style-3d">
           <div className="relative h-64 overflow-hidden">
-            <img 
-              src={`${unit.images?.[0] || 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750'}?w=800&q=80&auto=format`} 
-              alt={unit.number} 
-              loading="lazy"
+            <EntityImage 
+              src={unit.images?.[0]} 
+              alt={unit.number}
+              type="unit"
               className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-transparent to-transparent opacity-60"></div>
@@ -51,7 +54,9 @@ const UnitCard = ({ unit }) => {
               </h3>
               
               <div className="flex items-center justify-end text-textLight text-sm mb-4">
-                <span className="line-clamp-1">{unit.locationAr || unit.city || 'Cairo'}</span>
+                <span className="line-clamp-1">
+                  {unit.location?.name || unit.project?.location?.name || unit.locationAr || unit.city || 'Cairo'}
+                </span>
                 <MapPin size={14} className="ml-1 text-primary" />
               </div>
               
@@ -95,9 +100,8 @@ const UnitCard = ({ unit }) => {
                    </button>
                </div>
                <div>
-                  <span className="text-[10px] text-textLight block text-left mb-0.5" style={{ textAlign: 'left' }}>EGP</span>
                   <span className="text-xl md:text-2xl font-bold text-primary font-heading">
-                    {unit.price?.toLocaleString()}
+                    {format(unit.price)}
                   </span>
                </div>
             </div>
@@ -110,6 +114,7 @@ const UnitCard = ({ unit }) => {
 
 const UnitsList = () => {
   const { t, i18n } = useTranslation();
+  const location = useLocation();
   const [units, setUnits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState('grid');
@@ -120,11 +125,14 @@ const UnitsList = () => {
 
   useEffect(() => {
     setLoading(true);
-    api.getUnits().then(data => {
+    estateService.getUnits().then(data => {
       setUnits(data);
       setLoading(false);
+    }).catch(err => {
+      console.error("Failed to load units:", err);
+      setLoading(false);
     });
-  }, []);
+  }, [location.key]);
 
   const filteredUnits = units.filter(unit => {
       // Basic filter logic can be expanded
@@ -171,7 +179,7 @@ const UnitsList = () => {
             <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredUnits.length > 0 ? (
                     filteredUnits.map(unit => (
-                        <UnitCard key={unit.id} unit={unit} />
+                        <UnitCard key={unit.id || unit._id} unit={unit} />
                     ))
                 ) : (
                     <div className="col-span-full text-center py-20">

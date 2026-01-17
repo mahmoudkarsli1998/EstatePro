@@ -5,7 +5,7 @@ import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import Modal from '../../components/shared/Modal';
 import Badge from '../../components/shared/Badge';
-import { api } from '../../utils/api';
+import { crmService } from '../../services/crmService';
 import { useDashboardCrud } from '../../hooks/useDashboardCrud';
 
 const Admins = () => {
@@ -38,17 +38,17 @@ const Admins = () => {
     handleDelete,
     handleExport
   } = useDashboardCrud(
-    api.getAdmins,
-    api.createAdmin,
-    api.updateAdmin,
-    api.deleteAdmin,
+    crmService.getAdmins,
+    crmService.createAdmin,
+    crmService.updateAdmin,
+    crmService.deleteAdmin,
     { name: '', email: '', phone: '', role: 'Support Admin', status: 'active' },
     (admin, term) => {
       const lowerTerm = term.toLowerCase();
       const matchesSearch = 
-        admin.name.toLowerCase().includes(lowerTerm) || 
-        admin.email.toLowerCase().includes(lowerTerm) ||
-        admin.role.toLowerCase().includes(lowerTerm);
+        (admin.name || admin.fullName || '').toLowerCase().includes(lowerTerm) || 
+        (admin.email || '').toLowerCase().includes(lowerTerm) ||
+        (admin.role || '').toLowerCase().includes(lowerTerm);
       
       const matchesFilter = roleFilter === 'All Roles' || admin.role === roleFilter;
 
@@ -130,22 +130,22 @@ const Admins = () => {
                   <td className="px-6 py-4">
                     <div className="font-medium text-textDark dark:text-white flex items-center gap-2">
                         {admin.role === 'Super Admin' && <Shield size={14} className="text-primary" />}
-                        {admin.name}
+                        {admin.name || admin.fullName || 'Unknown'}
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col space-y-1">
                       <div className="flex items-center text-sm text-gray-300">
-                        <Mail size={12} className="me-2 text-gray-500" /> {admin.email}
+                        <Mail size={12} className="me-2 text-gray-500" /> {admin.email || '-'}
                       </div>
                       <div className="flex items-center text-sm text-gray-300">
-                        <Phone size={12} className="me-2 text-gray-500" /> {admin.phone}
+                        <Phone size={12} className="me-2 text-gray-500" /> {admin.phone || '-'}
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded text-xs text-gray-300 ${admin.role === 'Super Admin' ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-white/10'}`}>
-                        {admin.role}
+                        {admin.role || 'N/A'}
                     </span>
                   </td>
                   <td className="px-6 py-4">

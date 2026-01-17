@@ -1,8 +1,8 @@
 import React from 'react';
-import { Bell, Search, User, Menu } from 'lucide-react';
-
+import { Search, User, Menu } from 'lucide-react';
 import ThemeToggle from '../shared/ThemeToggle';
 import LanguageSwitcher from '../LanguageSwitcher';
+import NotificationBell from './NotificationBell';
 
 const Header = ({ onMenuClick }) => {
   return (
@@ -28,10 +28,7 @@ const Header = ({ onMenuClick }) => {
       <div className="flex items-center space-x-4">
         <LanguageSwitcher />
         <ThemeToggle />
-        <button className="relative p-2 text-textLight hover:bg-section dark:hover:bg-white/10 rounded-full transition-colors">
-          <Bell size={20} />
-          <span className="absolute top-1 right-1 w-2 h-2 bg-accent rounded-full shadow-sm"></span>
-        </button>
+        <NotificationBell />
         
         <div className="flex items-center pl-4 border-l border-border/20">
           <div className="mr-3 text-right hidden md:block">
@@ -48,3 +45,4 @@ const Header = ({ onMenuClick }) => {
 };
 
 export default Header;
+

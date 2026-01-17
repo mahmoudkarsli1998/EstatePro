@@ -660,5 +660,51 @@ export const api = {
         }
       }, 1000);
     });
+  },
+
+  // AI Integration
+  /**
+   * Send a user's natural language question to the AI.
+   * @param {string} question - The user's input.
+   * @param {boolean} [enableRag=true] - Whether to allow AI to "guess" similar projects if exact search fails.
+   * @returns {Promise<Object>} The structured AI response.
+   */
+  askAi: (question, enableRag = true) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Mock AI response for development
+        // In production, this would be: axios.post('/ai/query', { question, enableRag })
+        const mockResponse = {
+          query: question,
+          target: 'units',
+          data: [],
+          suggestions: [],
+          message: 'AI integration is configured. Replace this with actual backend call.'
+        };
+        resolve(mockResponse);
+      }, 800);
+    });
+  },
+
+  /**
+   * Trigger semantic re-indexing (Admin Only).
+   * Call this when you receive a signal that data has changed, or via a manual Admin button.
+   * @returns {Promise<Object>} Status of the indexing job.
+   */
+  reindexAi: () => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        // Mock reindex response for development
+        // In production, this would be: axios.post('/ai/reindex')
+        const mockResponse = {
+          success: true,
+          indexed: {
+            projects: projects.length,
+            developers: developers.length
+          }
+        };
+        resolve(mockResponse);
+      }, 1000);
+    });
   }
 };

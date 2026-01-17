@@ -423,5 +423,8 @@
   "newPassword": "New Password",
   "saveChanges": "Save Changes",
   "emailCannotBeChanged": "Email address cannot be changed",
-  "profileUpdatedSuccess": "Profile updated successfully!"
+  "profileUpdatedSuccess": "Profile updated successfully!",
+  "saveDraft": "Save Draft",
+  "publishSave": "Save & Publish",
+  "save": "Save"
 }

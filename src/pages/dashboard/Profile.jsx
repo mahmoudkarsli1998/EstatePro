@@ -4,10 +4,12 @@ import { useAuth } from '../../hooks/useAuth';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import { User, Mail, Shield, Calendar } from 'lucide-react';
+import { useToast } from '../../context/ToastContext';
 
 const Profile = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const toast = useToast();
   const [formData, setFormData] = useState({
     name: user?.name || '',
     email: user?.email || '',
@@ -22,7 +24,7 @@ const Profile = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Simulate update
-    alert(t('profileUpdatedSuccess', 'Profile updated successfully!'));
+    toast.success(t('profileUpdatedSuccess', 'Profile updated successfully!'));
   };
 
   return (

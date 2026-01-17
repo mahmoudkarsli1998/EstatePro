@@ -8,49 +8,61 @@ import Badge from '../../components/shared/Badge';
 import Card from '../../components/shared/Card';
 import ContactForm from '../../components/public/ContactForm';
 import LiquidBackground from '../../components/shared/LiquidBackground';
-import { api } from '../../utils/api';
-
+import ImageGallery from '../../components/shared/ImageGallery';
+import EntityImage from '../../components/shared/EntityImage';
+import { estateService } from '../../services/estateService';
+import { crmService } from '../../services/crmService';
+import { useCurrency } from '../../context/CurrencyContext';
 import { useTranslation } from 'react-i18next';
+import { tracker } from '../../services/trackingService';
 
 const ProjectDetail = () => {
   const { t, i18n } = useTranslation();
+  const { format, formatCompact } = useCurrency();
   const { id } = useParams();
   const [project, setProject] = useState(null);
   const [units, setUnits] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeImage, setActiveImage] = useState(0);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [selectedUnit, setSelectedUnit] = useState(null);
+  const [assignedAgent, setAssignedAgent] = useState(null);
   const [selectedAgent, setSelectedAgent] = useState(null);
 
-  const mockAgent = {
-    name: "Sarah Johnson",
-    role: "Senior Property Consultant",
-    email: "sarah.j@estatepro.com",
-    phone: "+1 (555) 123-4567",
-    avatar: "https://i.pravatar.cc/150?u=agent",
-    stats: {
-      sales: "$12.5M",
-      listings: 8,
-      rating: 4.9
-    }
-  };
+  // Mock agent fallack if needed, but we prefer real one
+  // const mockAgent = { ... };
 
 
 
   useEffect(() => {
     setLoading(true);
-    api.getProjectById(id).then(data => {
-      setProject(data);
-      return api.getUnits(id);
+    Promise.all([
+      estateService.getProjectById(id),
+      crmService.getAgents()
+    ]).then(([projectData, agentsData]) => {
+      setProject(projectData);
+      
+      // Find assigned agent
+      const foundAgent = agentsData.find(a => 
+        a.assignedProjects && a.assignedProjects.some(pId => String(pId) === String(id) || String(pId?.id || pId?._id) === String(id))
+      );
+      setAssignedAgent(foundAgent);
+
+      return estateService.getUnits({ projectId: id });
     }).then(unitsData => {
-      setUnits(unitsData);
+      setUnits(Array.isArray(unitsData) ? unitsData : (unitsData.data || [])); 
       setLoading(false);
     }).catch(err => {
       console.error(err);
       setLoading(false);
     });
   }, [id]);
+
+  // Track project view
+  useEffect(() => {
+    if (project) {
+      tracker.projectViewed(project._id || project.id, project.name, project.location?.name || project.city);
+    }
+  }, [project]);
 
   if (loading) {
     return (
@@ -116,16 +128,31 @@ const ProjectDetail = () => {
             <h1 className="text-3xl md:text-5xl font-bold font-heading text-textDark dark:text-white mb-2">
               {project.name}
             </h1>
-            <div className="flex items-center text-textLight">
+            <div className="flex items-center text-textLight mb-1">
               <MapPin size={18} className="mr-2 text-primary" />
               {project.address}
             </div>
+            {(project.location?.name || project.locationId?.name) && (
+              <div className="flex items-center text-primary text-sm font-medium">
+                <Building size={16} className="mr-2" />
+                {project.location?.name || project.locationId?.name}
+                {(project.location?.city || project.locationId?.city) && (
+                  <span className="text-textLight ml-2">
+                    ({project.location?.city || project.locationId?.city})
+                  </span>
+                )}
+              </div>
+            )}
           </div>
           <div className="flex items-center gap-4">
             <div className="text-end">
               <p className="text-sm text-textLight">{t('startingFrom')}</p>
               <p className="text-2xl font-bold text-primary" style={{ direction: 'ltr' }}>
-                ${(project.priceRange.min / 1000).toFixed(0)}k
+                {(() => {
+                  const prices = units.filter(u => u.price > 0).map(u => u.price);
+                  const minPrice = prices.length > 0 ? Math.min(...prices) : (project.priceRange?.min || 0);
+                  return minPrice > 0 ? formatCompact(minPrice) : t('contactForPrice', 'Contact for Price');
+                })()}
               </p>
             </div>
             <Badge variant={project.status === 'active' ? 'success' : 'warning'} className="text-lg px-4 py-1">
@@ -142,28 +169,12 @@ const ProjectDetail = () => {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5 }}
-              className="space-y-4"
             >
-              <div className="h-[400px] md:h-[500px] rounded-2xl overflow-hidden glass-panel border-0">
-                <img 
-                  src={project.images[activeImage]} 
-                  alt={project.name} 
-                  className="w-full h-full object-cover transition-all duration-500"
-                />
-              </div>
-              <div className="flex gap-4 overflow-x-auto pb-2">
-                {project.images.map((img, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setActiveImage(index)}
-                    className={`flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden border-2 transition-all ${
-                      activeImage === index ? 'border-primary shadow-md' : 'border-transparent opacity-70 hover:opacity-100'
-                    }`}
-                  >
-                    <img src={img} alt={`View ${index + 1}`} className="w-full h-full object-cover" />
-                  </button>
-                ))}
-              </div>
+              <ImageGallery 
+                images={project.images} 
+                type="project" 
+                aspectRatio="aspect-[16/10]"
+              />
             </motion.div>
 
             {/* Overview */}
@@ -194,7 +205,9 @@ const ProjectDetail = () => {
                   </div>
                   <div>
                     <p className="text-xs text-textLight">{t('units')}</p>
-                    <p className="font-bold text-textDark dark:text-white">{project.stats.totalUnits}</p>
+                    <p className="font-bold text-textDark dark:text-white">
+                        {Math.max(project.stats?.totalUnits || 0, units.length)}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -247,7 +260,12 @@ const ProjectDetail = () => {
                   >
                     <div className="flex items-center gap-4 w-full md:w-auto">
                       <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
-                        <img src={unit.images[0]} alt={unit.number} className="w-full h-full object-cover" />
+                        <EntityImage 
+                          src={unit.images?.[0]} 
+                          alt={unit.number}
+                          type="unit"
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <div>
                         <h3 className="font-bold text-lg text-textDark dark:text-white">{t('unitLabel', { number: unit.number })}</h3>
@@ -260,9 +278,9 @@ const ProjectDetail = () => {
                       </div>
                     </div>
                     <div className="flex flex-col items-end gap-2 w-full md:w-auto">
-                      <span className="text-2xl font-bold text-primary" style={{ direction: 'ltr' }}>${unit.price.toLocaleString()}</span>
+                      <span className="text-2xl font-bold text-primary" style={{ direction: 'ltr' }}>{format(unit.price)}</span>
                       <div className="flex gap-2 w-full md:w-auto">
-                        <Link to={`/units/${unit.id}`} className="flex-1">
+                        <Link to={`/units/${unit.id || unit._id}`} className="flex-1">
                           <Button variant="outline" size="sm" className="w-full">{t('view')}</Button>
                         </Link>
                         <Button 
@@ -302,6 +320,7 @@ const ProjectDetail = () => {
                     onClick={() => {
                       setSelectedUnit(null);
                       setIsContactOpen(true);
+                      tracker.contactFormSubmitted('project_inquiry', project.name);
                     }}
                   >
                     {t('contactAgent')}
@@ -312,32 +331,34 @@ const ProjectDetail = () => {
                 </Card>
               </motion.div>
 
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.6, duration: 0.5 }}
-              >
-                <Card className="p-6">
-                  <h3 className="text-lg font-bold text-textDark dark:text-white mb-4">{t('agent')}</h3>
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-gray-700 overflow-hidden border border-border/20 dark:border-white/10">
-                      <img src={mockAgent.avatar} alt="Agent" />
+              {assignedAgent && (
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.6, duration: 0.5 }}
+                >
+                  <Card className="p-6">
+                    <h3 className="text-lg font-bold text-textDark dark:text-white mb-4">{t('agent')}</h3>
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-12 h-12 rounded-full bg-gray-700 overflow-hidden border border-border/20 dark:border-white/10">
+                        <img src={assignedAgent.avatar || 'https://i.pravatar.cc/150'} alt={assignedAgent.name} className="w-full h-full object-cover"/>
+                      </div>
+                      <div>
+                        <p className="font-bold text-textDark dark:text-white">{assignedAgent.name}</p>
+                        <p className="text-sm text-textLight">{assignedAgent.jobTitle || t('seniorPropertyConsultant')}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-bold text-textDark dark:text-white">{mockAgent.name}</p>
-                      <p className="text-sm text-textLight">{t('seniorPropertyConsultant')}</p>
-                    </div>
-                  </div>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="w-full hover:bg-primary/10 hover:text-primary"
-                    onClick={() => setSelectedAgent(mockAgent)}
-                  >
-                    {t('viewProfile')}
-                  </Button>
-                </Card>
-              </motion.div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="w-full hover:bg-primary/10 hover:text-primary"
+                      onClick={() => setSelectedAgent(assignedAgent)}
+                    >
+                      {t('viewProfile')}
+                    </Button>
+                  </Card>
+                </motion.div>
+              )}
             </div>
           </div>
         </div>
@@ -382,15 +403,19 @@ const ProjectDetail = () => {
 
             <div className="grid grid-cols-3 gap-4">
               <div className="bg-background dark:bg-white/5 rounded-xl p-4 text-center border border-border/20 dark:border-white/10">
-                <div className="text-2xl font-bold text-textDark dark:text-white mb-1">{selectedAgent.stats.sales}</div>
+                <div className="text-2xl font-bold text-textDark dark:text-white mb-1">
+                    {selectedAgent.totalSales ? format(Number(selectedAgent.totalSales)) : format(0)}
+                </div>
                 <div className="text-xs text-textLight uppercase tracking-wider">{t('totalSales')}</div>
               </div>
               <div className="bg-background dark:bg-white/5 rounded-xl p-4 text-center border border-border/20 dark:border-white/10">
-                <div className="text-2xl font-bold text-textDark dark:text-white mb-1">{selectedAgent.stats.listings}</div>
+                <div className="text-2xl font-bold text-textDark dark:text-white mb-1">
+                    {selectedAgent.activeListingsCount || selectedAgent.assignedProjects?.length || 0}
+                </div>
                 <div className="text-xs text-textLight uppercase tracking-wider">{t('activeListings')}</div>
               </div>
               <div className="bg-background dark:bg-white/5 rounded-xl p-4 text-center border border-border/20 dark:border-white/10">
-                <div className="text-2xl font-bold text-textDark dark:text-white mb-1">{selectedAgent.stats.rating}</div>
+                <div className="text-2xl font-bold text-textDark dark:text-white mb-1">{selectedAgent.rating || 'N/A'}</div>
                 <div className="text-xs text-textLight uppercase tracking-wider">{t('rating')}</div>
               </div>
             </div>
@@ -398,10 +423,26 @@ const ProjectDetail = () => {
             <div>
               <h3 className="text-lg font-bold text-textDark dark:text-white mb-3">{t('about')}</h3>
               <p className="text-textLight dark:text-gray-300 leading-relaxed text-sm">
-                {selectedAgent.name} is a dedicated real estate professional with over 5 years of experience in the luxury market. 
-                Specializing in high-end residential properties, they have a proven track record of closing complex deals and ensuring client satisfaction.
+                {selectedAgent.about || t('agentDescription', 'is a dedicated real estate professional with over 5 years of experience...')}
               </p>
             </div>
+
+            {selectedAgent.recentPerformance && selectedAgent.recentPerformance.length > 0 && (
+              <div>
+                <h3 className="text-lg font-bold text-textDark dark:text-white mb-3">{t('recentPerformance')}</h3>
+                <div className="space-y-3">
+                  {selectedAgent.recentPerformance.map((item, i) => (
+                    <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-background dark:bg-white/5 border border-border/20 dark:border-white/5">
+                      <div>
+                        <div className="text-textDark dark:text-white font-medium text-sm">{item.title}</div>
+                        <div className="text-xs text-textLight dark:text-gray-500">{new Date(item.date).toLocaleDateString()}</div>
+                      </div>
+                      <div className="text-green-600 dark:text-green-400 font-bold text-sm">+{format(Number(item.amount))}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </Modal>
       )}

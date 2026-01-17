@@ -14,7 +14,10 @@ const Dashboard = () => {
   // Debug log to ensure role is detected
   console.log('Dashboard Dispatcher - User Role:', user?.role);
 
-  if (user?.role?.toLowerCase() === 'sales') {
+  const role = user?.role?.toLowerCase();
+  
+  // Sales and Agent roles get SalesDashboard
+  if (role === 'sales' || role === 'agent') {
     return <SalesDashboard />;
   }
 
