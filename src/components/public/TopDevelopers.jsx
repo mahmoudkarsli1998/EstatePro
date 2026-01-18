@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import Button from '../shared/Button';
-import { api } from '../../utils/api';
+import { commonService } from '../../services/commonService';
+import { estateService } from '../../services/estateService';
 import { useStaggerList } from '../../hooks/useGSAPAnimations';
 import DeveloperCard from './DeveloperCard';
 
@@ -12,10 +13,49 @@ const TopDevelopers = () => {
   const containerRef = useStaggerList({ selector: '.stagger-item', delay: 0.2, dependencies: [loading, developers] });
 
   useEffect(() => {
-    api.getDevelopers().then(data => {
-      setDevelopers(data.slice(0, 4)); // Show top 4
-      setLoading(false);
-    });
+    const fetchData = async () => {
+      try {
+        const [devs, projects] = await Promise.all([
+          commonService.getDevelopers(),
+          estateService.getProjects()
+        ]);
+        
+        // Enrich developers with project count
+        const enrichedDevs = devs.map(dev => {
+          const devId = dev.id || dev._id;
+          const devName = dev.name?.toLowerCase();
+          
+          const projectCount = projects.filter(p => {
+            const pDev = p.developer;
+            
+            // If project developer is an object
+            if (pDev && typeof pDev === 'object') {
+              const pDevId = pDev.id || pDev._id || pDev.developerId;
+              if (pDevId && devId && String(pDevId) === String(devId)) return true;
+              if (pDev.name && devName && pDev.name.toLowerCase() === devName) return true;
+              return false;
+            }
+            
+            // If primitive (ID or name string)
+            const pDevStr = String(pDev);
+            if (devId && pDevStr === String(devId)) return true;
+            if (devName && pDevStr.toLowerCase() === devName) return true;
+            
+            return false;
+          }).length;
+          
+          return { ...dev, projectsCount: projectCount };
+        });
+        
+        setDevelopers(enrichedDevs.slice(0, 4)); // Show top 4
+      } catch (error) {
+        console.error('Failed to fetch developers:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
   }, []);
 
   return (
@@ -43,8 +83,8 @@ const TopDevelopers = () => {
           </div>
         ) : (
           <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {developers.map(dev => (
-              <DeveloperCard key={dev.id} developer={dev} />
+            {developers.map((dev, idx) => (
+              <DeveloperCard key={dev.id || dev._id || idx} developer={dev} />
             ))}
           </div>
         )}

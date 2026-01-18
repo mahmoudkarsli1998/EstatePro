@@ -1,7 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from 'lucide-react';
+import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin, Cookie } from 'lucide-react';
+import CookieSettingsButton from '../shared/CookieSettingsButton';
 
 const Footer = () => {
   const { t } = useTranslation();
@@ -73,9 +74,10 @@ const Footer = () => {
           <p className="text-gray-500 text-sm mb-4 md:mb-0">
             &copy; {new Date().getFullYear()} EstatePro. {t('rightsReserved')}
           </p>
-          <div className="flex space-x-6 text-sm text-gray-500">
+          <div className="flex items-center space-x-6 rtl:space-x-reverse text-sm text-gray-500">
             <a href="#" className="hover:text-white transition-colors">{t('privacyPolicy')}</a>
             <a href="#" className="hover:text-white transition-colors">{t('termsOfService')}</a>
+            <CookieSettingsButton variant="text" />
           </div>
         </div>
       </div>

@@ -15,6 +15,8 @@ const Sell = React.lazy(() => import('./pages/public/Sell'));
 const PublicDevelopers = React.lazy(() => import('./pages/public/Developers'));
 const UnitsList = React.lazy(() => import('./pages/public/UnitsList'));
 const DeveloperDetail = React.lazy(() => import('./pages/public/DeveloperDetail'));
+const AiAssistantPage = React.lazy(() => import('./pages/public/AiAssistantPage'));
+
 
 const InviteAccept = React.lazy(() => import('./pages/dashboard/InviteAccept'));
 const Login = React.lazy(() => import('./pages/dashboard/Login'));
@@ -32,6 +34,7 @@ const Agents = React.lazy(() => import('./pages/dashboard/Agents'));
 const Calendar = React.lazy(() => import('./pages/dashboard/Calendar'));
 const Analysis = React.lazy(() => import('./pages/dashboard/Analysis'));
 const Reports = React.lazy(() => import('./pages/dashboard/Reports'));
+const AiSettings = React.lazy(() => import('./pages/dashboard/AiSettings'));
 const Profile = React.lazy(() => import('./pages/dashboard/Profile'));
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './hooks/useAuth';
@@ -41,6 +44,8 @@ import Particles from './components/shared/Particles';
 import Preloader from './components/shared/Preloader';
 import RequireAuth from './components/auth/RequireAuth';
 import ScrollToTop from './components/shared/ScrollToTop';
+import CookieConsentBanner from './components/shared/CookieConsentBanner';
+import usePageTracking from './hooks/usePageTracking';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -56,6 +61,7 @@ function App() {
         {!loading && (
           <Router>
             <AnimatedRoutes />
+            <CookieConsentBanner />
           </Router>
         )}
       </AuthProvider>
@@ -65,6 +71,9 @@ function App() {
 
 const AnimatedRoutes = () => {
   const location = useLocation();
+  
+  // Initialize analytics and track page views
+  usePageTracking();
   
   return (
     <AnimatePresence mode="wait">
@@ -86,6 +95,10 @@ const AnimatedRoutes = () => {
             <Route path="/units" element={<UnitsList />} />
           </Route>
 
+          {/* Standalone AI Assistant (No Navbar/Footer) */}
+          <Route path="/ai-assistant" element={<AiAssistantPage />} />
+
+
           {/* Dashboard Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/invite-accept" element={<InviteAccept />} />
@@ -106,13 +119,14 @@ const AnimatedRoutes = () => {
               <Route path="admins" element={<Admins />} />
               <Route path="developers" element={<Developers />} />
               <Route path="agents" element={<Agents />} />
-              <Route path="calendar" element={<Calendar />} />
               <Route path="analysis" element={<Analysis />} />
               <Route path="reports" element={<Reports />} />
+              <Route path="ai-settings" element={<AiSettings />} />
             </Route>
 
             {/* Shared Routes (with internal restrictions) */}
             <Route path="leads" element={<RequireAuth allowedRoles={['admin', 'manager', 'sales']}><Leads /></RequireAuth>} />
+            <Route path="calendar" element={<RequireAuth allowedRoles={['admin', 'manager', 'sales', 'agent']}><Calendar /></RequireAuth>} />
             <Route path="units" element={<Units />} />
             <Route path="units/add" element={<AddUnit />} />
             <Route path="units/edit/:id" element={<AddUnit />} />

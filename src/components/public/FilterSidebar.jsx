@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { Filter, X, Search, DollarSign, Home, CheckCircle } from 'lucide-react';
 import Button from '../shared/Button';
+import { useCurrency } from '../../context/CurrencyContext';
 
 const FilterSidebar = ({ filters, setFilters, isOpen, onClose }) => {
+  const { getCurrency } = useCurrency();
+  const currency = getCurrency();
   const [localFilters, setLocalFilters] = useState(filters);
 
   const handleChange = (e) => {
@@ -70,11 +73,11 @@ const FilterSidebar = ({ filters, setFilters, isOpen, onClose }) => {
           {/* Price Range */}
           <div>
             <label className="flex items-center gap-2 text-sm font-bold text-white mb-4">
-              <DollarSign size={16} className="text-primary" /> Price Range (k)
+              <DollarSign size={16} className="text-primary" /> Price Range ({currency.code})
             </label>
             <div className="grid grid-cols-2 gap-4">
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-xs">$</span>
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-xs">{currency.symbolEn}</span>
                 <input
                   type="number"
                   name="minPrice"
@@ -85,7 +88,7 @@ const FilterSidebar = ({ filters, setFilters, isOpen, onClose }) => {
                 />
               </div>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-xs">$</span>
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 text-xs">{currency.symbolEn}</span>
                 <input
                   type="number"
                   name="maxPrice"

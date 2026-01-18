@@ -3,6 +3,7 @@ import React from 'react';
 const Input = ({ 
   label, 
   error, 
+  helperText,
   className = '', 
   ...props 
 }) => {
@@ -35,6 +36,9 @@ const Input = ({
       </div>
       {error && (
         <p className="mt-1 text-sm text-red-500">{error}</p>
+      )}
+      {!error && helperText && (
+        <p className="mt-1 text-sm text-textLight/70">{helperText}</p>
       )}
     </div>
   );

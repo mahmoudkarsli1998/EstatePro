@@ -10,8 +10,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Card from '../../components/shared/Card';
 import Button from '../../components/shared/Button';
 import Modal from '../../components/shared/Modal';
-import { api } from '../../utils/api';
+import { estateService } from '../../services/estateService';
+import { crmService } from '../../services/crmService';
 import { useToast } from '../../context/ToastContext';
+import { useCurrency } from '../../context/CurrencyContext';
 
 // Custom Tooltip for better readability with forced high contrast
 const CustomTooltip = ({ active, payload, label }) => {
@@ -47,6 +49,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 const Reports = () => {
   const { t } = useTranslation();
   const toast = useToast();
+  const { format, formatCompact } = useCurrency();
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
     units: [],
@@ -65,10 +68,10 @@ const Reports = () => {
       setLoading(true);
       try {
         const [units, leads, users, projects] = await Promise.all([
-          api.getUnits(),
-          api.getLeads(),
-          api.getUsers(),
-          api.getProjects()
+          estateService.getUnits(),
+          crmService.getLeads(),
+          crmService.getUsers(),
+          estateService.getProjects()
         ]);
         setData({ units, leads, users, projects });
       } catch (error) {
@@ -238,6 +241,31 @@ const Reports = () => {
     }, 500);
   };
 
+  // Export to CSV function
+  const exportToCSV = () => {
+    const headers = ['Month', 'Revenue', 'Leads', 'Users'];
+    const rows = processedData.timelineData.map(row => [
+      row.name,
+      row.revenue,
+      row.leads,
+      row.users
+    ]);
+    
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `reports_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    toast.success(t('csvExported', 'CSV exported successfully!'));
+  };
+
+  const [showExportDropdown, setShowExportDropdown] = useState(false);
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -287,9 +315,33 @@ const Reports = () => {
             ))}
           </div>
           
-          <Button onClick={() => setIsReportModalOpen(true)} className="whitespace-nowrap">
-            <FileText size={18} className="me-2" /> {t('generateReport')}
-          </Button>
+          {/* Export Dropdown */}
+          <div className="relative">
+            <button 
+              onClick={() => setShowExportDropdown(!showExportDropdown)}
+              className="px-4 py-2 bg-primary text-white rounded-lg text-sm font-bold shadow-md hover:shadow-lg transition-shadow flex items-center gap-2"
+            >
+              <Download size={16} />
+              {t('export', 'Export')}
+            </button>
+            
+            {showExportDropdown && (
+              <div className="absolute right-0 mt-2 w-52 bg-white dark:bg-dark-card rounded-lg shadow-xl border border-border/20 py-2 z-50">
+                <button
+                  onClick={() => { setIsReportModalOpen(true); setShowExportDropdown(false); }}
+                  className="w-full px-4 py-2 text-left text-sm text-textDark dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 flex items-center gap-2"
+                >
+                  📄 {t('generateReport', 'Generate PDF Report')}
+                </button>
+                <button
+                  onClick={() => { exportToCSV(); setShowExportDropdown(false); }}
+                  className="w-full px-4 py-2 text-left text-sm text-textDark dark:text-white hover:bg-gray-100 dark:hover:bg-white/10 flex items-center gap-2"
+                >
+                  📊 {t('exportCSV', 'Export as CSV')}
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -298,7 +350,7 @@ const Reports = () => {
         {[
           { 
             title: t('totalRevenue'), 
-            value: `$${(processedData.metrics.totalRevenue / 1000000).toFixed(2)}M`,
+            value: formatCompact(processedData.metrics.totalRevenue),
             icon: DollarSign, 
             color: 'cyan', 
             trend: '+12%',
@@ -322,7 +374,7 @@ const Reports = () => {
           },
           { 
             title: t('avgTicket'), 
-            value: `$${(processedData.metrics.avgTicket / 1000).toFixed(0)}k`,
+            value: formatCompact(processedData.metrics.avgTicket),
             icon: Home, 
             color: 'green', 
             trend: '+8%',
@@ -371,7 +423,7 @@ const Reports = () => {
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(100,100,100,0.1)" vertical={false} />
                   <XAxis dataKey="name" stroke="#64748b" tick={{fill: 'var(--text-light)'}} axisLine={false} tickLine={false} />
-                  <YAxis stroke="#64748b" tick={{fill: 'var(--text-light)'}} axisLine={false} tickLine={false} tickFormatter={(val) => `$${val/1000}k`} />
+                  <YAxis stroke="#64748b" tick={{fill: 'var(--text-light)'}} axisLine={false} tickLine={false} tickFormatter={(val) => formatCompact(val)} />
                   <Tooltip content={<CustomTooltip />} />
                   <Area type="monotone" dataKey="revenue" stroke="#00F0FF" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
                 </AreaChart>

@@ -2,13 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, ArrowRight, Bed, Bath, Maximize, Phone, MessageCircle } from 'lucide-react';
 import Button from '../shared/Button';
-import { api } from '../../utils/api';
+import { estateService } from '../../services/estateService';
 import { useStaggerList, useHover3D } from '../../hooks/useGSAPAnimations';
 import { useTranslation } from 'react-i18next';
+import { useCurrency } from '../../context/CurrencyContext';
 
 const UnitCard = ({ unit }) => {
   const cardRef = useHover3D({ intensity: 10, scale: 1.02 });
   const { t, i18n } = useTranslation();
+  const { format } = useCurrency();
   const isRTL = i18n.dir() === 'rtl';
 
   return (
@@ -36,7 +38,7 @@ const UnitCard = ({ unit }) => {
           </div>
 
           <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 translate-z-20">
-             <Link to={`/units/${unit.id}`} className="block w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
+             <Link to={`/units/${unit.id || unit._id}`} className="block w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
               <Button variant="primary" className="w-full shadow-lg">View Details</Button>
             </Link>
           </div>
@@ -94,9 +96,8 @@ const UnitCard = ({ unit }) => {
                  </button>
              </div>
              <div>
-                <span className="text-[10px] text-textLight block text-left mb-0.5">EGP</span>
                 <span className="text-xl md:text-2xl font-bold text-primary font-heading">
-                  {unit.price?.toLocaleString()}
+                  {format(unit.price)}
                 </span>
              </div>
           </div>
@@ -112,7 +113,7 @@ const FeaturedUnits = () => {
   const containerRef = useStaggerList({ selector: '.stagger-item', delay: 0.2, dependencies: [loading, units] });
 
   useEffect(() => {
-    api.getUnits().then(data => {
+    estateService.getUnits().then(data => {
       // Filter for available units and take top 6, or just top 6 if mock data is limited
       const featured = data.filter(u => u.status === 'available').slice(0, 6);
       setUnits(featured.length > 0 ? featured : data.slice(0, 6)); // Fallback if no available
@@ -146,7 +147,7 @@ const FeaturedUnits = () => {
         ) : (
           <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 perspective-1000">
             {units.map(unit => (
-              <UnitCard key={unit.id} unit={unit} />
+              <UnitCard key={unit.id || unit._id} unit={unit} />
             ))}
           </div>
         )}

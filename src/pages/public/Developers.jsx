@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { api } from '../../utils/api';
+import { commonService } from '../../services/commonService';
+import { estateService } from '../../services/estateService';
 import DeveloperCard from '../../components/public/DeveloperCard';
 import PageLoader from '../../components/shared/PageLoader';
 import { useStaggerList } from '../../hooks/useGSAPAnimations';
@@ -13,10 +14,50 @@ const Developers = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    api.getDevelopers().then(data => {
-      setDevelopers(data);
-      setLoading(false);
-    });
+    const loadData = async () => {
+        try {
+            const [devs, allProjects] = await Promise.all([
+                commonService.getDevelopers(),
+                estateService.getProjects().catch(() => [])
+            ]);
+            
+            // Map projects to developers
+            const enrichedDevs = devs.map(dev => {
+                const devId = dev.id || dev._id;
+                
+                const myProjects = allProjects.filter(p => {
+                    let pDev = p.developer;
+                    
+                    // 1. If project developer is an object
+                    if (pDev && typeof pDev === 'object') {
+                        const pDevId = pDev.id || pDev._id || pDev.developerId;
+                        if (pDevId && devId && String(pDevId) === String(devId)) return true;
+                        if (pDev.name && dev.name && pDev.name.toLowerCase() === dev.name.toLowerCase()) return true;
+                        return false;
+                    }
+                    
+                    // 2. If primitive
+                    const pDevStr = String(pDev);
+                    const devIdStr = String(devId);
+                    
+                    if (devId && pDevStr === devIdStr) return true;
+                    if (dev.name && pDevStr.toLowerCase() === dev.name.toLowerCase()) return true;
+                    
+                    return false;
+                });
+                
+                return { ...dev, projects: myProjects };
+            });
+            
+            setDevelopers(enrichedDevs);
+        } catch (err) {
+            console.error("Failed to load developers", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    loadData();
   }, []);
 
   if (loading) return <PageLoader />;

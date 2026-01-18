@@ -5,7 +5,7 @@ import { Check, AlertCircle } from 'lucide-react';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import LiquidBackground from '../../components/shared/LiquidBackground';
-import { api } from '../../utils/api';
+import { authService } from '../../services/authService';
 
 const InviteAccept = () => {
   const { t } = useTranslation();
@@ -33,24 +33,32 @@ const InviteAccept = () => {
     setError('');
 
     if (formData.password !== formData.confirmPassword) {
-      setError(t('passwordsDoNotMatch'));
+      setError(t('passwordsDoNotMatch', 'Passwords do not match'));
       return;
     }
 
     if (formData.password.length < 6) {
-      setError(t('passwordLength'));
+      setError(t('passwordLength', 'Password must be at least 6 characters'));
+      return;
+    }
+
+    if (!formData.fullName.trim()) {
+      setError(t('fullNameRequired', 'Full name is required'));
       return;
     }
 
     setLoading(true);
     
+    console.log('Accepting invite with token:', token?.substring(0, 20) + '...');
+    
     try {
-      await api.acceptInvite({
+      const result = await authService.acceptInvite({
         token,
         password: formData.password,
         fullName: formData.fullName
       });
 
+      console.log('Invite accepted successfully:', result);
       setLoading(false);
       setSuccess(true);
       
@@ -59,8 +67,15 @@ const InviteAccept = () => {
         navigate('/login');
       }, 2000);
     } catch (err) {
-      console.error(err);
-      setError(t('invitationProcessError', 'Failed to process invitation'));
+      console.error('Accept invite error:', err);
+      
+      // Extract error message from backend response
+      const errorMessage = err?.response?.data?.message 
+        || err?.response?.data?.error 
+        || err?.message 
+        || t('invitationProcessError', 'Failed to process invitation');
+      
+      setError(errorMessage);
       setLoading(false);
     }
   };

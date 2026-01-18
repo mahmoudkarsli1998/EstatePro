@@ -1,18 +1,23 @@
 import React, { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Plus, User, Edit, Trash, Download, Copy, Check } from 'lucide-react';
+import { Plus, User, Edit, Trash, Download, Copy, Check, AlertTriangle } from 'lucide-react';
 import Button from '../../components/shared/Button';
 import Badge from '../../components/shared/Badge';
 import Modal from '../../components/shared/Modal';
 import Input from '../../components/shared/Input';
-import { api } from '../../utils/api';
+import { crmService } from '../../services/crmService';
+import { authService } from '../../services/authService';
 import { useDashboardCrud } from '../../hooks/useDashboardCrud';
 import { useAuth } from '../../hooks/useAuth';
+import { useToast } from '../../context/ToastContext';
+import { useNotifications } from '../../context/NotificationsContext';
 
 const Users = () => {
   const { t } = useTranslation();
   const { user: currentUser } = useAuth();
+  const toast = useToast();
+  const { createNotification } = useNotifications();
   const isManager = currentUser?.role === 'manager';
   const [inviteSuccessUser, setInviteSuccessUser] = React.useState(null);
   const [copied, setCopied] = React.useState(false);
@@ -32,12 +37,12 @@ const Users = () => {
     handleSubmit: handleCrudSubmit, // Rename hook's submit
     handleDelete,
     handleExport,
-    refresh
+    refresh, // Add refresh function
   } = useDashboardCrud(
-    api.getUsers,
-    api.inviteUser, // Mapped to creation/invitation
-    api.updateUser,
-    api.deleteUser,
+    crmService.getUsers,
+    authService.invite, // Mapped to creation/invitation
+    crmService.updateUser,
+    crmService.deleteUser,
     { fullName: '', email: '', role: 'agent' }, // Initial form state
     (user, term) => 
       user.fullName.toLowerCase().includes(term.toLowerCase()) || 
@@ -67,11 +72,32 @@ const Users = () => {
       handleCrudSubmit(e);
     } else {
       try {
-        const newUser = await api.inviteUser(formData);
+        const newUser = await authService.invite(formData);
+        console.log('Invite response:', newUser); // Debug log
+        
+        if (!newUser.inviteToken) {
+          console.warn('No inviteToken in response:', newUser);
+          toast.warning(t('inviteTokenMissing', 'Invitation sent but token not received. Check backend response.'));
+        }
+        
+        // Create a notification for the activity feed
+        try {
+          await createNotification({
+            title: t('userInvited', 'User Invited'),
+            message: `${currentUser?.fullName || 'Admin'} invited ${formData.email} as ${formData.role}`,
+            type: 'NEW_USER',
+            metadata: { email: formData.email, role: formData.role }
+          });
+        } catch (notifErr) {
+          console.log('Notification creation failed (non-critical):', notifErr);
+        }
+        
         await refresh();
         setInviteSuccessUser(newUser);
+        toast.success(t('invitationSent', 'Invitation sent successfully!'));
       } catch (error) {
         console.error("Invite failed", error);
+        toast.error(error?.response?.data?.message || t('inviteFailed', 'Failed to send invitation'));
       }
     }
   };

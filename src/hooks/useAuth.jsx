@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext } from 'react';
-import { api } from '../utils/api';
+import { authService } from '../services/authService';
 
 const AuthContext = createContext(null);
 
@@ -8,32 +8,63 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for stored auth (mock)
-    const storedUser = localStorage.getItem('user');
-    const token = localStorage.getItem('authToken');
-    
-    if (storedUser && token) {
-      setUser(JSON.parse(storedUser));
-    }
-    setLoading(false);
+    const initAuth = async () => {
+      const token = localStorage.getItem('auth_token');
+      if (token) {
+        try {
+          // Verify token and get fresh user data
+          const userData = await authService.getProfile();
+          setUser(userData);
+        } catch (error) {
+          console.error("Failed to restore session", error);
+          localStorage.removeItem('auth_token');
+        }
+      }
+      setLoading(false);
+    };
+    initAuth();
   }, []);
 
   const login = async (email, password) => {
     try {
-      const { user, token } = await api.login(email, password);
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      setUser(user);
-      return user;
+      const response = await authService.login({ email, password });
+      // Assuming response contains access_token, adapt if needed
+      const token = response.access_token || response.token || response.accessToken;
+      const userData = response.user; // If provided
+
+      if (token) {
+        localStorage.setItem('auth_token', token);
+        // If user data isn't in login response, fetch it
+        if (userData) {
+          setUser(userData);
+        } else {
+          const profile = await authService.getProfile();
+          setUser(profile);
+        }
+        return true;
+      } else {
+        throw new Error('No access token received');
+      }
     } catch (error) {
       throw error;
     }
   };
 
   const logout = () => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
+    localStorage.removeItem('auth_token');
     setUser(null);
+    window.location.href = '/login'; 
+  };
+
+  const updateUser = async (data) => {
+    try {
+      const updatedUser = await authService.updateProfile(data);
+      // Merge updated fields into current user state
+      setUser(prev => ({ ...prev, ...updatedUser }));
+      return updatedUser;
+    } catch (error) {
+      throw error;
+    }
   };
 
   const hasRole = (allowedRoles) => {
@@ -50,7 +81,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, hasRole }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, hasRole, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -5,7 +5,7 @@ import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import Modal from '../../components/shared/Modal';
 import Badge from '../../components/shared/Badge';
-import { api } from '../../utils/api';
+import { crmService } from '../../services/crmService';
 import { useDashboardCrud } from '../../hooks/useDashboardCrud';
 
 const Managers = () => {
@@ -36,17 +36,17 @@ const Managers = () => {
     handleDelete,
     handleExport
   } = useDashboardCrud(
-    api.getManagers,
-    api.createManager,
-    api.updateManager,
-    api.deleteManager,
+    crmService.getManagers,
+    crmService.createManager,
+    crmService.updateManager,
+    crmService.deleteManager,
     { name: '', email: '', phone: '', department: '', status: 'active' },
     (manager, term) => {
       const lowerTerm = term.toLowerCase();
       const matchesSearch = 
-        manager.name.toLowerCase().includes(lowerTerm) || 
-        manager.email.toLowerCase().includes(lowerTerm) ||
-        manager.department.toLowerCase().includes(lowerTerm);
+        (manager.name || manager.fullName || '').toLowerCase().includes(lowerTerm) || 
+        (manager.email || '').toLowerCase().includes(lowerTerm) ||
+        (manager.department || '').toLowerCase().includes(lowerTerm);
       
       const matchesFilter = departmentFilter === 'All Departments' || manager.department === departmentFilter;
 
@@ -125,23 +125,23 @@ const Managers = () => {
               ) : managers.length === 0 ? (
                 <tr><td colSpan="6" className="px-6 py-4 text-center">{t('noManagersFound')}</td></tr>
               ) : managers.map((manager) => (
-                <tr key={manager.id} className="hover:bg-section dark:hover:bg-white/5 transition-colors border-b border-border/10 dark:border-white/5 last:border-0">
+                <tr key={manager.id || manager._id} className="hover:bg-section dark:hover:bg-white/5 transition-colors border-b border-border/10 dark:border-white/5 last:border-0">
                   <td className="px-6 py-4">
-                    <div className="font-medium text-textDark dark:text-white">{manager.name}</div>
+                    <div className="font-medium text-textDark dark:text-white">{manager.name || manager.fullName || 'Unknown'}</div>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex flex-col space-y-1">
                       <div className="flex items-center text-sm text-textLight dark:text-gray-300">
-                        <Mail size={12} className="me-2 text-gray-500" /> {manager.email}
+                        <Mail size={12} className="me-2 text-gray-500" /> {manager.email || '-'}
                       </div>
                       <div className="flex items-center text-sm text-textLight dark:text-gray-300">
-                        <Phone size={12} className="me-2 text-gray-500" /> {manager.phone}
+                        <Phone size={12} className="me-2 text-gray-500" /> {manager.phone || '-'}
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4">
                     <span className="bg-background dark:bg-white/10 px-2 py-1 rounded text-xs text-textLight dark:text-gray-300 border border-border/20 dark:border-transparent">
-                        {manager.department}
+                        {manager.department || 'N/A'}
                     </span>
                   </td>
                   <td className="px-6 py-4">

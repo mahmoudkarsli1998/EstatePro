@@ -3,16 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import Button from '../../components/shared/Button';
 import Input from '../../components/shared/Input';
 import { useAuth } from '../../hooks/useAuth';
-import { api } from '../../utils/api';
+import { authService } from '../../services/authService';
 import LoginBackground3D from '../../components/dashboard/LoginBackground3D';
 import { useGSAP } from '@gsap/react';
 import gsap from 'gsap';
-
 import { useTranslation } from 'react-i18next';
+import { useToast } from '../../context/ToastContext';
 
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const toast = useToast();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '', name: '', confirmPassword: '' });
@@ -46,13 +47,17 @@ const Login = () => {
         await login(formData.email, formData.password);
         navigate('/dashboard');
       } else {
-        // Mock Signup
         if (formData.password !== formData.confirmPassword) {
           throw new Error("Passwords don't match");
         }
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate API
+        // Use real registration
+        await authService.register({
+            name: formData.name,
+            email: formData.email,
+            password: formData.password
+        });
         setIsLogin(true); // Flip back to login on success
-        alert("Account created! Please sign in.");
+        toast.success("Account created! Please sign in.");
       }
     } catch (err) {
       setError(err.message || 'Authentication failed');

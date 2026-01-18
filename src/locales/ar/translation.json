@@ -411,5 +411,8 @@
   "newPassword": "كلمة المرور الجديدة",
   "saveChanges": "حفظ التغييرات",
   "emailCannotBeChanged": "لا يمكن تغيير البريد الإلكتروني",
-  "profileUpdatedSuccess": "تم تحديث الملف الشخصي بنجاح!"
+  "profileUpdatedSuccess": "تم تحديث الملف الشخصي بنجاح!",
+  "saveDraft": "حفظ كمسودة",
+  "publishSave": "حفظ ونشر",
+  "save": "حفظ"
 }

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, ArrowRight } from 'lucide-react';
 import Button from '../shared/Button';
-import { api } from '../../utils/api';
+import { estateService } from '../../services/estateService';
 import { useStaggerList, useHover3D } from '../../hooks/useGSAPAnimations';
 
 const ProjectCard = ({ project }) => {
@@ -13,7 +13,7 @@ const ProjectCard = ({ project }) => {
       <div className="h-full flex flex-col glass-panel overflow-hidden group hover:border-primary/50 transition-all duration-300 relative transform-style-3d">
         <div className="relative h-72 overflow-hidden">
           <img 
-            src={`${project.images[0]}?w=800&q=80&auto=format`} 
+            src={project.images?.[0] ? `${project.images[0]}?w=800&q=80&auto=format` : 'https://via.placeholder.com/800x600?text=No+Image'} 
             alt={project.name} 
             loading="lazy"
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -31,7 +31,7 @@ const ProjectCard = ({ project }) => {
           </div>
 
           <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 translate-z-20">
-             <Link to={`/projects/${project.id}`} className="block w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
+             <Link to={`/projects/${project.id || project._id}`} className="block w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
               <Button variant="primary" className="w-full shadow-lg">View Details</Button>
             </Link>
           </div>
@@ -43,7 +43,7 @@ const ProjectCard = ({ project }) => {
               {project.name}
             </h3>
             <span className="text-primary font-bold text-lg bg-primary/10 px-2 py-1 rounded-lg border border-primary/20">
-              ${(project.priceRange.min / 1000).toFixed(0)}k+
+              ${((project?.priceRange?.min || 0) / 1000).toFixed(0)}k+
             </span>
           </div>
           
@@ -59,11 +59,11 @@ const ProjectCard = ({ project }) => {
           <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/10">
             <div className="text-center p-2 rounded-lg bg-background/50 dark:bg-white/5 border border-border/10">
               <span className="block text-xs text-textLight uppercase tracking-wider mb-1">Available</span>
-              <span className="font-bold text-textDark dark:text-white text-lg">{project.stats.available} <span className="text-xs font-normal text-textLight">Units</span></span>
+              <span className="font-bold text-textDark dark:text-white text-lg">{project.stats?.available ?? '-'} <span className="text-xs font-normal text-textLight">Units</span></span>
             </div>
             <div className="text-center p-2 rounded-lg bg-background/50 dark:bg-white/5 border border-border/10">
               <span className="block text-xs text-textLight uppercase tracking-wider mb-1">Delivery</span>
-              <span className="font-bold text-textDark dark:text-white text-lg">{new Date(project.deliveryDate).getFullYear()}</span>
+              <span className="font-bold text-textDark dark:text-white text-lg">{project.deliveryDate ? new Date(project.deliveryDate).getFullYear() : 'N/A'}</span>
             </div>
           </div>
         </div>
@@ -78,7 +78,7 @@ const FeaturedProjects = () => {
   const containerRef = useStaggerList({ selector: '.stagger-item', delay: 0.2, dependencies: [loading, projects] });
 
   useEffect(() => {
-    api.getProjects().then(data => {
+    estateService.getProjects().then(data => {
       setProjects(data.slice(0, 6));
       setLoading(false);
     });
@@ -110,7 +110,7 @@ const FeaturedProjects = () => {
         ) : (
           <div ref={containerRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 perspective-1000">
             {projects.map(project => (
-              <ProjectCard key={project.id} project={project} />
+              <ProjectCard key={project.id || project._id} project={project} />
             ))}
           </div>
         )}

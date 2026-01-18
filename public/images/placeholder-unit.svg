@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect width="400" height="300" fill="#E6D5B8"/>
+  <g transform="translate(160, 90)">
+    <!-- Building icon -->
+    <rect x="10" y="30" width="60" height="70" rx="2" fill="#0B3C5D" opacity="0.4"/>
+    <rect x="18" y="40" width="12" height="12" rx="1" fill="#FCF5E5"/>
+    <rect x="50" y="40" width="12" height="12" rx="1" fill="#FCF5E5"/>
+    <rect x="18" y="58" width="12" height="12" rx="1" fill="#FCF5E5"/>
+    <rect x="50" y="58" width="12" height="12" rx="1" fill="#FCF5E5"/>
+    <rect x="32" y="76" width="16" height="24" rx="1" fill="#C89B3C" opacity="0.6"/>
+  </g>
+  <text x="200" y="220" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" fill="#555555">No Unit Image</text>
+</svg>
