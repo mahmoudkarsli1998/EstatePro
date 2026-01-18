@@ -5,7 +5,7 @@ const apiClient = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: true, // Required for cookie-based session management (chat API)
+  withCredentials: false, // Disabled for CORS compatibility with wildcard origin
 });
 
 // Request Interceptor: Attach Token
