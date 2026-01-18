@@ -4,7 +4,12 @@ import ThemeToggle from '../shared/ThemeToggle';
 import LanguageSwitcher from '../LanguageSwitcher';
 import NotificationBell from './NotificationBell';
 
+import { useAuth } from '../../hooks/useAuth';
+import { getFullImageUrl } from '../../utils/imageUrlHelper';
+
 const Header = ({ onMenuClick }) => {
+  const { user } = useAuth();
+
   return (
     <header className="h-16 glass-panel !rounded-none !border-l-0 !border-r-0 !border-t-0 border-b border-border/20 flex items-center justify-between px-4 md:px-6 sticky top-0 z-40 font-sans">
       <div className="flex items-center gap-4 w-full md:w-96">
@@ -32,11 +37,15 @@ const Header = ({ onMenuClick }) => {
         
         <div className="flex items-center pl-4 border-l border-border/20">
           <div className="mr-3 text-right hidden md:block">
-            <div className="text-sm font-bold text-textDark dark:text-white">Admin User</div>
-            <div className="text-xs text-textLight">Administrator</div>
+            <div className="text-sm font-bold text-textDark dark:text-white">{user?.name || 'User'}</div>
+            <div className="text-xs text-textLight capitalize">{user?.role || 'Guest'}</div>
           </div>
-          <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center text-primary border border-primary/30 shadow-sm">
-            <User size={20} />
+          <div className="w-10 h-10 rounded-full overflow-hidden border border-primary/30 shadow-sm">
+            <img 
+              src={getFullImageUrl(user?.avatar)} 
+              alt={user?.name} 
+              className="w-full h-full object-cover"
+            />
           </div>
         </div>
       </div>

@@ -53,10 +53,18 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('auth_token');
     setUser(null);
-    // authService.logout().catch(console.error); // Optional
-    // Redirect handled by component usage or global router protection usually
-    // But forcing reload or clear is good
     window.location.href = '/login'; 
+  };
+
+  const updateUser = async (data) => {
+    try {
+      const updatedUser = await authService.updateProfile(data);
+      // Merge updated fields into current user state
+      setUser(prev => ({ ...prev, ...updatedUser }));
+      return updatedUser;
+    } catch (error) {
+      throw error;
+    }
   };
 
   const hasRole = (allowedRoles) => {
@@ -73,7 +81,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, hasRole }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, hasRole, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -29,6 +29,7 @@ export const authService = {
   
   getProfile: () => apiClient.get('/auth/me'),
   updateProfile: (data) => apiClient.patch('/auth/profile', data),
+  deactivateAccount: () => apiClient.delete('/auth/profile'),
   logout: () => apiClient.post('/auth/logout'),
   refreshToken: () => apiClient.post('/auth/refresh-token'),
   forgotPassword: (email) => apiClient.post('/auth/forgot-password', { email }),
