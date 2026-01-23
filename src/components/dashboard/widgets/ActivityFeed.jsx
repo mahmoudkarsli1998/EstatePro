@@ -153,9 +153,9 @@ const ActivityFeed = () => {
     }));
 
     // Add timestamp to activities for sorting
-    const activityItems = (activities || []).map(a => ({
+    const activityItems = (activities || []).map((a, idx) => ({
       ...a,
-      id: `activity-${a.id}`,
+      id: `activity-${a.id || a._id || idx}`,
       _isNotification: false,
       _timestamp: a.createdAt ? new Date(a.createdAt).getTime() : Date.now() - Math.random() * 86400000
     }));

@@ -35,6 +35,7 @@ const Calendar = React.lazy(() => import('./pages/dashboard/Calendar'));
 const Analysis = React.lazy(() => import('./pages/dashboard/Analysis'));
 const Reports = React.lazy(() => import('./pages/dashboard/Reports'));
 const AiSettings = React.lazy(() => import('./pages/dashboard/AiSettings'));
+const AiChats = React.lazy(() => import('./pages/dashboard/AiChats'));
 const Profile = React.lazy(() => import('./pages/dashboard/Profile'));
 import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider } from './hooks/useAuth';
@@ -126,6 +127,7 @@ const AnimatedRoutes = () => {
 
             {/* Shared Routes (with internal restrictions) */}
             <Route path="leads" element={<RequireAuth allowedRoles={['admin', 'manager', 'sales']}><Leads /></RequireAuth>} />
+            <Route path="ai-chats" element={<RequireAuth allowedRoles={['admin', 'manager', 'sales']}><AiChats /></RequireAuth>} />
             <Route path="calendar" element={<RequireAuth allowedRoles={['admin', 'manager', 'sales', 'agent']}><Calendar /></RequireAuth>} />
             <Route path="units" element={<Units />} />
             <Route path="units/add" element={<AddUnit />} />

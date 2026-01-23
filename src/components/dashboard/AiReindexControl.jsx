@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sparkles, RefreshCw, CheckCircle2, AlertCircle, Database } from 'lucide-react';
-import { reindexAi } from '../../services/aiService';
+import { aiService } from '../../services/aiService';
 import { useToast } from '../../context/ToastContext';
 
 /**
@@ -16,7 +16,7 @@ const AiReindexControl = () => {
   const handleSync = async () => {
     setIsSyncing(true);
     try {
-      const response = await reindexAi();
+      const response = await aiService.reindexAi();
       // Assume structure: { message: "...", indexed: { projects: X, developers: Y } }
       setLastStats(response.indexed || null);
       

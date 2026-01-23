@@ -12,7 +12,7 @@ import {
   Search,
   Zap
 } from 'lucide-react';
-import { reindexAi } from '../../services/aiService';
+import { aiService } from '../../services/aiService';
 import { useToast } from '../../context/ToastContext';
 
 /**
@@ -27,7 +27,7 @@ const AiSettings = () => {
   const handleReindex = async () => {
     setIsSyncing(true);
     try {
-      const response = await reindexAi();
+      const response = await aiService.reindexAi();
       setLastStats(response.indexed || null);
       
       const total = Object.values(response.indexed || {}).reduce((a, b) => a + b, 0);
