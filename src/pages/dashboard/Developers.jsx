@@ -30,7 +30,8 @@ const Developers = () => {
     handleInputChange,
     handleSubmit,
     handleDelete,
-    handleExport
+    handleExport,
+    refresh // Add refresh
   } = useDashboardCrud(
     estateService.getDevelopers,
     estateService.createDeveloper,
@@ -89,12 +90,32 @@ const Developers = () => {
         finalFormData.logo = uploadedFilename;
       } catch (error) {
         console.error('Logo upload failed:', error);
+        return; // Stop if upload fails
       }
     }
     
-    // Use the original submit with modified data
-    handleInputChange({ target: { name: 'logo', value: finalFormData.logo } });
-    handleSubmit(e);
+    try {
+        if (editingItem && (editingItem.id || editingItem._id)) {
+            // Update
+            const id = editingItem.id || editingItem._id;
+            await estateService.updateDeveloper(id, finalFormData);
+        } else {
+            // Create
+            await estateService.createDeveloper(finalFormData);
+        }
+        
+        // Success
+        setLogoFile(null);
+        setLogoPreview(null);
+        handleCloseModal();
+        // Success
+        setLogoFile(null);
+        setLogoPreview(null);
+        handleCloseModal();
+        if (refresh) refresh();
+    } catch (error) {
+        console.error("Failed to save developer:", error);
+    }
   };
   
   const getDevProjects = (dev) => {
