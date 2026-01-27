@@ -30,7 +30,8 @@ const Agents = () => {
     handleSubmit,
     handleDelete,
     handleExport,
-    setFormData // Exposed from hook
+    setFormData, // Exposed from hook
+    refresh // For real-time updates without page reload
   } = useDashboardCrud(
     crmService.getAgents,
     (data) => crmService.createAgent({
@@ -90,14 +91,15 @@ const Agents = () => {
                 activeListingsCount: Number(formData.activeListingsCount)
           };
           
-          if (editingItem) {
-              await crmService.updateAgent(editingItem.id, payload);
+          const agentId = editingItem?.id || editingItem?._id;
+          if (editingItem && agentId) {
+              await crmService.updateAgent(agentId, payload);
           } else {
               await crmService.createAgent(payload);
           }
           
           handleCloseModal();
-          window.location.reload(); 
+          refresh(); // Real-time update instead of page reload
       } catch (err) {
           console.error(err);
           toast.error("Failed to save agent");
@@ -165,11 +167,10 @@ const Agents = () => {
      if (!assigningAgent) return;
      
      try {
-         await crmService.assignProjectsToAgent(assigningAgent.id, selectedProjectIds);
+         const agentId = assigningAgent.id || assigningAgent._id;
+         await crmService.assignProjectsToAgent(agentId, selectedProjectIds);
          setAssignModalOpen(false);
-         // Refresh agents list
-         // We can call refresh() from useDashboardCrud but let's just reload
-         window.location.reload(); 
+         refresh(); // Real-time update instead of page reload
      } catch (err) {
          console.error("Failed to assign projects", err);
          toast.error("Failed to assign projects");

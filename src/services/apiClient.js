@@ -8,13 +8,19 @@ const apiClient = axios.create({
   withCredentials: false, // Disabled for CORS compatibility with wildcard origin
 });
 
-// Request Interceptor: Attach Token
+// Request Interceptor: Attach Token and handle FormData
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('auth_token');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
+    
+    // For FormData (file uploads), let the browser set Content-Type with boundary
+    if (config.data instanceof FormData) {
+      delete config.headers['Content-Type'];
+    }
+    
     return config;
   },
   (error) => {

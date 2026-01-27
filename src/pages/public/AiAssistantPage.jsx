@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Bot, Send, Sparkles, X, RotateCcw, Home as HomeIcon, Target, Zap, MessageSquare, Trash2, Plus } from 'lucide-react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 import { sendChatMessage, getSessions, getSessionHistory, deleteSession } from '../../services/chatService';
 import AiResultCard from '../../components/public/AiResultCard';
@@ -8,22 +9,15 @@ import { tracker } from '../../services/trackingService';
 
 const AiAssistantPage = () => {
     const navigate = useNavigate();
+    const { t } = useTranslation();
     
     // Session state
     const [sessionId, setSessionId] = useState(() => localStorage.getItem('current_chat_session') || null);
     const [sessions, setSessions] = useState([]);
     const [loadingSessions, setLoadingSessions] = useState(false);
     
-    // Chat state
-    const [messages, setMessages] = useState([
-        { 
-            id: 1, 
-            text: "Hello! I am your EstatePro AI. How can I help you today?", 
-            sender: 'ai', 
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isArabic: false
-        }
-    ]);
+    // Chat state - Note: initial message set in useEffect to use t() properly
+    const [messages, setMessages] = useState([]);
 
     const [inputValue, setInputValue] = useState("");
     const [isTyping, setIsTyping] = useState(false);
@@ -34,6 +28,16 @@ const AiAssistantPage = () => {
     // Load sessions on mount
     useEffect(() => {
         loadSessions();
+        // Initialize with greeting message
+        if (messages.length === 0) {
+            setMessages([{
+                id: 1,
+                text: t('aiGreeting'),
+                sender: 'ai',
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                isArabic: false
+            }]);
+        }
     }, []);
 
     // Load session history if sessionId exists
@@ -127,7 +131,7 @@ const AiAssistantPage = () => {
                 }
             }
             
-            const aiMessageText = response.message || response.explanation || "I found some results for you.";
+            const aiMessageText = response.message || response.explanation || t('aiFoundResults');
             const aiData = response.data || [];
             const aiSuggestions = response.suggestions || [];
             const aiTarget = response.target;
@@ -149,7 +153,7 @@ const AiAssistantPage = () => {
         } catch (error) {
             setMessages(prev => [...prev, {
                 id: Date.now() + 1,
-                text: "I apologize, but I'm having trouble connecting to the server right now. Please try again later.",
+                text: t('aiErrorMessage'),
                 sender: 'ai',
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 isArabic: false
@@ -165,7 +169,7 @@ const AiAssistantPage = () => {
         setMessages([
             { 
                 id: Date.now(), 
-                text: "Hello! I am your EstatePro AI. How can I help you today?", 
+                text: t('aiGreeting'), 
                 sender: 'ai', 
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 isArabic: false
@@ -182,7 +186,7 @@ const AiAssistantPage = () => {
 
     const handleDeleteSession = async (e, sessId) => {
         e.stopPropagation();
-        if (!window.confirm("Delete this conversation?")) return;
+        if (!window.confirm(t('deleteConversation'))) return;
         
         try {
             await deleteSession(sessId);
@@ -198,7 +202,7 @@ const AiAssistantPage = () => {
     };
 
     const clearHistory = () => {
-        if (window.confirm("Are you sure you want to start a new chat?")) {
+        if (window.confirm(t('startNewChatConfirm'))) {
             startNewChat();
         }
     };
@@ -231,19 +235,19 @@ const AiAssistantPage = () => {
                         onClick={startNewChat}
                         className="w-full py-4 px-6 bg-primary text-white rounded-2xl font-black flex items-center justify-center gap-3 shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all text-sm uppercase tracking-wider"
                     >
-                        <Plus size={20} /> New Chat
+                        <Plus size={20} /> {t('newChat')}
                     </button>
                 </div>
 
                 <div className="flex-1 overflow-y-auto px-6 py-2 space-y-2 custom-scrollbar">
                     <div className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-4 px-2">
-                        Recent Conversations
+                        {t('recentConversations')}
                     </div>
                     
                     {loadingSessions ? (
-                        <div className="text-center py-4 text-gray-400 text-sm">Loading...</div>
+                        <div className="text-center py-4 text-gray-400 text-sm">{t('loading')}</div>
                     ) : sessions.length === 0 ? (
-                        <div className="text-center py-4 text-gray-400 text-sm">No conversations yet</div>
+                        <div className="text-center py-4 text-gray-400 text-sm">{t('noConversationsYet')}</div>
                     ) : (
                         sessions.map((session) => (
                             <div 
@@ -259,11 +263,11 @@ const AiAssistantPage = () => {
                                     <div className={`text-sm font-bold truncate ${
                                         session.sessionId === sessionId ? 'text-primary' : 'text-gray-600 dark:text-gray-300'
                                     }`}>
-                                        {session.title || 'New Conversation'}
+                                        {session.title || t('newChat')}
                                     </div>
                                     <div className="text-[10px] text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-2">
                                         <MessageSquare size={10} />
-                                        {session.messageCount || 0} messages
+                                        {session.messageCount || 0} {t('messagesCount')}
                                     </div>
                                 </div>
                                 <button
@@ -282,12 +286,12 @@ const AiAssistantPage = () => {
                         onClick={() => navigate('/')} 
                         className="w-full py-4 px-6 flex items-center justify-center gap-3 text-sm font-black text-gray-500 hover:text-primary transition-all bg-gray-100 dark:bg-white/5 rounded-2xl hover:bg-white dark:hover:bg-primary/10 border border-transparent hover:border-primary/10 shadow-sm hover:shadow-md"
                     >
-                        <HomeIcon size={18} /> Back to Website
+                        <HomeIcon size={18} /> {t('backToWebsite')}
                     </button>
                     <div className="flex items-center justify-center gap-4 text-xs text-gray-400 font-bold uppercase tracking-widest opacity-60">
-                         <span>Privacy</span>
+                         <span>{t('privacy')}</span>
                          <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                         <span>Help</span>
+                         <span>{t('help')}</span>
                     </div>
                 </div>
             </div>
@@ -302,15 +306,15 @@ const AiAssistantPage = () => {
                         </div>
                         <div>
                             <div className="flex items-center gap-3">
-                                <h1 className="font-black text-xl md:text-2xl text-textDark dark:text-white tracking-tight">AI Advisor</h1>
-                                <span className="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-tighter rounded-full border border-primary/20">Alpha v1</span>
+                                <h1 className="font-black text-xl md:text-2xl text-textDark dark:text-white tracking-tight">{t('aiAdvisor')}</h1>
+                                <span className="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-black uppercase tracking-tighter rounded-full border border-primary/20">{t('alphaVersion')}</span>
                             </div>
                             <div className="flex items-center gap-2 text-xs text-green-500 font-bold mt-1">
                                 <span className="flex h-2 w-2 relative">
                                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                                     <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                                 </span>
-                                EstatePro Intelligence Active
+                                {t('aiIntelligenceActive')}
                             </div>
                         </div>
                     </div>
@@ -326,7 +330,7 @@ const AiAssistantPage = () => {
                                   <Target size={16} className="text-gray-400" />
                                 )}
                                 <span className="text-xs font-bold text-gray-600 dark:text-gray-300">
-                                  {enableRag ? 'Smart' : 'Exact'}
+                                  {enableRag ? t('smartMode') : t('exactMode')}
                                 </span>
                               </div>
                               <div className="relative">
@@ -347,7 +351,7 @@ const AiAssistantPage = () => {
                             title="New Chat"
                         >
                             <Plus size={20} />
-                            <span className="hidden md:inline text-xs font-black uppercase tracking-widest">New</span>
+                            <span className="hidden md:inline text-xs font-black uppercase tracking-widest">{t('newChat')}</span>
                         </button>
                         <button 
                             onClick={() => navigate('/')} 
@@ -367,11 +371,11 @@ const AiAssistantPage = () => {
                                 <div className="w-24 h-24 bg-primary/5 dark:bg-primary/20 rounded-[40px] flex items-center justify-center mb-8 rotate-3 shadow-inner">
                                     <Sparkles size={48} className="text-primary animate-pulse" />
                                 </div>
-                                <h2 className="text-3xl font-black text-textDark dark:text-white mb-4 tracking-tighter">How can I assist you today?</h2>
-                                <p className="text-gray-500 max-w-md text-sm md:text-base font-medium leading-relaxed">Ask about property prices, investment areas, or let me find the perfect home in Egypt for you.</p>
+                                <h2 className="text-3xl font-black text-textDark dark:text-white mb-4 tracking-tighter">{t('howCanIAssist')}</h2>
+                                <p className="text-gray-500 max-w-md text-sm md:text-base font-medium leading-relaxed">{t('aiAssistDescription')}</p>
                                 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12 w-full max-w-2xl px-4">
-                                     {['Show me villas in New Cairo', 'What are the best investment areas?', 'Units near the AUC', 'Price starting from 3 Million'].map((pref, i) => (
+                                     {[t('suggestVillasNewCairo'), t('suggestInvestmentAreas'), t('suggestUnitsNearAUC'), t('suggestPriceFrom3M')].map((pref, i) => (
                                          <button 
                                             key={i} 
                                             onClick={() => { setInputValue(pref); }}
@@ -420,7 +424,7 @@ const AiAssistantPage = () => {
                                             {msg.suggestions?.length > 0 && (
                                                 <div className="col-span-full pt-8 animate-in fade-in duration-1000 delay-300">
                                                     <div className="flex items-center gap-4 mb-6 px-2">
-                                                        <span className="text-[11px] font-black text-amber-500 uppercase tracking-[0.3em]">Insights & Suggestions</span>
+                                                        <span className="text-[11px] font-black text-amber-500 uppercase tracking-[0.3em]">{t('insightsAndSuggestions')}</span>
                                                         <div className="h-[2px] flex-1 bg-gradient-to-r from-amber-500/30 to-transparent"></div>
                                                     </div>
                                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -450,7 +454,7 @@ const AiAssistantPage = () => {
                                         <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
                                         <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
                                     </div>
-                                    <span className="text-xs md:text-sm text-gray-500 font-black uppercase tracking-[0.1em]">AI analyzes raw data...</span>
+                                    <span className="text-xs md:text-sm text-gray-500 font-black uppercase tracking-[0.1em]">{t('aiAnalyzingData')}</span>
                                 </div>
                             </div>
                         )}
@@ -474,7 +478,7 @@ const AiAssistantPage = () => {
                                     handleSendMessage();
                                 }
                             }}
-                            placeholder="Ask me anything..."
+                            placeholder={t('askMeAnything')}
                             rows="1"
                             className="flex-1 bg-transparent border-none px-6 py-3 text-base md:text-lg focus:outline-none text-textDark dark:text-white placeholder:text-gray-400 font-medium resize-none max-h-[50vh] custom-scrollbar"
                             style={{ minHeight: '44px' }}
@@ -488,7 +492,7 @@ const AiAssistantPage = () => {
                         </button>
                     </form>
                     <p className="text-center mt-6 text-[10px] text-gray-400 uppercase font-black tracking-[0.4em] opacity-30 select-none">
-                        Private & Secure Chat • Powered by EstatePro
+                        {t('privateSecureChat')}
                     </p>
                 </div>
             </div>

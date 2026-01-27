@@ -86,8 +86,8 @@ const Developers = () => {
     // Upload logo if new file selected
     if (logoFile) {
       try {
-        const uploadedFilename = await uploadService.uploadImage(logoFile);
-        finalFormData.logo = uploadedFilename;
+        const result = await uploadService.uploadFile(logoFile);
+        finalFormData.logo = result.url || result; // uploadFile returns {url, fullUrl}
       } catch (error) {
         console.error('Logo upload failed:', error);
         return; // Stop if upload fails
@@ -104,11 +104,7 @@ const Developers = () => {
             await estateService.createDeveloper(finalFormData);
         }
         
-        // Success
-        setLogoFile(null);
-        setLogoPreview(null);
-        handleCloseModal();
-        // Success
+        // Success - cleanup and refresh
         setLogoFile(null);
         setLogoPreview(null);
         handleCloseModal();
