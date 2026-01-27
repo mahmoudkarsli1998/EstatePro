@@ -94,10 +94,10 @@ const AiChats = () => {
         <div>
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold font-heading text-textDark dark:text-white flex items-center gap-2">
-                    <MessageSquare className="text-primary" /> {t('AI Chats')}
+                    <MessageSquare className="text-primary" /> {t('aiChats')}
                 </h1>
                 <div className="flex gap-2">
-                    <Button variant="outline" onClick={loadSessions} size="sm">Refresh</Button>
+                    <Button variant="outline" onClick={loadSessions} size="sm">{t('refresh')}</Button>
                 </div>
             </div>
 
@@ -107,7 +107,7 @@ const AiChats = () => {
                         <Search size={18} className="absolute inset-y-0 start-3 my-auto text-gray-400" />
                         <input 
                         type="text" 
-                        placeholder={t('Search Chats...')}
+                        placeholder={t('searchChats')}
                         className="w-full ps-10 pe-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary/50 text-textDark dark:text-white placeholder-textLight"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
@@ -116,26 +116,26 @@ const AiChats = () => {
                 </div>
 
                 {loading ? (
-                    <div className="p-12 text-center text-gray-400">Loading chats...</div>
+                    <div className="p-12 text-center text-gray-400">{t('loadingChats')}</div>
                 ) : filteredSessions.length === 0 ? (
-                    <div className="p-12 text-center text-gray-400">No chat sessions found.</div>
+                    <div className="p-12 text-center text-gray-400">{t('noChatsFound')}</div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
                                 <tr className="bg-gray-50 dark:bg-white/5 text-textLight dark:text-gray-400 text-sm border-b border-border/20 dark:border-white/10">
-                                    <th className="p-4 font-medium">Topic / Question</th>
-                                    <th className="p-4 font-medium">Lead / User</th>
-                                    <th className="p-4 font-medium text-center">Messages</th>
-                                    <th className="p-4 font-medium">Last Active</th>
-                                    <th className="p-4 font-medium text-end">Action</th>
+                                    <th className="p-4 font-medium">{t('topicQuestion')}</th>
+                                    <th className="p-4 font-medium">{t('leadUser')}</th>
+                                    <th className="p-4 font-medium text-center">{t('messagesCount')}</th>
+                                    <th className="p-4 font-medium">{t('lastActive')}</th>
+                                    <th className="p-4 font-medium text-end">{t('action')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-border/20 dark:divide-white/5">
                                 {filteredSessions.map((session) => (
                                     <tr key={session.sessionId} className="hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group">
                                         <td className="p-4 max-w-xs">
-                                            <div className="font-bold text-textDark dark:text-white truncate" title={session.title}>{session.title || 'Untitled Session'}</div>
+                                            <div className="font-bold text-textDark dark:text-white truncate" title={session.title}>{session.title || t('untitledSession')}</div>
                                             <div className="text-xs text-textLight dark:text-gray-500 truncate">{session.lastMessage}</div>
                                         </td>
                                         <td className="p-4">
@@ -149,7 +149,7 @@ const AiChats = () => {
                                                 </div>
                                             ) : (
                                                  <div className="flex items-center gap-2 text-gray-400">
-                                                    <User size={14} /> <span className="text-sm">Anonymous</span>
+                                                    <User size={14} /> <span className="text-sm">{t('anonymous')}</span>
                                                  </div>
                                             )}
                                         </td>
@@ -178,10 +178,10 @@ const AiChats = () => {
                 
                 {/* Pagination (Simple) */}
                 <div className="p-4 border-t border-border/20 flex justify-between items-center">
-                    <span className="text-sm text-gray-500">Page {page} of {totalPages}</span>
+                    <span className="text-sm text-gray-500">{t('pageOf', { page, total: totalPages })}</span>
                     <div className="flex gap-2">
-                        <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>Prev</Button>
-                        <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>Next</Button>
+                        <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(p => p - 1)}>{t('prev')}</Button>
+                        <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(p => p + 1)}>{t('next')}</Button>
                     </div>
                 </div>
             </div>
@@ -190,12 +190,12 @@ const AiChats = () => {
             <Modal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                title={selectedSession ? `Chat with ${selectedSession.leadName || 'Visitor'}` : 'Chat Details'}
+                title={selectedSession ? t('chatWith', { name: selectedSession.leadName || 'Visitor' }) : t('chatDetails')}
                 maxWidth="max-w-4xl"
             >
                 <div className="h-[60vh] flex flex-col">
                      {detailLoading ? (
-                         <div className="flex-1 flex items-center justify-center">Loading messages...</div>
+                         <div className="flex-1 flex items-center justify-center">{t('loadingMessages')}</div>
                      ) : selectedSession && selectedSession.messages ? (
                          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50 dark:bg-black/20 rounded-lg">
                              {selectedSession.messages.map((msg, idx) => (
@@ -209,12 +209,11 @@ const AiChats = () => {
                                                 <p className="text-sm">{msg.content}</p>
                                             </div>
                                             
-                                            {/* Render Tool Metadata / Outputs */}
-                                            {msg.metadata && msg.metadata.data && msg.metadata.data.length > 0 && (
+                                                {msg.metadata && msg.metadata.data && msg.metadata.data.length > 0 && (
                                                 <div className="text-xs bg-gray-100 dark:bg-white/5 p-2 rounded border border-border/20">
                                                     <div className="font-bold mb-1 opacity-70 flex items-center gap-1 uppercase tracking-wider">
                                                         <Search size={10} />
-                                                        {msg.metadata.target || 'Results'} ({msg.metadata.data.length})
+                                                        {msg.metadata.target || t('results')} ({msg.metadata.data.length})
                                                     </div>
                                                     <div className="flex gap-2 overflow-x-auto pb-2">
                                                         {msg.metadata.data.map((item, i) => (
@@ -227,7 +226,7 @@ const AiChats = () => {
                                                                 </div>
                                                                 {item.priceRange && (
                                                                     <div className="text-[10px] text-green-600 dark:text-green-400">
-                                                                        {item.priceRange.min ? `${(item.priceRange.min / 1000000).toFixed(1)}M` : 'Price on Request'}
+                                                                        {item.priceRange.min ? `${(item.priceRange.min / 1000000).toFixed(1)}M` : t('priceOnRequest')}
                                                                     </div>
                                                                 )}
                                                             </div>
@@ -243,12 +242,12 @@ const AiChats = () => {
                                     </div>
                              ))}
                              {selectedSession.messages.length === 0 && (
-                                 <div className="text-center text-gray-400 italic">No messages recorded</div>
+                                 <div className="text-center text-gray-400 italic">{t('noMessagesRecorded')}</div>
                              )}
                          </div>
                      ) : (
                          <div className="flex-1 flex items-center justify-center text-red-400">
-                             Failed to access chat content. (Access Restricted)
+                             {t('failedToAccessChat')}
                          </div>
                      )}
                 </div>

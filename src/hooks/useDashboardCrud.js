@@ -77,9 +77,11 @@ export const useDashboardCrud = (
     if (e) e.preventDefault();
     
     try {
-      if (editingItem && editingItem.id) {
+      // Handle both 'id' and '_id' for MongoDB compatibility
+      const itemId = editingItem?.id || editingItem?._id;
+      if (editingItem && itemId) {
         if (updater) {
-          await updater(editingItem.id, formData);
+          await updater(itemId, formData);
           await loadItems();
         }
       } else {
@@ -103,7 +105,11 @@ export const useDashboardCrud = (
       try {
         if (deleter) {
           await deleter(id);
-          setItems(prev => prev.filter(item => item.id !== id));
+          // Handle both 'id' and '_id' for MongoDB compatibility
+          setItems(prev => prev.filter(item => {
+            const itemId = item.id || item._id;
+            return itemId !== id;
+          }));
         }
       } catch (error) {
         console.error("Delete failed", error);

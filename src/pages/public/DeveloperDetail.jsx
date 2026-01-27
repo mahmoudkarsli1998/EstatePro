@@ -96,8 +96,8 @@ const DeveloperDetail = () => {
   if (!developer) {
       return (
           <div className="min-h-screen pt-32 container mx-auto px-4 text-center">
-              <h2 className="text-2xl font-bold mb-4">Developer Not Found</h2>
-              <Link to="/developers"><Button variant="primary">Back to Developers</Button></Link>
+              <h2 className="text-2xl font-bold mb-4">{t('developerNotFound')}</h2>
+              <Link to="/developers"><Button variant="primary">{t('backToDevelopers')}</Button></Link>
           </div>
       )
   }

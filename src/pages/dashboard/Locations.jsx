@@ -106,59 +106,49 @@ const Locations = () => {
     );
   };
 
-  // Custom submit using uploadService
+  // Custom submit - upload image to Cloudinary first, then save location
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Build FormData for multipart/form-data request
-      const formDataObj = new FormData();
+      let imageUrl = formData.image || '';
       
-      // Basic Text Fields
-      formDataObj.append('name', formData.name || '');
-      formDataObj.append('city', formData.city || '');
-      formDataObj.append('country', formData.country || '');
-      formDataObj.append('description', formData.description || '');
-      formDataObj.append('slug', formData.slug || (formData.name ? generateSlug(formData.name) : ''));
-      
-      if (formData.lat) formDataObj.append('coordinates[lat]', formData.lat);
-      if (formData.lng) formDataObj.append('coordinates[lng]', formData.lng);
-      
-      // Arrays (Project IDs)
-      // JSON.stringify projectIds so backend can parse it back
-      if (formData.projectIds && formData.projectIds.length > 0) {
-          formDataObj.append('projectIds', JSON.stringify(formData.projectIds));
-      }
-
-      // Image Handling
-      // If a new file is selected, append it as 'image'
+      // If a new file is selected, upload to Cloudinary first
       if (imageFile) {
-          formDataObj.append('image', imageFile); 
-      } else if (formData.image) {
-           // If existing image string (not changed), we might pass it as well if backend expects it, 
-           // BUT backend logic often ignores text in 'image' if looking for file.
-           // However, locationsService.saveLocation (which calls patch/post) needs to send something?
-           // Actually, if we use the backend 'interceptor', it looks for a file.
-           // If we don't send a file, the interceptor does nothing.
-           // BUT LocationsController.update checks: if (file) updateDto.image = file.filename
-           // If we don't send a file, we want to KEEP the old image.
-           // We should NOT send 'image' field if it's just the old string URL, 
-           // unless backend explicitly handles string URL in that field.
-           // Looking at controller: createLocationDto.image = file.filename (IF file exists)
-           // It does NOT seem to overwrite image if file is missing, provided we pass the other fields.
-           // However, if we preserve the 'image' string in the body, it might be safe.
-           // Let's safe-guard: send it only if it's needed or if backend model needs it.
-           // Controller logic: "if (file) ...". It doesn't clear image if file is missing.
-           // So we can skip appending 'image' if it's just a string, OR append it if we want to be safe.
-           // Let's append it to be safe, but creating a FormData key 'image' with string value is fine.
-           // WAIT! The Update DTO might have an image property.
-           formDataObj.append('image', formData.image);
+        try {
+          const uploadResult = await uploadService.uploadFile(imageFile);
+          imageUrl = uploadResult.url || uploadResult.fullUrl || uploadResult;
+          console.log('Image uploaded to Cloudinary:', imageUrl);
+        } catch (uploadError) {
+          console.error('Image upload failed:', uploadError);
+          // Optionally show error to user
+          return;
+        }
       }
+      
+      // Build the payload as a plain object (no FormData needed)
+      const payload = {
+        name: formData.name || '',
+        city: formData.city || '',
+        country: formData.country || '',
+        description: formData.description || '',
+        slug: formData.slug || (formData.name ? generateSlug(formData.name) : ''),
+        image: imageUrl,
+      };
+      
+      // Add optional fields
+      if (formData.lat) payload.lat = parseFloat(formData.lat);
+      if (formData.lng) payload.lng = parseFloat(formData.lng);
+      if (formData.projectIds && formData.projectIds.length > 0) {
+        payload.projectIds = formData.projectIds;
+      }
+      
+      console.log('Saving location with payload:', payload);
       
       // Save (create or update)
       if (editingItem) {
-        await locationsService.updateLocation(editingItem._id || editingItem.id, formDataObj);
+        await locationsService.updateLocation(editingItem._id || editingItem.id, payload);
       } else {
-        await locationsService.createLocation(formDataObj);
+        await locationsService.createLocation(payload);
       }
       
       handleCloseModal();

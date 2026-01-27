@@ -45,7 +45,7 @@ const FloatingChatWidget = () => {
         return [
             { 
                 id: 1, 
-                text: "Hello! I am your EstatePro AI. How can I help you today?", 
+                text: t('aiGreeting'), 
                 sender: 'ai', 
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 isArabic: false
@@ -83,7 +83,7 @@ const FloatingChatWidget = () => {
         const initialMsg = [
             { 
                 id: Date.now(), 
-                text: "Hello! I am your EstatePro AI. How can I help you today?", 
+                text: t('aiGreeting'), 
                 sender: 'ai', 
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 isArabic: false
@@ -93,7 +93,7 @@ const FloatingChatWidget = () => {
     };
 
     const clearHistory = () => {
-        if (window.confirm("Are you sure you want to start a new chat?")) {
+        if (window.confirm(t('startNewChatConfirm'))) {
             startNewChat();
         }
     };
@@ -134,7 +134,7 @@ const FloatingChatWidget = () => {
             setMessages(loadedMessages.length > 0 ? loadedMessages : [
                 { 
                     id: Date.now(), 
-                    text: "Hello! I am your EstatePro AI. How can I help you today?", 
+                    text: t('aiGreeting'), 
                     sender: 'ai', 
                     time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                     isArabic: false
@@ -150,7 +150,7 @@ const FloatingChatWidget = () => {
 
     // Delete a session
     const handleDeleteSession = async (id) => {
-        if (!window.confirm('Delete this conversation?')) return;
+        if (!window.confirm(t('deleteConversation'))) return;
         try {
             await deleteSession(id);
             loadSessions();
@@ -219,7 +219,7 @@ const FloatingChatWidget = () => {
                 localStorage.setItem('current_chat_session', response.sessionId);
             }
             
-            const aiMessageText = response.message || response.explanation || "I found some results for you.";
+            const aiMessageText = response.message || response.explanation || t('aiFoundResults');
             const aiData = response.data || [];
             const aiSuggestions = response.suggestions || [];
             const aiTarget = response.target;
@@ -238,7 +238,7 @@ const FloatingChatWidget = () => {
         } catch (error) {
             setMessages(prev => [...prev, {
                 id: Date.now() + 1,
-                text: "I apologize, but I'm having trouble connecting to the server right now. Please try again later.",
+                text: t('aiErrorMessage'),
                 sender: 'ai',
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 isArabic: false
@@ -317,34 +317,34 @@ const FloatingChatWidget = () => {
                             </div>
                             <div>
                                 <h4 className="font-bold text-sm text-textDark dark:text-white">
-                                    {leadInfo?.name ? `مرحباً ${leadInfo.name.split(' ')[0]} 👋` : 'AI Assistant'}
+                                    {leadInfo?.name ? `${t('welcomeToEstatePro').split(' ')[0]} ${leadInfo.name.split(' ')[0]} 👋` : t('aiAssistant')}
                                 </h4>
                                 <button 
                                     onClick={resetLeadForm}
                                     className="text-[10px] text-primary hover:underline font-medium"
                                 >
-                                    تغيير البيانات
+                                    {t('changeDetails')}
                                 </button>
                             </div>
                         </div>
                         <div className="flex items-center gap-2">
                             <button 
                                 onClick={() => setShowSidebar(!showSidebar)} 
-                                title="Chat History"
+                                title={t('chatHistory')}
                                 className={`p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors ${showSidebar ? 'text-primary bg-gray-100 dark:bg-gray-800' : 'text-gray-400'}`}
                             >
                                 <Menu size={18} />
                             </button>
                             <button 
                                 onClick={clearHistory} 
-                                title="New Chat"
+                                title={t('newChat')}
                                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors text-gray-400 hover:text-green-500"
                             >
                                 <RotateCcw size={18} />
                             </button>
                             <button 
                                 onClick={() => navigate('/ai-assistant')} 
-                                title="Full Screen"
+                                title={t('fullScreen')}
                                 className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors text-gray-400 hover:text-primary"
                             >
                                 <Maximize2 size={18} />
@@ -405,7 +405,7 @@ const FloatingChatWidget = () => {
                                         {msg.suggestions?.length > 0 && (
                                             <div className="pt-2">
                                                 <div className="flex items-center gap-2 mb-2 px-1">
-                                                    <span className="text-[10px] font-extrabold text-amber-600 dark:text-amber-500 uppercase tracking-tighter">Recommended Alternatives</span>
+                                                    <span className="text-[10px] font-extrabold text-amber-600 dark:text-amber-500 uppercase tracking-tighter">{t('recommendedAlternatives')}</span>
                                                     <div className="h-px flex-1 bg-amber-200/50 dark:bg-amber-900/30"></div>
                                                 </div>
                                                 <div className="space-y-2">
@@ -454,7 +454,7 @@ const FloatingChatWidget = () => {
                                         handleSendMessage();
                                     }
                                 }}
-                                placeholder="Ask me anything..."
+                                placeholder={t('askMeAnything')}
                                 rows="1"
                                 className="flex-1 bg-transparent border-none px-4 py-2 text-sm focus:outline-none text-textDark dark:text-white placeholder:text-gray-400 font-medium resize-none max-h-32 custom-scrollbar"
                                 style={{ minHeight: '40px' }}
@@ -487,7 +487,7 @@ const FloatingChatWidget = () => {
                         <>
                             <Sparkles size={28} className="animate-pulse" />
                             <span className="absolute right-full mr-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xl border border-border/10 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                                Ask AI Assistant
+                                {t('askAiAssistant')}
                             </span>
                         </>
                     )}
