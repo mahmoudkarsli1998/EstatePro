@@ -8,24 +8,28 @@ import Modal from '../../components/shared/Modal';
 import Badge from '../../components/shared/Badge';
 import EntityImage from '../../components/shared/EntityImage';
 import { estateService } from '../../services/estateService';
+import { crmService } from '../../services/crmService';
 import { useDashboardCrud } from '../../hooks/useDashboardCrud';
 import { useCurrency } from '../../context/CurrencyContext';
 import { useAuth } from '../../hooks/useAuth';
 import { useNotifications } from '../../context/NotificationsContext';
+import { commonService } from '../../services/commonService';
 import UnitStatusControl from '../../components/dashboard/UnitStatusControl';
 
 const Units = () => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const { user } = useAuth();
     const { format, formatCompact } = useCurrency();
     const { createNotification } = useNotifications();
     const [viewMode, setViewMode] = useState('list');
     // Secure Fetcher to enforce Draft Privacy
     const [projects, setProjects] = useState([]);
+    const [cities, setCities] = useState([]);
 
-    // Load Projects on Mount
+    // Load Initial Data
     useEffect(() => {
-        estateService.getProjects().then(setProjects);
+        estateService.getProjects().then(setProjects).catch(console.error);
+        commonService.getCities().then(setCities).catch(console.error);
     }, []);
 
     const secureGetUnits = React.useCallback(async () => {
@@ -41,6 +45,13 @@ const Units = () => {
         const id = typeof projectId === 'object' ? projectId?._id || projectId?.id : projectId;
         const proj = projects.find(p => (p.id === id || p._id === id));
         return proj ? proj.name : '';
+    };
+
+    const getCityName = (slug) => {
+        if (!slug || !cities.length) return slug || '';
+        const city = cities.find(c => c.slug === slug);
+        if (!city) return slug;
+        return i18n.language === 'ar' ? city.nameAr : city.nameEn;
     };
 
     const {
@@ -222,12 +233,17 @@ const Units = () => {
 
         // Persist to API
         await estateService.updateUnit(unit.id, { isFavorite: newStatus });
+        createNotification({
+            title: newStatus ? t('addedToFavorites') : t('removedFromFavorites'),
+            type: 'info',
+            duration: 3000
+        });
     };
 
     const handleUnitUpdate = async (result) => {
         if (result?.deleted) {
-            // If deleted, remove from local state immediately
-            setAllItems(prev => prev.filter(u => String(u.id) !== String(id) && String(u._id) !== String(id)));
+            const idToDelete = result.id || result._id;
+            setAllItems(prev => prev.filter(u => String(u.id) !== String(idToDelete) && String(u._id) !== String(idToDelete)));
             return;
         }
         // Otherwise simple refresh by re-fetching all items
@@ -238,7 +254,10 @@ const Units = () => {
     return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold font-heading text-textDark dark:text-white">{t('units', 'Units Management')}</h1>
+        <h1 className="text-2xl font-bold font-heading text-textDark dark:text-white flex items-center gap-2">
+            <Home className="text-primary" size={28} />
+            {t('units', 'Units Management')}
+        </h1>
         <div className="flex gap-3">
            <Button variant="outline" onClick={() => window.print()}>
               {t('print')}
@@ -433,10 +452,13 @@ const Units = () => {
                   {/* Details: Price + Location + Features */}
                   <td className="px-4 py-4 align-top w-[250px]">
                     <div className="flex flex-col items-end gap-2 text-end">
-                        <div className="text-primary font-bold text-lg">{format(unit.price || 0)}</div>
+                        <div className="text-primary font-bold text-lg flex items-center gap-1">
+                            <DollarSign size={16} />
+                            {format(unit.price || 0)}
+                        </div>
                         <div className="text-sm text-textDark dark:text-gray-300 capitalize">{t(unit.type)}</div>
                         <div className="flex items-center gap-1 text-xs text-textLight">
-                             <span>{unit.city || 'Cairo'}</span>
+                             <span>{getCityName(unit.city) || 'Cairo'}</span>
                              <MapPin size={12} />
                         </div>
                         <div className="flex items-center gap-2 mt-2 text-gray-400">
@@ -449,6 +471,11 @@ const Units = () => {
                              <span className="flex items-center gap-1 text-xs" title="Area">
                                 {unit.area_m2}m² <Maximize size={12} />
                             </span>
+                            {unit.features?.parking && (
+                               <span className="flex items-center gap-1 text-xs text-blue-400" title="Parking">
+                                   <Car size={12} />
+                               </span>
+                            )}
                         </div>
                     </div>
                   </td>
@@ -519,13 +546,21 @@ const Units = () => {
                          <Star size={18} fill={unit.isFavorite ? "currentColor" : "none"} />
                       </button>
                       
-                      {(user?.role !== 'sales' || unit.createdById === user.id) && (
+                       <button 
+                          className="p-2 text-gray-400 hover:text-primary transition-colors"
+                          onClick={() => handleOpenModal(unit)}
+                          title={t('quickEdit', 'Quick Edit')}
+                       >
+                          <Edit size={18} />
+                       </button>
+
+                       {(user?.role !== 'sales' || unit.createdById === user.id) && (
                         <button 
                           className="p-2 text-gray-400 hover:text-blue-500 transition-colors"
                           onClick={() => navigate(`/dashboard/units/edit/${unit.id || unit._id}`)}
-                          title={t('edit')}
+                          title={t('fullEdit', 'Full Edit')}
                         >
-                          <Edit size={18} />
+                          <Layers size={18} />
                         </button>
                       )}
                       <button 
@@ -578,17 +613,23 @@ const Units = () => {
                                                 <div className="font-bold text-textDark dark:text-white truncate max-w-[150px]">{unit.number}</div>
                                                 <div className="font-bold text-primary text-sm">{formatCompact(unit.price)}</div>
                                             </div>
-                                            <div className="text-xs text-textLight flex items-center gap-1 mb-2">
-                                                <MapPin size={10} /> {unit.city}
-                                            </div>
+                                             <div className="text-xs text-textLight flex items-center gap-1 mb-2">
+                                                <MapPin size={10} /> {getCityName(unit.city)}
+                                             </div>
                                             <div className="flex justify-between items-center text-xs text-gray-400 border-t border-border/10 pt-2 mt-2 mb-3">
                                                 <div className="flex gap-2">
                                                     <span className="flex items-center gap-0.5"><Bed size={10} /> {unit.features?.bedrooms}</span>
                                                     <span className="flex items-center gap-0.5"><Maximize size={10} /> {unit.area_m2}m²</span>
+                                                    {unit.features?.parking && (
+                                                       <span className="flex items-center gap-0.5 text-blue-400" title="Parking">
+                                                           <Car size={10} />
+                                                       </span>
+                                                    )}
                                                 </div>
                                                 <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity absolute top-2 right-2 bg-black/50 backdrop-blur rounded p-1">
+                                                    <button onClick={(e) => { e.stopPropagation(); handleOpenModal(unit); }} className="text-white hover:text-primary" title={t('quickEdit')}><Edit size={12} /></button>
                                                     {(user?.role !== 'sales' || unit.createdById === user.id) && (
-                                                      <button onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/units/edit/${unit.id || unit._id}`); }} className="text-white hover:text-blue-300"><Edit size={12} /></button>
+                                                      <button onClick={(e) => { e.stopPropagation(); navigate(`/dashboard/units/edit/${unit.id || unit._id}`); }} className="text-white hover:text-blue-300" title={t('fullEdit')}><Layers size={12} /></button>
                                                     )}
                                                 </div>
                                             </div>
@@ -651,6 +692,93 @@ const Units = () => {
             </div>
         </div>
       </div>
+        {/* Quick Edit Modal */}
+        <Modal 
+            isOpen={isModalOpen} 
+            onClose={handleCloseModal} 
+            title={editingItem ? `${t('editUnit')}: ${formData.number || t('unit')}` : t('addNewUnit')}
+        >
+            <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                    <Input 
+                        label={t('unitNumber')} 
+                        name="number" 
+                        value={formData.number} 
+                        onChange={handleInputChange} 
+                        required 
+                    />
+                    <Input 
+                        label={t('price')} 
+                        name="price" 
+                        type="number" 
+                        value={formData.price} 
+                        onChange={handleInputChange} 
+                        required 
+                    />
+                </div>
+                
+                <div>
+                   <label className="block text-sm font-medium text-textLight dark:text-gray-400 mb-1">{t('status')}</label>
+                   <select 
+                     name="status"
+                     value={formData.status}
+                     onChange={handleInputChange}
+                     className="w-full px-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 text-textDark dark:text-white outline-none focus:border-primary"
+                   >
+                     <option value="available">{t('available')}</option>
+                     <option value="sold">{t('sold')}</option>
+                     <option value="reserved">{t('reserved')}</option>
+                     <option value="rented">{t('rented')}</option>
+                   </select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                    <div>
+                        <label className="block text-sm font-medium text-textLight dark:text-gray-400 mb-1">{t('phase')}</label>
+                        <select 
+                            name="phaseId"
+                            value={formData.phaseId}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 text-textDark dark:text-white outline-none focus:border-primary"
+                        >
+                            <option value="">{t('selectPhase')}</option>
+                            {phases.map(p => (
+                                <option key={p.id || p._id} value={p.id || p._id}>{p.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-textLight dark:text-gray-400 mb-1">{t('block')}</label>
+                        <select 
+                            name="blockId"
+                            value={formData.blockId}
+                            onChange={handleInputChange}
+                            className="w-full px-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 text-textDark dark:text-white outline-none focus:border-primary"
+                        >
+                            <option value="">{t('selectBlock')}</option>
+                            {blocks.map(b => (
+                                <option key={b.id || b._id} value={b.id || b._id}>{b.name}</option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                <div className="flex justify-end gap-3 pt-4 border-t border-border/10">
+                    {editingItem && (
+                        <Button 
+                            variant="ghost" 
+                            type="button" 
+                            onClick={() => setFormData(editingItem)}
+                            title={t('resetToOriginal')}
+                        >
+                            {t('reset')}
+                        </Button>
+                    )}
+                    <Button variant="ghost" type="button" onClick={handleCloseModal}>{t('cancel')}</Button>
+                    <Button type="submit" loading={loading}>{t('saveChanges')}</Button>
+                </div>
+            </form>
+        </Modal>
     </div>
   );
 };

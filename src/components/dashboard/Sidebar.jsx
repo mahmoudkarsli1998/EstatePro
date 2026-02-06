@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Building, Home, Users, UserCheck, FileText, LogOut, Briefcase, Calendar, BarChart2, X, Shield, MapPin, MessageSquare } from 'lucide-react';
+import { LayoutDashboard, Building, Home, Users, UserCheck, FileText, LogOut, Briefcase, Calendar, BarChart2, X, Shield, MapPin, Map, MessageSquare } from 'lucide-react';
 
 import { useAuth } from '../../hooks/useAuth';
 
@@ -21,6 +21,7 @@ const Sidebar = ({ isOpen, onClose }) => {
     // Admin/Manager only
     { name: 'Projects', path: '/dashboard/projects', icon: Building, roles: ['admin', 'manager'] },
     { name: 'Locations', path: '/dashboard/locations', icon: MapPin, roles: ['admin', 'manager'] },
+    { name: 'Cities', path: '/dashboard/cities', icon: Map, roles: ['admin', 'manager'] },
     { name: 'Leads', path: '/dashboard/leads', icon: Users, roles: ['admin', 'manager', 'sales'] },
     { name: 'AI Chats', path: '/dashboard/ai-chats', icon: MessageSquare, roles: ['admin', 'manager', 'sales'] },
     { name: 'Developers', path: '/dashboard/developers', icon: Briefcase, roles: ['admin', 'manager'] },
