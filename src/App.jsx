@@ -27,6 +27,7 @@ const AddUnit = React.lazy(() => import('./pages/dashboard/AddUnit'));
 const Leads = React.lazy(() => import('./pages/dashboard/Leads'));
 const Users = React.lazy(() => import('./pages/dashboard/Users'));
 const DashboardLocations = React.lazy(() => import('./pages/dashboard/Locations'));
+const Cities = React.lazy(() => import('./pages/dashboard/Cities'));
 const Developers = React.lazy(() => import('./pages/dashboard/Developers'));
 const Managers = React.lazy(() => import('./pages/dashboard/Managers'));
 const Admins = React.lazy(() => import('./pages/dashboard/Admins'));
@@ -115,6 +116,7 @@ const AnimatedRoutes = () => {
             <Route element={<RequireAuth allowedRoles={['admin', 'manager']}><Outlet /></RequireAuth>}>
               <Route path="projects" element={<Projects />} />
               <Route path="locations" element={<DashboardLocations />} />
+              <Route path="cities" element={<Cities />} />
               <Route path="users" element={<Users />} />
               <Route path="managers" element={<Managers />} />
               <Route path="admins" element={<Admins />} />

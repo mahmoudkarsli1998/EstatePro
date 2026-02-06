@@ -59,7 +59,9 @@ const ProjectCard = ({ project }) => {
           <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/10">
             <div className="text-center p-2 rounded-lg bg-background/50 dark:bg-white/5 border border-border/10">
               <span className="block text-xs text-textLight uppercase tracking-wider mb-1">Available</span>
-              <span className="font-bold text-textDark dark:text-white text-lg">{project.stats?.available ?? '-'} <span className="text-xs font-normal text-textLight">Units</span></span>
+              <span className="font-bold text-textDark dark:text-white text-lg">
+                {project.stats?.available ?? project.stats?.totalUnits ?? '-'} <span className="text-xs font-normal text-textLight">Units</span>
+              </span>
             </div>
             <div className="text-center p-2 rounded-lg bg-background/50 dark:bg-white/5 border border-border/10">
               <span className="block text-xs text-textLight uppercase tracking-wider mb-1">Delivery</span>
@@ -75,13 +77,52 @@ const ProjectCard = ({ project }) => {
 const FeaturedProjects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [lastUpdate, setLastUpdate] = useState(Date.now());
   const containerRef = useStaggerList({ selector: '.stagger-item', delay: 0.2, dependencies: [loading, projects] });
 
-  useEffect(() => {
-    estateService.getProjects().then(data => {
+  const fetchProjects = async () => {
+    try {
+      console.log('DEBUG: FeaturedProjects - Fetching fresh project data...');
+      const data = await estateService.getProjects();
+      console.log('DEBUG: FeaturedProjects - Projects data:', data);
+      
+      // Log the stats for each project
+      data.forEach((project, index) => {
+        console.log(`DEBUG: FeaturedProjects - Project ${index + 1} "${project.name}" stats:`, project.stats);
+      });
+      
       setProjects(data.slice(0, 6));
       setLoading(false);
-    });
+    } catch (err) {
+      console.error('DEBUG: FeaturedProjects - Error fetching projects:', err);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  // Add a refresh mechanism that checks for updates every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      console.log('DEBUG: FeaturedProjects - Checking for project updates...');
+      fetchProjects();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Also add a manual refresh function that can be called from outside
+  useEffect(() => {
+    // Listen for custom refresh event
+    const handleRefresh = () => {
+      console.log('DEBUG: FeaturedProjects - Manual refresh triggered');
+      fetchProjects();
+    };
+
+    window.addEventListener('refreshProjects', handleRefresh);
+    return () => window.removeEventListener('refreshProjects', handleRefresh);
   }, []);
 
   return (

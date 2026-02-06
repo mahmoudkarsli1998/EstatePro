@@ -58,33 +58,40 @@ const AddUnit = () => {
   useEffect(() => {
     if (isEditMode) {
       setLoading(true);
-      estateService.getUnits().then(units => {
-        const unit = units.find(u => String(u.id) === String(id) || String(u._id) === String(id));
+      estateService.getUnitById(id).then(unit => {
         if (unit) {
-          console.log('EDIT UNIT DATA:', unit); // Debugging Contact Info
+          console.log('EDIT UNIT DATA:', unit);
 
           // Resolve IDs robustly
-          const pId = unit.projectId || (typeof unit.project === 'string' ? unit.project : unit.project?.id || unit.project?._id) || '';
-          const phId = unit.phaseId || (typeof unit.phase === 'string' ? unit.phase : unit.phase?.id || unit.phase?._id) || '';
-          const blkId = unit.blockId || (typeof unit.block === 'string' ? unit.block : unit.block?.id || unit.block?._id) || '';
+          const pId = unit.projectId || (typeof unit.project === 'string' ? unit.project : unit.project?.id || unit.project?._id || unit.project) || '';
+          const phId = unit.phaseId || '';
+          const blkId = unit.blockId || (typeof unit.block === 'string' ? unit.block : unit.block?.id || unit.block?._id || unit.block) || '';
 
           // Pre-fetch phases and blocks if project exists
-          if (pId) {
+          if (pId && pId !== '0') {
             Promise.all([
                 estateService.getProjectPhases(pId),
                 estateService.getProjectBlocks(pId)
             ]).then(([phasesData, blocksData]) => {
                 setPhases(phasesData || []);
                 setBlocks(blocksData || []);
-            });
+            }).catch(e => console.error("Error fetching related items:", e));
           }
 
-          // Parse private notes safely
+          // Parse private notes
           let parsedNotes = [];
           if (Array.isArray(unit.privateNotes)) {
               parsedNotes = unit.privateNotes;
           } else if (typeof unit.privateNotes === 'string') {
-              try { parsedNotes = JSON.parse(unit.privateNotes); } catch (e) { parsedNotes = [unit.privateNotes]; }
+              try { 
+                  if (unit.privateNotes.startsWith('[') || unit.privateNotes.startsWith('{')) {
+                      parsedNotes = JSON.parse(unit.privateNotes);
+                  } else {
+                      parsedNotes = unit.privateNotes.split('\n').filter(n => n.trim());
+                  }
+              } catch (e) { 
+                  parsedNotes = unit.privateNotes ? [unit.privateNotes] : []; 
+              }
           }
 
           setFormData({
@@ -94,17 +101,17 @@ const AddUnit = () => {
              targetAudience: unit.targetAudience || 'family',
              category: unit.category || 'sale',
              status: unit.status || 'available',
-             occupants: unit.occupants || unit.features?.bedrooms || '',
-             bathrooms: unit.features?.bathrooms || '',
+             occupants: unit.features?.bedrooms || unit.occupants || '',
+             bathrooms: unit.features?.bathrooms || unit.bathrooms || '',
              floor: unit.floor || '',
              view: unit.features?.view || unit.view || '',
-             parking: unit.features?.parking ?? false,
-             furnished: unit.features?.furnished ?? false,
+             parking: !!unit.features?.parking,
+             furnished: !!unit.features?.furnished,
              buildingAge: unit.buildingAge || '',
-             area: unit.area_m2 || '',
-             isSimilar: unit.isSimilar || false,
+             area: unit.area_m2 || unit.area || '',
+             price: unit.price || '',
+             isSimilar: !!unit.isSimilar,
              
-             // Contact Info - Try multiple sources
              contactFamilyName: unit.contactFamilyName || unit.owner?.lastName || unit.owner?.familyName || unit.contact?.familyName || '',
              contactFirstName: unit.contactFirstName || unit.owner?.firstName || unit.contact?.firstName || '',
              contactServicesCount: unit.contactServicesCount || unit.servicesCount || '',
@@ -117,16 +124,15 @@ const AddUnit = () => {
              
              installationType: unit.installationType || 'cash',
              annualInstallment: unit.annualInstallment || '',
-             price: unit.price || '',
              
              address: unit.address || '',
              addressAr: unit.addressAr || unit.address || '',
              addressEn: unit.addressEn || unit.address || '',
              city: unit.city || 'cairo',
-             latitude: unit.latitude || '30.0444', 
-             longitude: unit.longitude || '31.2357',
+             latitude: unit.coordinates?.latitude || unit.latitude || 30.0444,
+             longitude: unit.coordinates?.longitude || unit.longitude || 31.2357,
              
-             images: unit.images || [],
+             images: Array.isArray(unit.images) ? unit.images : [],
              descriptionAr: unit.descriptionAr || '',
              descriptionEn: unit.descriptionEn || '',
              
@@ -134,7 +140,6 @@ const AddUnit = () => {
              finalContactWhatsapp: unit.finalContactWhatsapp || '',
              finalContactPhone: unit.finalContactPhone || '',
              finalContactEmail: unit.finalContactEmail || '',
-             
              
              amenities: (unit.features?.amenities || unit.amenities || []).map(a => typeof a === 'object' ? a.name || a.value || '' : a).filter(Boolean),
              nearbyFacilities: unit.features?.nearbyFacilities || [],
@@ -145,12 +150,14 @@ const AddUnit = () => {
              phaseId: phId,
              blockId: blkId,
              agentId: unit.agentId || '',
-             isFavorite: unit.isFavorite || false,
+             isFavorite: !!unit.isFavorite,
              privateNotes: parsedNotes
           });
         }
-        setLoading(false);
-      });
+      }).catch(err => {
+         console.error("Failed to load unit:", err);
+         toast.error("Could not load unit details");
+      }).finally(() => setLoading(false));
     }
   }, [id, isEditMode]);
   
@@ -481,7 +488,7 @@ const AddUnit = () => {
            bedrooms: parseInt(formData.occupants) || 0,
            bathrooms: parseInt(formData.bathrooms) || 0
         },
-        privateNotes: formData.privateNotes || []
+        privateNotes: formData.privateNotes || ''
       };
       
       console.log("Saving unit payload:", apiData); // Debug log
@@ -939,7 +946,7 @@ const AddUnit = () => {
                      <LocationPicker 
                         lat={formData.latitude} 
                         lng={formData.longitude} 
-                        selectedCity={cities.find(c => c.id === parseInt(formData.city))?.nameEn || formData.city}
+                        selectedCity={cities.find(c => c.slug === formData.city || c._id === formData.city)?.nameEn || formData.city}
                         onLocationSelect={(lat, lng) => {
                             setFormData(prev => ({
                                 ...prev,

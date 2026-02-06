@@ -89,6 +89,19 @@ const Projects = () => {
     }
   }, [location.state, loading]);
 
+  const getDeveloperName = (devId) => {
+    const id = typeof devId === 'object' ? devId?._id || devId?.id : devId;
+    const dev = developers.find(d => (d.id === id || d._id === id));
+    return dev ? dev.name : 'Unknown';
+  };
+
+  const getCityName = (slug) => {
+    if (!slug || !cities.length) return slug || '';
+    const city = cities.find(c => c.slug === slug);
+    if (!city) return slug;
+    return i18n.language === 'ar' ? city.nameAr : city.nameEn;
+  };
+
   const [activeTab, setActiveTab] = useState('details');
   const [pendingUploads, setPendingUploads] = useState([]);
 
@@ -187,19 +200,21 @@ const Projects = () => {
 
   // Move Stepper Logic here to be available for Block Handling
   const [currentStep, setCurrentStep] = useState(1);
-  // Always show all steps including Phases and Blocks
+  // Always show all steps including Phases, Blocks and Units Assignment
   const steps = [
     { id: 1, title: t('basicInfo'), icon: Home },
     { id: 2, title: t('location'), icon: MapPin },
     { id: 3, title: t('details'), icon: List },
     { id: 4, title: t('media'), icon: Maximize },
     { id: 5, title: t('phases'), icon: Layers },
-    { id: 6, title: t('blocks', 'Blocks'), icon: Box }
+    { id: 6, title: t('blocks', 'Blocks'), icon: Box },
+    { id: 7, title: t('units', 'Assign Units'), icon: Home }
   ];
 
-  // Pending phases/blocks for CREATE mode (stored locally before project exists)
+  // Pending phases/blocks/units for CREATE mode (stored locally before project exists)
   const [pendingPhases, setPendingPhases] = useState([]);
   const [pendingBlocks, setPendingBlocks] = useState([]);
+  const [pendingUnits, setPendingUnits] = useState([]);
 
   // Reset step and pending state when modal opens/closes
   useEffect(() => {
@@ -209,6 +224,7 @@ const Projects = () => {
       if (!editingItem) {
         setPendingPhases([]);
         setPendingBlocks([]);
+        setPendingUnits([]);
         setPendingUploads([]);
       }
     }
@@ -230,6 +246,11 @@ const Projects = () => {
   const [newBlockName, setNewBlockName] = useState('');
   const [newBlockPhase, setNewBlockPhase] = useState('');
 
+  // Unit Assignment Handling
+  const [availableUnits, setAvailableUnits] = useState([]);
+  const [selectedUnits, setSelectedUnits] = useState([]);
+  const [showUnitSelector, setShowUnitSelector] = useState(false);
+
   // Fetch blocks when entering the modal or when blocks step is active
   useEffect(() => {
     if (editingItem && isModalOpen) {
@@ -237,6 +258,62 @@ const Projects = () => {
        estateService.getProjectBlocks(editingItem.id).then(res => setProjectBlocks(res || [])).catch(console.error);
     }
   }, [editingItem, isModalOpen, currentStep]);
+
+  // Fetch available units when entering units step
+  useEffect(() => {
+    if (currentStep === 7 && isModalOpen) {
+      console.log('DEBUG: Entering units step. Current editingItem:', editingItem);
+      console.log('DEBUG: editingItem keys:', editingItem ? Object.keys(editingItem) : 'null');
+      
+      // Update project stats first to ensure they're current
+      if (editingItem?._id) {
+        updateProjectStats(editingItem._id);
+      }
+      
+      // Fetch units that are not assigned to any project OR are assigned to this project (for edit mode)
+      estateService.getUnits().then(units => {
+        console.log('DEBUG: All units fetched:', units);
+        console.log('DEBUG: Editing project ID:', editingItem?.id);
+        console.log('DEBUG: Editing project _id:', editingItem?._id);
+        
+        // Log each unit's project assignment
+        units.forEach(unit => {
+          console.log(`DEBUG: Unit "${unit.number || unit.titleEn}" - project:`, unit.project, 'projectId:', unit.projectId);
+        });
+        
+        let availableUnitsForSelection;
+        
+        if (editingItem?.id || editingItem?._id) {
+          const projectId = editingItem?.id || editingItem?._id;
+          console.log('DEBUG: Using project ID:', projectId);
+          
+          // EDIT MODE: Show unassigned units + units already assigned to this project
+          availableUnitsForSelection = units.filter(u => 
+            (!u.project && !u.projectId) || 
+            (u.project === projectId || u.projectId === projectId || u.project?._id === projectId || u.project?.id === projectId)
+          );
+          
+          console.log('DEBUG: Available units for selection:', availableUnitsForSelection);
+          
+          // Pre-populate pending units with units already assigned to this project
+          const currentlyAssignedUnits = units.filter(u => 
+            u.project === projectId || 
+            u.projectId === projectId || 
+            u.project?._id === projectId || 
+            u.project?.id === projectId
+          );
+          console.log('DEBUG: Currently assigned units:', currentlyAssignedUnits);
+          setPendingUnits(currentlyAssignedUnits);
+        } else {
+          // CREATE MODE: Only show unassigned units
+          availableUnitsForSelection = units.filter(u => !u.project && !u.projectId);
+          console.log('DEBUG: CREATE MODE - Available units:', availableUnitsForSelection);
+        }
+        
+        setAvailableUnits(availableUnitsForSelection);
+      }).catch(console.error);
+    }
+  }, [currentStep, isModalOpen, editingItem?.id, editingItem?._id]);
 
   const handleAddBlock = async () => {
     if (!newBlockName) return;
@@ -287,6 +364,169 @@ const Projects = () => {
     } else {
       // CREATE MODE: Remove from local state
       setPendingBlocks(prev => prev.filter(b => b.id !== blockId));
+    }
+  };
+
+  // Unit Assignment Handlers
+  const handleUnitSelection = (unit) => {
+    setSelectedUnits(prev => {
+      const isSelected = prev.some(u => u.id === unit.id || u._id === unit.id);
+      if (isSelected) {
+        return prev.filter(u => u.id !== unit.id && u._id !== unit.id);
+      } else {
+        return [...prev, unit];
+      }
+    });
+  };
+
+  const handleAssignUnits = () => {
+    if (selectedUnits.length === 0) {
+      toast.warning("Please select at least one unit to assign");
+      return;
+    }
+    
+    if (editingItem?.id) {
+      // EDIT MODE: Handle both assignment and unassignment
+      selectedUnits.forEach(async (unit) => {
+        try {
+          const isCurrentlyAssigned = unit.project === editingItem.id || 
+                                     unit.projectId === editingItem.id || 
+                                     unit.project?._id === editingItem.id || 
+                                     unit.project?.id === editingItem.id;
+          
+          if (isCurrentlyAssigned) {
+            // Unit is already assigned to this project - keep it in pending
+            // No action needed
+          } else {
+            // Assign new unit to this project
+            await estateService.updateUnit(unit.id || unit._id, { 
+              projectId: editingItem.id,
+              project: editingItem.id 
+            });
+          }
+        } catch(err) {
+          console.error("Failed to assign unit:", err);
+        }
+      });
+      
+      // Update pending units to reflect the new state
+      setPendingUnits(prev => {
+        const newPending = [...prev];
+        selectedUnits.forEach(unit => {
+          const isAlreadyInPending = newPending.some(u => u.id === unit.id || u._id === unit.id);
+          if (!isAlreadyInPending) {
+            newPending.push(unit);
+          }
+        });
+        return newPending;
+      });
+      
+      // Force project stats update
+      updateProjectStats(editingItem.id || editingItem._id);
+      
+      toast.success(`Updated unit assignments for project`);
+      setSelectedUnits([]);
+    } else {
+      // CREATE MODE: Store units for assignment after project creation
+      setPendingUnits(prev => [...prev, ...selectedUnits]);
+      toast.success(`Added ${selectedUnits.length} units for assignment`);
+      setSelectedUnits([]);
+    }
+  };
+
+  // Function to update project stats
+  const updateProjectStats = async (projectId) => {
+    try {
+      console.log('DEBUG: Updating project stats for:', projectId);
+      
+      // Get all units for this project
+      const projectUnits = await estateService.getUnits({ projectId });
+      console.log('DEBUG: Project units for stats update:', projectUnits);
+      
+      const totalUnits = projectUnits.length;
+      const availableUnits = projectUnits.filter(u => u.status === 'available').length;
+      const soldUnits = projectUnits.filter(u => u.status === 'sold').length;
+      
+      console.log('DEBUG: Calculated stats:', { totalUnits, availableUnits, soldUnits });
+      
+      // Update project stats via API (if endpoint exists)
+      try {
+        console.log('DEBUG: Attempting to update project with stats...');
+        const updatePayload = {
+          stats: { 
+            totalUnits, 
+            available: availableUnits, 
+            sold: soldUnits 
+          }
+        };
+        console.log('DEBUG: Update payload:', updatePayload);
+        
+        const response = await estateService.updateProject(projectId, updatePayload);
+        console.log('DEBUG: Project update response:', response);
+        console.log('DEBUG: Project stats updated successfully');
+        
+        // Force refresh after a short delay to ensure backend has processed
+        setTimeout(() => {
+          console.log('DEBUG: Refreshing projects list...');
+          refresh();
+          
+          // Trigger home page refresh
+          window.dispatchEvent(new CustomEvent('refreshProjects'));
+          
+          // Force a second refresh after another delay
+          setTimeout(() => {
+            console.log('DEBUG: Second refresh to ensure UI updates...');
+            refresh();
+            
+            // Trigger home page refresh again
+            window.dispatchEvent(new CustomEvent('refreshProjects'));
+          }, 1000);
+        }, 500);
+        
+      } catch (err) {
+        console.warn('DEBUG: Could not update project stats via API:', err);
+        console.warn('DEBUG: Error details:', err.response?.data || err.message);
+        
+        // Still refresh to try to get updated data
+        setTimeout(() => {
+          console.log('DEBUG: Refreshing projects list anyway...');
+          refresh();
+        }, 500);
+      }
+      
+    } catch (err) {
+      console.error('DEBUG: Failed to update project stats:', err);
+    }
+  };
+
+  const handleRemovePendingUnit = async (unitId) => {
+    if (editingItem?.id) {
+      // EDIT MODE: Actually unassign the unit from the project
+      try {
+        await estateService.updateUnit(unitId, { 
+          projectId: null,
+          project: null 
+        });
+        toast.success("Unit unassigned from project");
+        
+        // Remove from pending units
+        setPendingUnits(prev => prev.filter(u => (u.id !== unitId && u._id !== unitId)));
+        
+        // Refresh available units to include the newly unassigned unit
+        estateService.getUnits().then(units => {
+          const availableUnitsForSelection = units.filter(u => 
+            (!u.project && !u.projectId) || 
+            (u.project === editingItem.id || u.projectId === editingItem.id || u.project?._id === editingItem.id || u.project?.id === editingItem.id)
+          );
+          setAvailableUnits(availableUnitsForSelection);
+        }).catch(console.error);
+      } catch(err) {
+        console.error("Failed to unassign unit:", err);
+        toast.error("Failed to unassign unit");
+      }
+    } else {
+      // CREATE MODE: Just remove from pending list
+      setPendingUnits(prev => prev.filter(u => (u.id !== unitId && u._id !== unitId)));
     }
   };
 
@@ -394,8 +634,10 @@ const Projects = () => {
         // Copy pending items to local vars and IMMEDIATELY clear state to prevent duplicates
         const phasesToCreate = [...pendingPhases];
         const blocksToCreate = [...pendingBlocks];
+        const unitsToAssign = [...pendingUnits];
         setPendingPhases([]);
         setPendingBlocks([]);
+        setPendingUnits([]);
         
         const projectResponse = await estateService.createProject(payload);
         console.log("Created project response:", projectResponse);
@@ -478,6 +720,24 @@ const Projects = () => {
             await estateService.createBlock(blockPayload);
             console.log(`Created block: ${block.name}`);
           }
+        }
+
+        // Assign units if any pending
+        if (unitsToAssign.length > 0) {
+          console.log(`Assigning ${unitsToAssign.length} units to project...`);
+          
+          for (const unit of unitsToAssign) {
+            try {
+              await estateService.updateUnit(unit.id || unit._id, { 
+                projectId: projectId,
+                project: projectId 
+              });
+              console.log(`Assigned unit ${unit.number || unit.titleEn} to project`);
+            } catch(err) {
+              console.error(`Failed to assign unit ${unit.number || unit.titleEn}:`, err);
+            }
+          }
+          console.log(`Successfully assigned units to project`);
         }
         
         // Success - close modal and refresh
@@ -562,7 +822,7 @@ const Projects = () => {
               <div className="p-5 flex-1 flex flex-col">
                 <h3 className="text-xl font-bold text-textDark dark:text-white mb-2">{project.name}</h3>
                 <div className="flex items-center text-textLight dark:text-gray-400 mb-4 text-sm">
-                  <MapPin size={14} className="me-1" /> {project.address}
+                  <MapPin size={14} className="me-1" /> {getCityName(project.city)} {project.address && ` - ${project.address}`}
                 </div>
                 
                 <div className="grid grid-cols-3 gap-2 mb-4">
@@ -639,7 +899,8 @@ const Projects = () => {
                                 <td className="p-4 text-textDark dark:text-gray-300">
                                     <div className="flex items-center text-sm gap-1">
                                         <MapPin size={14} className="text-gray-400" />
-                                        {project.address}
+                                        <div className="font-bold">{getCityName(project.city)}</div>
+                                        <div className="text-xs">{project.address}</div>
                                     </div>
                                 </td>
                                 <td className="p-4 text-center">
@@ -1064,6 +1325,137 @@ const Projects = () => {
                            );
                          })()}
                     </div>
+                 </div>
+              )}
+
+              {/* Step 7: Units Assignment */}
+              {currentStep === 7 && (
+                   <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                    <div className="flex justify-between items-center">
+                        <h3 className="text-lg font-bold text-textDark dark:text-white">Assign Units to Project</h3>
+                        <div className="flex gap-2">
+                            <Button type="button" size="sm" variant="outline" onClick={() => refresh()}>
+                                Refresh Projects
+                            </Button>
+                            <Button type="button" size="sm" onClick={() => setShowUnitSelector(!showUnitSelector)}>
+                                <Plus size={16} className="mr-1" /> {showUnitSelector ? 'Hide' : 'Show'} Available Units
+                            </Button>
+                        </div>
+                    </div>
+
+                    {/* Pending Units for Assignment */}
+                    <div className="space-y-2">
+                        <div className="text-sm font-medium text-textLight dark:text-gray-400">
+                            Units to be Assigned ({pendingUnits.length})
+                        </div>
+                        {console.log('DEBUG: Rendering pendingUnits:', pendingUnits)}
+                        {pendingUnits.length === 0 ? (
+                            <div className="text-gray-500 text-sm italic py-4 text-center border border-dashed border-border/20 rounded-lg">
+                                No units selected for assignment. Click "Show Available Units" to add units.
+                            </div>
+                        ) : (
+                            <div className="space-y-2 max-h-60 overflow-y-auto">
+                                {pendingUnits.map((unit, idx) => (
+                                    <div key={unit.id || unit._id || idx} className="bg-background dark:bg-white/5 p-3 rounded-lg border border-border/20 dark:border-white/10 flex justify-between items-center">
+                                        <div className="flex items-center gap-3">
+                                            <div className="bg-primary/10 p-2 rounded text-primary">
+                                                <Home size={16} />
+                                            </div>
+                                            <div>
+                                                <div className="font-bold text-textDark dark:text-white flex items-center gap-2">
+                                                    {unit.number || unit.titleEn}
+                                                    {editingItem?._id && (
+                                                        unit.project === editingItem._id || 
+                                                        unit.projectId === editingItem._id || 
+                                                        unit.project?._id === editingItem._id || 
+                                                        unit.project?.id === editingItem._id
+                                                    ) && (
+                                                        <span className="text-xs bg-green-10 text-green-500 px-2 py-0.5 rounded-full">
+                                                            Current Assignment
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="text-xs text-textLight dark:text-gray-400">
+                                                    {unit.type} • {unit.area_m2}m² • {unit.price ? `${unit.price.toLocaleString()} EGP` : 'No price'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button 
+                                            type="button"
+                                            onClick={() => handleRemovePendingUnit(unit.id || unit._id)}
+                                            className="text-red-400 hover:text-red-300 transition-colors bg-transparent p-1"
+                                        >
+                                            <X size={16} />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Available Units Selector */}
+                    {showUnitSelector && (
+                        <div className="border border-border/20 rounded-lg p-4 bg-section/30 dark:bg-white/5">
+                            <div className="flex justify-between items-center mb-3">
+                                <div className="text-sm font-medium text-textLight dark:text-gray-400">
+                                    Available Units ({availableUnits.length})
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                    Selected: {selectedUnits.length}
+                                </div>
+                            </div>
+                            
+                            {availableUnits.length === 0 ? (
+                                <div className="text-gray-500 text-sm italic py-4 text-center">
+                                    No available units found. All units are already assigned to projects.
+                                </div>
+                            ) : (
+                                <div className="space-y-2 max-h-60 overflow-y-auto">
+                                    {availableUnits.map((unit) => {
+                                        const isSelected = selectedUnits.some(u => u.id === unit.id || u._id === unit.id);
+                                        const isCurrentlyAssignedToThisProject = editingItem?._id && (
+                                            unit.project === editingItem._id || 
+                                            unit.projectId === editingItem._id || 
+                                            unit.project?._id === editingItem._id || 
+                                            unit.project?.id === editingItem._id
+                                        );
+                                        
+                                        return (
+                                            <div key={unit.id || unit._id} className="flex items-center gap-3 p-2 rounded-lg border border-border/10 hover:bg-section/50 transition-colors">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isSelected}
+                                                    onChange={() => handleUnitSelection(unit)}
+                                                    className="rounded border-gray-300 text-primary focus:ring-primary"
+                                                />
+                                                <div className="flex-1">
+                                                    <div className="font-medium text-textDark dark:text-white flex items-center gap-2">
+                                                        {unit.number || unit.titleEn}
+                                                        {isCurrentlyAssignedToThisProject && (
+                                                            <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                                                                Already Assigned
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="text-xs text-textLight dark:text-gray-400">
+                                                        {unit.type} • {unit.area_m2}m² • {unit.status} • {unit.price ? `${unit.price.toLocaleString()} EGP` : 'No price'}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                            
+                            {selectedUnits.length > 0 && (
+                                <div className="mt-3 pt-3 border-t border-border/10">
+                                    <Button type="button" size="sm" onClick={handleAssignUnits} className="w-full">
+                                        Assign {selectedUnits.length} Selected Units
+                                    </Button>
+                                </div>
+                            )}
+                        </div>
+                    )}
                  </div>
               )}
 

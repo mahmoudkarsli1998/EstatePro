@@ -16,6 +16,8 @@
   "delete": "Delete",
   "details": "Details",
   "saveDetails": "Save Details",
+  "reset": "Reset",
+  "resetToOriginal": "Reset to original values",
   "cancel": "Cancel",
   "name": "Name",
   "email": "Email",

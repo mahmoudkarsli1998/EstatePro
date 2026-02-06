@@ -9,12 +9,14 @@ import { useDashboardCrud } from '../../hooks/useDashboardCrud';
 import { useTranslation } from 'react-i18next';
 import { estateService } from '../../services/estateService';
 import { uploadService } from '../../services/uploadService';
+import { commonService } from '../../services/commonService';
 import EntityImage from '../../components/shared/EntityImage';
 
 const Locations = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [viewMode, setViewMode] = useState('grid');
   const [projects, setProjects] = useState([]);
+  const [cities, setCities] = useState([]);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState('');
   
@@ -53,9 +55,10 @@ const Locations = () => {
     (loc, term) => (loc.name?.toLowerCase().includes(term.toLowerCase()) || loc.city?.toLowerCase().includes(term.toLowerCase()))
   );
 
-  // Load projects for selection
+  // Load data for selection
   useEffect(() => {
     estateService.getProjects().then(setProjects).catch(console.error);
+    commonService.getCities().then(setCities).catch(console.error);
   }, []);
 
   // Handle file selection
@@ -89,6 +92,13 @@ const Locations = () => {
       .replace(/[^\w\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-');
+  };
+
+  const getCityName = (slug) => {
+    if (!slug || !cities.length) return slug || '';
+    const city = cities.find(c => c.slug === slug);
+    if (!city) return slug;
+    return i18n.language === 'ar' ? city.nameAr : city.nameEn;
   };
 
   const onExport = () => {
@@ -219,7 +229,7 @@ const Locations = () => {
                       className="w-full h-full object-cover" 
                     />
                     <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-md px-2 py-1 rounded text-xs text-white uppercase font-bold border border-white/10">
-                    {location.city}, {location.country}
+                    {getCityName(location.city)}, {location.country}
                     </div>
                 </div>
                 <div className="p-5 flex-1 flex flex-col">
@@ -306,7 +316,7 @@ const Locations = () => {
                                     </div>
                                 </td>
                                 <td className="p-4 text-textDark dark:text-gray-300">
-                                    {location.city}, {location.country}
+                                    {getCityName(location.city)}, {location.country}
                                 </td>
                                 <td className="p-4 text-center">
                                     <span className="inline-block px-2 py-1 rounded-md bg-primary/10 text-primary font-bold text-sm">
@@ -370,13 +380,23 @@ const Locations = () => {
                 onChange={handleInputChange}
                 required
               />
-              <Input 
-                label={t('City')} 
-                name="city"
-                value={formData.city}
-                onChange={handleInputChange}
-                required
-              />
+              <div>
+                <label className="block text-sm font-medium text-textLight dark:text-gray-400 mb-1">{t('City')}</label>
+                <select 
+                  name="city" 
+                  value={formData.city} 
+                  onChange={handleInputChange} 
+                  className="w-full px-4 py-2 rounded-lg border border-border/20 dark:border-white/10 bg-background dark:bg-white/5 text-textDark dark:text-white focus:outline-none focus:border-primary"
+                  required
+                >
+                  <option value="">{t('Select City')}</option>
+                  {cities.map(city => (
+                    <option key={city._id} value={city.slug}>
+                      {i18n.language === 'ar' ? city.nameAr : city.nameEn}
+                    </option>
+                  ))}
+                </select>
+              </div>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

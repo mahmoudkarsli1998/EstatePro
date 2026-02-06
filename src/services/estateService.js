@@ -81,6 +81,9 @@ export const estateService = {
     const res = await apiClient.get('/units', { params: query });
     const data = Array.isArray(res) ? res : (res?.data || res?.items || []);
     
+    console.log('DEBUG: estateService.getUnits() response:', res);
+    console.log('DEBUG: estateService.getUnits() parsed data:', data);
+    
     if (params) {
         let result = data;
         
