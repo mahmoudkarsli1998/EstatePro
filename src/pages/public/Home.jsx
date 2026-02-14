@@ -36,8 +36,8 @@ const Home = () => {
       <LiquidBackground />
       <DemoModal isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
       
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-32 md:pt-44 lg:pt-52 pb-20">
+      {/* Hero Section - Removed overflow-hidden to prevent search dropdown clipping */}
+      <section className="relative min-h-screen flex items-center justify-center pt-32 md:pt-44 lg:pt-52 pb-20">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
@@ -58,8 +58,7 @@ const Home = () => {
               {t('futureOfLiving')}
             </div>
             
-            <h1 className="stagger-item opacity-0 text-5xl md:text-7xl font-bold font-heading mb-8 leading-tight text-white drop-shadow-2xl">
-              {t('discoverYour')} <br />
+            <h1 className="stagger-item opacity-0 text-5xl md:text-7xl font-bold font-heading mb-6 leading-tight text-white drop-shadow-2xl">
               {t('discoverYour')} <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-white to-accent">{t('perfectSanctuary')}</span>
             </h1>
@@ -69,7 +68,7 @@ const Home = () => {
             </p>
 
             {/* New Hero Search Component */}
-            <div className="stagger-item opacity-0 mb-16">
+            <div className="stagger-item opacity-0 mb-16 relative z-30">
               <HeroSearch />
             </div>
 

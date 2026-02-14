@@ -97,6 +97,10 @@ export const estateService = {
         if (params.status) result = result.filter(u => u.status === params.status);
         if (params.minPrice) result = result.filter(u => u.price >= params.minPrice);
         if (params.maxPrice) result = result.filter(u => u.price <= params.maxPrice);
+        if (params.beds) {
+            const minBeds = parseInt(params.beds);
+            result = result.filter(u => (u.features?.bedrooms || u.bedrooms || 0) >= minBeds);
+        }
         
         // Handle pagination (Mock)
         if (params.page && params.limit) {
@@ -113,6 +117,8 @@ export const estateService = {
     }
     return data;
   },
+  // Units
+  getUnits: (params) => apiClient.get('/units', { params }),
   createUnit: (data) => apiClient.post('/units', data),
   getUnitById: (id) => apiClient.get(`/units/${id}`),
   updateUnit: (id, data) => apiClient.patch(`/units/${id}`, data),
@@ -123,9 +129,18 @@ export const estateService = {
   sellUnit: (id, data) => apiClient.post(`/units/${id}/sell`, data),
   getUnitLeads: (id) => apiClient.get(`/units/${id}/leads`),
   searchUnits: (params) => apiClient.get('/units/search', { params }),
-  searchUnits: (params) => apiClient.get('/units/search', { params }),
   getAvailableUnits: () => apiClient.get('/units/available'),
   registerUnitView: (id) => apiClient.post(`/units/${id}/view`),
+
+  // Projects
+  getProjects: (params) => apiClient.get('/projects', { params }),
+  searchProjects: (params) => apiClient.get('/projects/search', { params }),
+  getProjectById: (id) => apiClient.get(`/projects/${id}`),
+  
+  // Developers
+  getDevelopers: (params) => apiClient.get('/developers', { params }),
+  searchDevelopers: (params) => apiClient.get('/developers/search', { params }),
+  getDeveloperById: (id) => apiClient.get(`/developers/${id}`),
 
   // Blocks
   getBlocks: async (params) => {

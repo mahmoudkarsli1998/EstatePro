@@ -189,7 +189,7 @@ const UnitDetail = () => {
                 <Unit3DViewer unit={unit} />
               ) : (
                 <ImageGallery 
-                  images={unit.images} 
+                  images={unit.images?.length > 0 ? unit.images : (unit.image ? [unit.image] : (unit.thumbnail ? [unit.thumbnail] : []))} 
                   type="unit" 
                   aspectRatio="aspect-[16/10]"
                   className="h-[500px]"

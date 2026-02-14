@@ -6,6 +6,7 @@ import { estateService } from '../../services/estateService';
 import { useStaggerList, useHover3D } from '../../hooks/useGSAPAnimations';
 import { useTranslation } from 'react-i18next';
 import { useCurrency } from '../../context/CurrencyContext';
+import { getFirstImage, UNIT_PLACEHOLDER } from '../../utils/imageHelper';
 
 const UnitCard = ({ unit }) => {
   const cardRef = useHover3D({ intensity: 10, scale: 1.02 });
@@ -13,15 +14,21 @@ const UnitCard = ({ unit }) => {
   const { format } = useCurrency();
   const isRTL = i18n.dir() === 'rtl';
 
+  // Get image with proper fallback handling
+  const imageSrc = unit.images?.[0] ? getFirstImage(unit.images, 'unit') : UNIT_PLACEHOLDER;
+
   return (
-    <div ref={cardRef} className="h-full stagger-item opacity-0">
-      <div className="h-full flex flex-col glass-panel overflow-hidden group hover:border-primary/50 transition-all duration-300 relative transform-style-3d">
+    <Link to={`/units/${unit.id || unit._id}`} ref={cardRef} className="h-full stagger-item opacity-0 block group">
+      <div className="h-full flex flex-col glass-panel overflow-hidden group hover:border-primary/50 transition-all duration-300 relative transform-style-3d text-right">
         <div className="relative h-64 overflow-hidden">
           <img 
-            src={`${unit.images?.[0] || 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750'}?w=800&q=80&auto=format`} 
+            src={imageSrc} 
             alt={unit.number} 
             loading="lazy"
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            onError={(e) => {
+              e.target.src = UNIT_PLACEHOLDER;
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-transparent to-transparent opacity-60"></div>
           
@@ -38,9 +45,7 @@ const UnitCard = ({ unit }) => {
           </div>
 
           <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 translate-z-20">
-             <Link to={`/units/${unit.id || unit._id}`} className="block w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
-              <Button variant="primary" className="w-full shadow-lg">View Details</Button>
-            </Link>
+             <Button variant="primary" className="w-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">View Details</Button>
           </div>
         </div>
         
@@ -88,10 +93,16 @@ const UnitCard = ({ unit }) => {
           
           <div className="flex items-center justify-between mt-auto pt-4 border-t border-border/10">
              <div className="flex gap-2">
-                 <button className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition-colors shadow-md hover:shadow-lg hover:scale-110 active:scale-95 duration-200">
+                 <button 
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); /* handle whatsapp */ }}
+                  className="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center hover:bg-green-600 transition-colors shadow-md hover:shadow-lg hover:scale-110 active:scale-95 duration-200"
+                 >
                     <MessageCircle size={20} />
                  </button>
-                 <button className="w-10 h-10 rounded-full bg-gray-600/80 text-white flex items-center justify-center hover:bg-gray-700 transition-colors shadow-md hover:shadow-lg hover:scale-110 active:scale-95 duration-200">
+                 <button 
+                  onClick={(e) => { e.preventDefault(); e.stopPropagation(); /* handle phone */ }}
+                  className="w-10 h-10 rounded-full bg-gray-600/80 text-white flex items-center justify-center hover:bg-gray-700 transition-colors shadow-md hover:shadow-lg hover:scale-110 active:scale-95 duration-200"
+                 >
                     <Phone size={20} />
                  </button>
              </div>
@@ -103,7 +114,7 @@ const UnitCard = ({ unit }) => {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 

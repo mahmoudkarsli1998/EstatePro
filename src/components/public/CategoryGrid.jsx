@@ -22,14 +22,14 @@ const CategoryGrid = () => {
   const navigate = useNavigate();
 
   const categories = [
-    { icon: Key, title: t('units', 'Units'), filter: { type: 'keys' } },
-    { icon: LockOpen, title: t('unlocked'), filter: { status: 'unlocked' } },
-    { icon: Building2, title: t('developerUnits'), filter: { type: 'developer' } },
-    { icon: RefreshCw, title: t('resaleUnits'), filter: { status: 'resale' } },
-    { icon: Percent, title: t('offers'), filter: { type: 'offer' } },
-    { icon: KeyRound, title: t('moveNow'), filter: { status: 'ready' } },
+    { icon: Key, title: t('units', 'Units'), filter: { type: 'keys' }, target: '/units' },
+    { icon: LockOpen, title: t('unlocked'), filter: { status: 'unlocked' }, target: '/units' },
+    { icon: Building2, title: t('developerUnits'), filter: { type: 'developer' }, target: '/projects' },
+    { icon: RefreshCw, title: t('resaleUnits'), filter: { status: 'resale' }, target: '/units' },
+    { icon: Percent, title: t('offers'), filter: { type: 'offer' }, target: '/units' },
+    { icon: KeyRound, title: t('moveNow'), filter: { status: 'ready' }, target: '/units' },
     { icon: Tag, title: t('sellYourUnit'), action: '/sell' }, 
-    { icon: PieChart, title: t('invest'), filter: { type: 'invest' } }
+    { icon: PieChart, title: t('invest'), filter: { type: 'invest' }, target: '/projects' }
   ];
 
   const handleCategoryClick = (category) => {
@@ -38,7 +38,7 @@ const CategoryGrid = () => {
     } else if (category.filter) {
       const params = new URLSearchParams(category.filter);
       navigate({
-        pathname: '/projects',
+        pathname: category.target || '/projects',
         search: params.toString()
       });
     }

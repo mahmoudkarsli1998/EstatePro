@@ -15,7 +15,7 @@ import { Maximize2 } from 'lucide-react';
 
 
 const FloatingChatWidget = () => {
-    const { t, i18n } = useTranslation();
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
     const [showSidebar, setShowSidebar] = useState(false);
@@ -173,7 +173,8 @@ const FloatingChatWidget = () => {
         scrollToBottom();
     }, [messages, isOpen]);
 
-    const handleSendMessage = async (e) => {
+    // Enhanced AI Response Handler with proper data/no-data handling
+    const handleSendMessage = async (e, retryCount = 0) => {
         if (e) e.preventDefault();
         if (!inputValue.trim() || isTyping) return;
 
@@ -193,13 +194,7 @@ const FloatingChatWidget = () => {
         try {
             // Pass leadInfo only on first message of new session
             // Add source to identify leads from AI Chat
-            const leadToSend = !sessionId && leadInfo ? { ...leadInfo, source: 'AI Chat' } : null;
-            console.log('🚀 [Chat] Sending message with leadInfo:', {
-                question: userMsgText,
-                sessionId,
-                leadInfo: leadToSend
-            });
-            
+            const leadToSend = leadInfo ? { ...leadInfo, source: 'AI Chat' } : null;
             const response = await sendChatMessage(
                 userMsgText, 
                 sessionId, 
@@ -217,6 +212,11 @@ const FloatingChatWidget = () => {
             if (response.sessionId) {
                 setSessionId(response.sessionId);
                 localStorage.setItem('current_chat_session', response.sessionId);
+                
+                // Refresh sessions list if this is a new session
+                if (response.isNewSession) {
+                    loadSessions();
+                }
             }
             
             const aiMessageText = response.message || response.explanation || t('aiFoundResults');
@@ -224,24 +224,59 @@ const FloatingChatWidget = () => {
             const aiSuggestions = response.suggestions || [];
             const aiTarget = response.target;
 
+            // CONDITION A: Data Found - High Power, Attractive Response
+            // CONDITION B: No Data - Meaningful Response with contact request
+            let finalMessage = aiMessageText;
+            let showContactPrompt = false;
+            
+            if (aiData.length === 0 && aiSuggestions.length === 0) {
+                // CONDITION B: No Data Found - Provide meaningful response
+                const isArabic = containsArabic(userMsgText);
+                if (!aiMessageText || aiMessageText === t('aiFoundResults')) {
+                    finalMessage = isArabic 
+                        ? "للأسف ملقيناش نتائج مناسبة لطلبك حالياً. هل تريد أن نتواصل معاك cuando تتوفر خيارات جديدة؟"
+                        : "I couldn't find any properties matching your criteria right now. Would you like me to notify you when new options become available?";
+                }
+                showContactPrompt = true;
+            }
+
             setMessages(prev => [...prev, {
                 id: Date.now() + 1,
-                text: aiMessageText,
+                text: finalMessage,
                 sender: 'ai',
                 data: aiData,
                 suggestions: aiSuggestions,
                 target: aiTarget,
+                showContactPrompt: showContactPrompt,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                isArabic: containsArabic(aiMessageText)
+                isArabic: containsArabic(finalMessage)
             }]);
 
-        } catch (error) {
+        } catch (err) {
+            // Enhanced error handling with retry mechanism
+            console.error('❌ [Chat] Error:', err);
+            
+            // Retry up to 2 times on network errors
+            if (retryCount < 2 && (err.code === 'NETWORK_ERROR' || err.code === 'ECONNABORTED' || !err.response)) {
+                console.log(`🔄 [Chat] Retrying... (${retryCount + 1}/2)`);
+                setTimeout(() => handleSendMessage(null, retryCount + 1), 1000);
+                return;
+            }
+            
+            // Safe error handling - never return null
+            const isArabic = containsArabic(userMsgText);
             setMessages(prev => [...prev, {
                 id: Date.now() + 1,
-                text: t('aiErrorMessage'),
+                text: isArabic 
+                    ? "عذراً، حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى."
+                    : t('aiErrorMessage'),
                 sender: 'ai',
+                data: [],
+                suggestions: [],
+                showContactPrompt: true,
+                isError: true,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                isArabic: false
+                isArabic: isArabic
             }]);
         } finally {
             setIsTyping(false);
@@ -249,10 +284,13 @@ const FloatingChatWidget = () => {
     };
 
     const handleCardClick = (item, msgTarget) => {
-        // Determine if item is a project or unit regardless of what the backend predicted as 'target'
-        const isItemProject = item.type === 'project' || (item.priceRange && !item.price) || (item.slug && !item.projectId && !item.project);
+        // Intelligent routing based on item properties
+        const isDeveloper = item.type === 'developer' || (!item.project && !item.projectId && !item.priceRange && item.website);
+        const isProject = item.type === 'project' || (item.priceRange && !item.price) || (item.slug && !item.projectId && !item.project);
         
-        if (isItemProject || msgTarget === 'projects') {
+        if (isDeveloper) {
+            navigate(`/developers/${item._id || item.id}`);
+        } else if (isProject || msgTarget === 'projects') {
              navigate(`/projects/${item.slug || item.id || item._id}`);
         } else {
              const unitId = item._id || item.id;
@@ -422,6 +460,43 @@ const FloatingChatWidget = () => {
 
                                             </div>
                                         )}
+                                    </div>
+                                )}
+
+                                {/* Contact Prompt for No Data Found */}
+                                {msg.showContactPrompt && (
+                                    <div className="mt-3 w-full max-w-[90%]">
+                                        <div className="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200/50 dark:border-amber-700/30 rounded-xl p-4">
+                                            <p className="text-xs text-amber-800 dark:text-amber-200 mb-3">
+                                                {msg.isArabic 
+                                                    ? "📞 هل تريد أن نتواصل معاك quando تتوفر خيارات مناسبة؟"
+                                                    : "📞 Would you like us to contact you when suitable options become available?"}
+                                            </p>
+                                            <div className="flex gap-2">
+                                                <button 
+                                                    onClick={() => setShowLeadForm(true)}
+                                                    className="flex-1 px-3 py-2 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary-dark transition-colors"
+                                                >
+                                                    {msg.isArabic ? "نعم، تواصل معايا" : "Yes, contact me"}
+                                                </button>
+                                                <button 
+                                                    onClick={() => {
+                                                        setMessages(prev => [...prev, {
+                                                            id: Date.now(),
+                                                            text: msg.isArabic 
+                                                                ? "تمام، لو محتاج أي مساعدة تانية قوللي!"
+                                                                : "Sure! Let me know if you need any other help.",
+                                                            sender: 'ai',
+                                                            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                                                            isArabic: msg.isArabic
+                                                        }]);
+                                                    }}
+                                                    className="flex-1 px-3 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-bold rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+                                                >
+                                                    {msg.isArabic ? "لأ، شكراً" : "No thanks"}
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 )}
                             </div>
