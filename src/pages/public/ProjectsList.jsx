@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams, useLocation } from 'react-router-dom';
-import { Filter, Map as MapIcon, Grid } from 'lucide-react';
+import { Link, useSearchParams, useLocation, useNavigate } from 'react-router-dom';
+import { Filter, Map as MapIcon, Grid, ArrowRight, X, Sparkles, RotateCcw, Search } from 'lucide-react';
 import Card from '../../components/shared/Card';
 import Badge from '../../components/shared/Badge';
 import Button from '../../components/shared/Button';
@@ -18,6 +18,7 @@ const ProjectsList = () => {
   const location = useLocation();
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [viewMode, setViewMode] = useState('grid');
   const [filters, setFilters] = useState({
@@ -29,10 +30,79 @@ const ProjectsList = () => {
   });
 
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const fetchProjects = () => {
+    setLoading(true);
+    setError(null);
+    
+    const params = {
+      search: searchParams.get('search'),
+      type: searchParams.get('type'),
+      status: searchParams.get('status'),
+      minPrice: searchParams.get('minPrice'),
+      maxPrice: searchParams.get('maxPrice')
+    };
+
+    const fetchFunc = params.search 
+      ? () => estateService.searchProjects(params)
+      : () => estateService.getProjects(params);
+
+    fetchFunc()
+      .then(data => {
+        setProjects(Array.isArray(data) ? data : (data.data || []));
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to load projects:", err);
+        setError(err.message || "Failed to connect to server");
+        setLoading(false);
+      });
+  };
+
+  const filteredProjects = React.useMemo(() => {
+    return projects.filter(project => {
+        if (filters.search) {
+            const search = filters.search.toLowerCase();
+            const nameMatch = project.name.toLowerCase().includes(search);
+            const devMatch = project.developer?.name?.toLowerCase().includes(search) || 
+                             project.developerName?.toLowerCase().includes(search);
+            if (!nameMatch && !devMatch) return false;
+        }
+        if (filters.status && project.status !== filters.status) return false;
+        
+        // Handle Special "Property Types" from Navbar (Resale, Commercial, Rent)
+        if (filters.type) {
+            if (filters.type === 'resale') {
+                 if (project.status !== 'resale') return false;
+            } else if (filters.type === 'rent') {
+                 if (project.listingType !== 'rent') return false;
+            } else if (filters.type === 'commercial') {
+                 if (project.propertyType !== 'commercial') return false;
+            } else {
+                 if (project.propertyType !== filters.type) return false;
+            }
+        }
+        
+        if (filters.minPrice && project.priceRange.min < parseInt(filters.minPrice)) return false;
+        if (filters.maxPrice && project.priceRange.max > parseInt(filters.maxPrice)) return false;
+        return true;
+    });
+  }, [projects, filters]);
+
+  const unitKeywords = ['apartment', 'villa', 'studio', 'penthouse', 'chalet', 'duplex', 'townhouse', 'twinhouse', 'room', 'bath', 'شقة', 'فيلا', 'توين', 'تاون', 'ستوديو', 'شاليه', 'دوبلكس', 'غرفة', 'حمام'];
+
+  // Smart Redirection: If searching for unit keywords in projects page and results are empty
+  useEffect(() => {
+    if (!loading && !error && filteredProjects.length === 0 && filters.search) {
+      const search = filters.search.toLowerCase();
+      if (unitKeywords.some(k => search.includes(k))) {
+         // Suggestion logic
+      }
+    }
+  }, [loading, error, filteredProjects.length, filters.search]);
 
   useEffect(() => {
-    setLoading(true);
-    
     // Initialize filters from URL params
     const initialFilters = {
       search: searchParams.get('search') || '',
@@ -42,38 +112,9 @@ const ProjectsList = () => {
       status: searchParams.get('status') || '',
     };
     setFilters(prev => ({ ...prev, ...initialFilters }));
-
-    estateService.getProjects().then(data => {
-      setProjects(data);
-      setLoading(false);
-    }).catch(err => {
-      console.error("Failed to load projects:", err);
-      setLoading(false);
-    });
+    
+    fetchProjects();
   }, [searchParams, location.key]);
-
-  const filteredProjects = projects.filter(project => {
-    if (filters.search && !project.name.toLowerCase().includes(filters.search.toLowerCase())) return false;
-    if (filters.status && project.status !== filters.status) return false;
-    
-    // Handle Special "Property Types" from Navbar (Resale, Commercial, Rent)
-    if (filters.type) {
-        if (filters.type === 'resale') {
-             if (project.status !== 'resale') return false;
-        } else if (filters.type === 'rent') {
-             if (project.listingType !== 'rent') return false;
-        } else if (filters.type === 'commercial') {
-             if (project.propertyType !== 'commercial') return false;
-        } else {
-             // Fallback for direct property type match (e.g. residential)
-             if (project.propertyType !== filters.type) return false;
-        }
-    }
-    
-    if (filters.minPrice && project.priceRange.min < parseInt(filters.minPrice)) return false;
-    if (filters.maxPrice && project.priceRange.max > parseInt(filters.maxPrice)) return false;
-    return true;
-  });
 
   // Pagination Logic
   const [currentPage, setCurrentPage] = useState(1);
@@ -154,10 +195,70 @@ const ProjectsList = () => {
                   <div key={i} className="h-80 glass-panel animate-pulse"></div>
                 ))}
               </div>
+            ) : error ? (
+              <div className="text-center py-20 glass-panel border-red-500/20">
+                <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500">
+                  <X size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-textDark dark:text-white mb-2">{t('errorLoadingProjects', 'Error loading projects')}</h3>
+                <p className="text-textLight dark:text-gray-400 mb-8">{error}</p>
+                <Button onClick={fetchProjects} className="shadow-lg">
+                   {t('tryAgain', 'Try Again')}
+                </Button>
+              </div>
             ) : filteredProjects.length === 0 ? (
-              <div className="text-center py-20 glass-panel">
-                <h3 className="text-xl font-bold text-textDark dark:text-white mb-2">{t('noProjectsFound')}</h3>
-                <p className="text-textLight dark:text-gray-400">{t('tryAdjustingFilters')}</p>
+              <div className="text-center py-20 px-6 glass-panel border-primary/10">
+                <div className="w-20 h-20 bg-primary/5 rounded-full flex items-center justify-center mx-auto mb-6 text-primary/30">
+                    <Search size={40} />
+                </div>
+                <h3 className="text-2xl font-bold text-textDark dark:text-white mb-3">
+                    {t('noResultsFound', 'We couldn\'t find a match')}
+                </h3>
+                <p className="text-textLight dark:text-gray-400 mb-10 max-w-lg mx-auto leading-relaxed">
+                    {t('tryAdjustingFilters', 'Try broadening your search or resetting filters to see more compounds.')}
+                </p>
+                
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+                    <Button 
+                      onClick={() => navigate('/projects')} 
+                      variant="outline" 
+                      className="w-full sm:w-auto px-8 py-3 rounded-xl border-primary/20 text-primary hover:bg-primary/5"
+                    >
+                      <RotateCcw size={18} className="mr-2" /> {t('resetAllFilters', 'Reset All Filters')}
+                    </Button>
+                    
+                    <Link 
+                      to={`/ai-assistant?q=${encodeURIComponent(filters.search)}`}
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-purple-600 text-white px-8 py-3 rounded-xl font-bold hover:shadow-xl hover:scale-105 active:scale-95 transition-all shadow-lg shadow-primary/20"
+                    >
+                      <Sparkles size={18} /> {t('askAiAssistant', 'Ask our AI Expert')}
+                    </Link>
+                </div>
+
+                {/* Smart Suggestion for Units */}
+                {(() => {
+                  const search = filters.search?.toLowerCase();
+                  if (search && unitKeywords.some(k => search.includes(k))) {
+                    return (
+                      <div className="max-w-xl mx-auto p-8 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl border border-primary/20 animate-in fade-in zoom-in duration-700">
+                        <div className="flex items-center gap-3 mb-4 justify-center">
+                            <Sparkles className="text-primary" size={20} />
+                            <span className="text-primary font-bold uppercase tracking-wider text-xs">Smart Discovery</span>
+                        </div>
+                        <p className="text-textDark dark:text-white font-medium mb-6 text-lg">
+                           Looking for specific <span className="text-primary">"{filters.search}"</span> units or inventory?
+                        </p>
+                        <Link 
+                          to={`/units?search=${encodeURIComponent(filters.search)}`}
+                          className="inline-flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-xl font-black hover:bg-primary/90 transition-all transform hover:scale-105 active:scale-95 shadow-xl"
+                        >
+                          Switch to Units <ArrowRight size={20} />
+                        </Link>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
             ) : viewMode === 'grid' ? (
               <>

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { getFullImageUrl, getPlaceholderImage } from '../../utils/imageHelper';
-// ... existing imports ...
+import { getFullImageUrl, getPlaceholderImage, UNIT_PLACEHOLDER } from '../../utils/imageHelper';
 
 /**
  * ImageGallery - Displays multiple images with navigation
@@ -19,18 +18,24 @@ const ImageGallery = ({
   const [activeIndex, setActiveIndex] = useState(0);
   const [failedImages, setFailedImages] = useState(new Set());
 
-  // Handle empty images array
-  const displayImages = images.length > 0 ? images : [null];
+  // Handle empty images array - Fallback to type-specific placeholder
+  const displayImages = images && images.length > 0 ? images.filter(img => !!img) : [null];
 
-  const handleImageError = (index) => {
+  const handleImageError = (e, index) => {
     setFailedImages(prev => new Set([...prev, index]));
+    e.target.src = getPlaceholderImage(type) || UNIT_PLACEHOLDER;
   };
 
   const getDisplayUrl = (filename, index) => {
     if (failedImages.has(index) || !filename) {
       return getPlaceholderImage(type);
     }
-    return getFullImageUrl(filename) || getPlaceholderImage(type);
+    
+    // Resolve URL from various formats (string or object)
+    const rawPath = typeof filename === 'string' ? filename : (filename.url || filename.path || filename.thumbnail);
+    if (!rawPath) return getPlaceholderImage(type);
+
+    return getFullImageUrl(rawPath) || getPlaceholderImage(type);
   };
 
   const goToPrev = () => {
@@ -48,7 +53,7 @@ const ImageGallery = ({
         <img
           src={getDisplayUrl(displayImages[activeIndex], activeIndex)}
           alt={`Image ${activeIndex + 1}`}
-          onError={() => handleImageError(activeIndex)}
+          onError={(e) => handleImageError(e, activeIndex)}
           className="w-full h-full object-cover"
         />
         
@@ -99,7 +104,7 @@ const ImageGallery = ({
               <img 
                 src={getDisplayUrl(img, index)} 
                 alt={`Thumbnail ${index + 1}`}
-                onError={() => handleImageError(index)}
+                onError={(e) => handleImageError(e, index)}
                 className="w-full h-full object-cover"
               />
             </button>

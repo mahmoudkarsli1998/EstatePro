@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { getImageWithFallback, getPlaceholderImage } from '../../utils/imageHelper';
+import { getImageWithFallback, getPlaceholderImage, UNIT_PLACEHOLDER } from '../../utils/imageHelper';
 
 /**
  * EntityImage - Displays a single image with error handling and fallback
@@ -19,14 +19,17 @@ const EntityImage = ({
   
   const imageUrl = hasError 
     ? getPlaceholderImage(type) 
-    : getImageWithFallback(src, type);
+    : (src ? getImageWithFallback(src, type) : getPlaceholderImage(type));
 
   return (
     <img
       src={imageUrl}
       alt={alt}
       className={`entity-image ${className}`}
-      onError={() => setHasError(true)}
+      onError={(e) => {
+        setHasError(true);
+        e.target.src = getPlaceholderImage(type) || UNIT_PLACEHOLDER;
+      }}
       loading="lazy"
       {...props}
     />

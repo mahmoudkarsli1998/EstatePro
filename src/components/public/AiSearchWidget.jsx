@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search, Sparkles, Brain, Target, Zap } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '../../utils/api';
+import { aiService } from '../../services/aiService';
 import AiResultCard from './AiResultCard';
 
 const AiSearchWidget = () => {
@@ -17,7 +17,7 @@ const AiSearchWidget = () => {
 
     setIsSearching(true);
     try {
-      const response = await api.askAi(query, enableRag);
+      const response = await aiService.query(query, enableRag);
       setResults(response);
     } catch (error) {
       console.error('AI Search Error:', error);
@@ -33,8 +33,12 @@ const AiSearchWidget = () => {
   };
 
   const handleCardClick = (item, target) => {
-    const isProject = item.type === 'project' || target === 'projects';
-    if (isProject) {
+    const isDeveloper = item.type === 'developer' || (!item.project && !item.projectId && !item.priceRange && item.website);
+    const isProject = item.type === 'project' || (item.priceRange && !item.price) || (item.slug && !item.projectId && !item.project);
+    
+    if (isDeveloper) {
+      navigate(`/developers/${item._id || item.id}`);
+    } else if (isProject || target === 'projects') {
       navigate(`/projects/${item.slug || item.id || item._id}`);
     } else {
       navigate(`/units/${item._id || item.id}`);

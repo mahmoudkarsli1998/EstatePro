@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Bot, Send, Sparkles, X, RotateCcw, Home as HomeIcon, Target, Zap, MessageSquare, Trash2, Plus } from 'lucide-react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 import { sendChatMessage, getSessions, getSessionHistory, deleteSession } from '../../services/chatService';
@@ -10,12 +10,18 @@ import { tracker } from '../../services/trackingService';
 const AiAssistantPage = () => {
     const navigate = useNavigate();
     const { t } = useTranslation();
+    const location = useLocation();
     
     // Session state
     const [sessionId, setSessionId] = useState(() => localStorage.getItem('current_chat_session') || null);
     const [sessions, setSessions] = useState([]);
     const [loadingSessions, setLoadingSessions] = useState(false);
-    
+    // Lead capture state
+    const [leadInfo] = useState(() => {
+        const saved = localStorage.getItem('lead_info');
+        return saved ? JSON.parse(saved) : null;
+    });
+
     // Chat state - Note: initial message set in useEffect to use t() properly
     const [messages, setMessages] = useState([]);
 
@@ -28,8 +34,18 @@ const AiAssistantPage = () => {
     // Load sessions on mount
     useEffect(() => {
         loadSessions();
-        // Initialize with greeting message
-        if (messages.length === 0) {
+        
+        // Handle initial query from URL param 'q'
+        const urlParams = new URLSearchParams(location.search);
+        const initialQuery = urlParams.get('q');
+        
+        if (initialQuery) {
+            setInputValue(initialQuery);
+            // We need a slight delay to ensure the component is fully ready
+            setTimeout(() => {
+                handleSendMessageFromQuery(initialQuery);
+            }, 500);
+        } else if (messages.length === 0) {
             setMessages([{
                 id: 1,
                 text: t('aiGreeting'),
@@ -38,7 +54,73 @@ const AiAssistantPage = () => {
                 isArabic: false
             }]);
         }
-    }, []);
+    }, [location.search]);
+
+    const handleSendMessageFromQuery = async (queryText, retryCount = 0) => {
+        if (!queryText.trim() || isTyping) return;
+
+        if (retryCount === 0) {
+            const userMsg = {
+                id: Date.now(),
+                text: queryText,
+                sender: 'user',
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                isArabic: containsArabic(queryText)
+            };
+            setMessages(prev => [...prev, userMsg]);
+        }
+        
+        setIsTyping(true);
+
+        try {
+            const isNewSessionRequest = !sessionId;
+            const response = await sendChatMessage(queryText, sessionId, enableRag, leadInfo);
+            if (response.sessionId) {
+                setSessionId(response.sessionId);
+                localStorage.setItem('current_chat_session', response.sessionId);
+                
+                // Refresh sessions list if this is a new session to show it in sidebar
+                if (isNewSessionRequest) {
+                    loadSessions();
+                }
+            }
+            
+            const aiMessageText = response.message || response.explanation || t('aiFoundResults');
+            const aiData = response.data || [];
+            const aiSuggestions = response.suggestions || [];
+            const aiTarget = response.target;
+
+            setMessages(prev => [...prev, {
+                id: Date.now() + 1,
+                text: aiMessageText,
+                sender: 'ai',
+                data: aiData,
+                suggestions: aiSuggestions,
+                target: aiTarget,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                isArabic: containsArabic(aiMessageText)
+            }]);
+            
+            tracker.aiQuerySent(aiTarget, aiData.length > 0 || aiSuggestions.length > 0);
+
+        } catch (error) {
+            console.error(`AI Error (Attempt ${retryCount + 1}):`, error);
+            if (retryCount < 2) {
+                setTimeout(() => handleSendMessageFromQuery(queryText, retryCount + 1), 1500);
+                return;
+            }
+            
+            setMessages(prev => [...prev, {
+                id: Date.now() + 1,
+                text: t('aiErrorMessage'),
+                sender: 'ai',
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                isArabic: false
+            }]);
+        } finally {
+            setIsTyping(false);
+        }
+    };
 
     // Load session history if sessionId exists
     useEffect(() => {
@@ -99,34 +181,33 @@ const AiAssistantPage = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     };
 
-    const handleSendMessage = async (e) => {
+    const handleSendMessage = async (e, retryCount = 0) => {
         if (e) e.preventDefault();
         if (!inputValue.trim() || isTyping) return;
 
         const userMsgText = inputValue;
-        const userMsg = {
-            id: Date.now(),
-            text: userMsgText,
-            sender: 'user',
-            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            isArabic: containsArabic(userMsgText)
-        };
-
-        setMessages(prev => [...prev, userMsg]);
-        setInputValue("");
+        if (retryCount === 0) {
+            const userMsg = {
+                id: Date.now(),
+                text: userMsgText,
+                sender: 'user',
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                isArabic: containsArabic(userMsgText)
+            };
+            setMessages(prev => [...prev, userMsg]);
+            setInputValue("");
+        }
+        
         setIsTyping(true);
 
         try {
-            // Use the new multi-turn chat API
-            const response = await sendChatMessage(userMsgText, sessionId, enableRag);
+            const isNewSessionRequest = !sessionId;
+            const response = await sendChatMessage(userMsgText, sessionId, enableRag, leadInfo);
             
-            // Store the session ID for future messages
             if (response.sessionId) {
                 setSessionId(response.sessionId);
                 localStorage.setItem('current_chat_session', response.sessionId);
-                
-                // Refresh sessions list if this is a new session
-                if (response.isNewSession) {
+                if (isNewSessionRequest) {
                     loadSessions();
                 }
             }
@@ -147,10 +228,17 @@ const AiAssistantPage = () => {
                 isArabic: containsArabic(aiMessageText)
             }]);
 
-            // Track AI query
             tracker.aiQuerySent(aiTarget, aiData.length > 0 || aiSuggestions.length > 0);
 
         } catch (error) {
+            console.error(`AI Error (Attempt ${retryCount + 1}):`, error);
+            
+            // Retry logic
+            if (retryCount < 2) {
+                setTimeout(() => handleSendMessage(null, retryCount + 1), 1500);
+                return;
+            }
+
             setMessages(prev => [...prev, {
                 id: Date.now() + 1,
                 text: t('aiErrorMessage'),
@@ -208,14 +296,17 @@ const AiAssistantPage = () => {
     };
 
     const handleCardClick = (item, msgTarget) => {
-        // Determine if item is a project or unit regardless of what the backend predicted as 'target'
-        const isItemProject = item.type === 'project' || (item.priceRange && !item.price) || (item.slug && !item.projectId && !item.project);
+        // Intelligent routing based on item properties
+        const isDeveloper = item.type === 'developer' || (!item.project && !item.projectId && !item.priceRange && item.website);
+        const isProject = item.type === 'project' || (item.priceRange && !item.price) || (item.slug && !item.projectId && !item.project);
         
-        if (isItemProject || msgTarget === 'projects') {
-             navigate(`/projects/${item.slug || item.id || item._id}`);
+        if (isDeveloper) {
+            navigate(`/developers/${item._id || item.id}`);
+        } else if (isProject || msgTarget === 'projects') {
+            navigate(`/projects/${item.slug || item.id || item._id}`);
         } else {
-             const unitId = item._id || item.id;
-             navigate(`/units/${unitId}`);
+            const unitId = item._id || item.id;
+            navigate(`/units/${unitId}`);
         }
     };
 

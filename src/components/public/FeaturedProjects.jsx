@@ -1,22 +1,32 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, ArrowRight } from 'lucide-react';
 import Button from '../shared/Button';
 import { estateService } from '../../services/estateService';
 import { useStaggerList, useHover3D } from '../../hooks/useGSAPAnimations';
+import { getFirstImage } from '../../utils/imageHelper';
+
+// Placeholder image for projects
+const PROJECT_PLACEHOLDER = 'https://via.placeholder.com/800x600?text=No+Image';
 
 const ProjectCard = ({ project }) => {
   const cardRef = useHover3D({ intensity: 10, scale: 1.02 });
 
+  // Get image with proper fallback handling
+  const imageSrc = project.images?.[0] ? getFirstImage(project.images, 'project') : PROJECT_PLACEHOLDER;
+
   return (
-    <div ref={cardRef} className="h-full stagger-item opacity-0">
+    <Link to={`/projects/${project.id || project._id}`} ref={cardRef} className="h-full stagger-item opacity-0 block group">
       <div className="h-full flex flex-col glass-panel overflow-hidden group hover:border-primary/50 transition-all duration-300 relative transform-style-3d">
         <div className="relative h-72 overflow-hidden">
           <img 
-            src={project.images?.[0] ? `${project.images[0]}?w=800&q=80&auto=format` : 'https://via.placeholder.com/800x600?text=No+Image'} 
+            src={imageSrc} 
             alt={project.name} 
             loading="lazy"
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            onError={(e) => {
+              e.target.src = PROJECT_PLACEHOLDER;
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-dark-bg via-transparent to-transparent opacity-60"></div>
           
@@ -31,9 +41,7 @@ const ProjectCard = ({ project }) => {
           </div>
 
           <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-4 group-hover:translate-y-0 transition-transform duration-300 translate-z-20">
-             <Link to={`/projects/${project.id || project._id}`} className="block w-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">
-              <Button variant="primary" className="w-full shadow-lg">View Details</Button>
-            </Link>
+             <Button variant="primary" className="w-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-100">View Details</Button>
           </div>
         </div>
         
@@ -70,55 +78,51 @@ const ProjectCard = ({ project }) => {
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 };
 
 const FeaturedProjects = () => {
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [lastUpdate, setLastUpdate] = useState(Date.now());
   const containerRef = useStaggerList({ selector: '.stagger-item', delay: 0.2, dependencies: [loading, projects] });
 
-  const fetchProjects = async () => {
-    try {
-      console.log('DEBUG: FeaturedProjects - Fetching fresh project data...');
-      const data = await estateService.getProjects();
-      console.log('DEBUG: FeaturedProjects - Projects data:', data);
-      
-      // Log the stats for each project
-      data.forEach((project, index) => {
-        console.log(`DEBUG: FeaturedProjects - Project ${index + 1} "${project.name}" stats:`, project.stats);
-      });
-      
-      setProjects(data.slice(0, 6));
-      setLoading(false);
-    } catch (err) {
-      console.error('DEBUG: FeaturedProjects - Error fetching projects:', err);
-      setLoading(false);
-    }
-  };
-
+  // PERFORMANCE FIX: Only fetch on mount with proper dependency handling
+  // This eliminates the 5-second interval that caused unnecessary re-renders
   useEffect(() => {
-    fetchProjects();
-  }, []);
+    // Only run once on mount
+    let isMounted = true;
+    
+    const loadProjects = async () => {
+      try {
+        console.log('DEBUG: FeaturedProjects - Fetching project data on mount...');
+        const data = await estateService.getProjects();
+        if (isMounted) {
+          setProjects(data.slice(0, 6));
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('DEBUG: FeaturedProjects - Error fetching projects:', err);
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+    
+    loadProjects();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Empty dependency = run once on mount
 
-  // Add a refresh mechanism that checks for updates every 5 seconds
+  // Listen for custom refresh event (for external triggers like after adding new project)
   useEffect(() => {
-    const interval = setInterval(() => {
-      console.log('DEBUG: FeaturedProjects - Checking for project updates...');
-      fetchProjects();
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  // Also add a manual refresh function that can be called from outside
-  useEffect(() => {
-    // Listen for custom refresh event
     const handleRefresh = () => {
       console.log('DEBUG: FeaturedProjects - Manual refresh triggered');
-      fetchProjects();
+      estateService.getProjects()
+        .then(data => setProjects(data.slice(0, 6)))
+        .catch(err => console.error('DEBUG: FeaturedProjects - Error on refresh:', err));
     };
 
     window.addEventListener('refreshProjects', handleRefresh);
