@@ -31,7 +31,6 @@ const UnitDetail = () => {
     setLoading(true);
     estateService.getUnitById(id).then(unitData => {
       setUnit(unitData);
-      console.log('Unit Data Loaded:', unitData); // Debug: Check if phaseId/blockId exist
 
       // Resolve project ID from various possible fields
       const pId = unitData.projectId || (typeof unitData.project === 'string' ? unitData.project : unitData.project?.id || unitData.project?._id);
