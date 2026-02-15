@@ -144,20 +144,13 @@ const Developers = () => {
                     {t('noDevsMessage', 'We couldn\'t find any developers matching your search. Try resetting filters or asking our AI.')}
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                    <Button 
-                      onClick={() => setSearchTerm('')} 
-                      variant="outline" 
-                      className="px-8 py-3 rounded-xl border-primary/20 text-primary hover:bg-primary/5"
-                    >
-                      <RotateCcw size={18} className="mr-2" /> {t('clearSearch', 'Clear Search')}
-                    </Button>
-                    <Link 
-                      to={`/ai-assistant?q=${encodeURIComponent(searchTerm)}`}
-                      className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-primary to-purple-600 text-white px-8 py-3 rounded-xl font-bold hover:shadow-xl hover:scale-105 active:scale-95 transition-all shadow-lg"
-                    >
-                      <Sparkles size={18} /> {t('askAiAssistant', 'Ask AI')}
-                    </Link>
-                </div>
+                     <Button 
+                       onClick={() => setSearchTerm('')}
+                       className="px-8 py-3 rounded-xl border-primary/20 text-primary hover:bg-primary/5"
+                     >
+                       <RotateCcw size={18} className="mr-2" /> {t('clearSearch', 'Clear Search')}
+                     </Button>
+                 </div>
             </div>
         )}
       </div>

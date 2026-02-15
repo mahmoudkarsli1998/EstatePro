@@ -36,7 +36,7 @@ export const useFadeIn = (options = {}) => {
         scrollTrigger: {
           trigger: el,
           start: `top ${100 - threshold * 100}%`,
-          toggleActions: 'play none none reverse',
+          toggleActions: 'play none none none',
         },
       }
     );
@@ -76,7 +76,7 @@ export const useSlideIn = (options = {}) => {
         scrollTrigger: {
           trigger: el,
           start: `top ${100 - threshold * 100}%`,
-          toggleActions: 'play none none reverse',
+          toggleActions: 'play none none none',
         },
       }
     );
@@ -118,7 +118,7 @@ export const useStaggerList = (options = {}) => {
         scrollTrigger: {
           trigger: el,
           start: `top ${100 - threshold * 100}%`,
-          toggleActions: 'play none none reverse',
+          toggleActions: 'play none none none',
         },
       }
     );

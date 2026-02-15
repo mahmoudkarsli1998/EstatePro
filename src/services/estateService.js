@@ -117,8 +117,7 @@ export const estateService = {
     }
     return data;
   },
-  // Units
-  getUnits: (params) => apiClient.get('/units', { params }),
+  // Units - Additional methods
   createUnit: (data) => apiClient.post('/units', data),
   getUnitById: (id) => apiClient.get(`/units/${id}`),
   updateUnit: (id, data) => apiClient.patch(`/units/${id}`, data),
@@ -132,15 +131,15 @@ export const estateService = {
   getAvailableUnits: () => apiClient.get('/units/available'),
   registerUnitView: (id) => apiClient.post(`/units/${id}/view`),
 
-  // Projects
-  getProjects: (params) => apiClient.get('/projects', { params }),
+  // Projects - Additional methods
   searchProjects: (params) => apiClient.get('/projects/search', { params }),
-  getProjectById: (id) => apiClient.get(`/projects/${id}`),
   
   // Developers
-  getDevelopers: (params) => apiClient.get('/developers', { params }),
+  getDevelopers: async () => {
+    const res = await apiClient.get('/developers');
+    return Array.isArray(res) ? res : (res?.data || res?.items || []);
+  },
   searchDevelopers: (params) => apiClient.get('/developers/search', { params }),
-  getDeveloperById: (id) => apiClient.get(`/developers/${id}`),
 
   // Blocks
   getBlocks: async (params) => {
@@ -164,10 +163,9 @@ export const estateService = {
   getLocationBySlug: (slug) => apiClient.get(`/locations/slug/${slug}`),
   getNearbyLocations: (params) => apiClient.get('/locations/nearby', { params }),
 
-  // Developers
-  getDevelopers: () => apiClient.get('/developers'),
-  createDeveloper: (data) => apiClient.post('/developers', data),
+  // Developers - Additional methods
   getDeveloperById: (id) => apiClient.get(`/developers/${id}`),
+  createDeveloper: (data) => apiClient.post('/developers', data),
   updateDeveloper: (id, data) => apiClient.patch(`/developers/${id}`, data),
   deleteDeveloper: (id) => apiClient.delete(`/developers/${id}`),
 };
