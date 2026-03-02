@@ -77,9 +77,7 @@ const Navbar = () => {
       <div className="px-6 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="text-2xl font-bold font-heading text-textDark dark:text-white flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-white text-lg font-bold">E</span>
-          </div>
+          <img src="/assets/logoep-nobg.png" alt="EstatePro Logo" className="w-10 h-10 object-contain" />
           <span>Estate<span className="text-primary dark:text-accent">Pro</span></span>
         </Link>
 

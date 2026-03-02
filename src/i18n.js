@@ -46,6 +46,28 @@ export const updateDocumentDirection = (lang) => {
     document.body.classList.add('ltr');
     document.body.classList.remove('rtl');
   }
+
+  // Update SEO Meta Tags based on language
+  const title = lang === 'ar' 
+    ? 'إستيت برو | تكنولوجيا العقارات الفاخرة الحديثة | اكتشف عقارك المثالي بدقة الذكاء الاصطناعي'
+    : 'EstatePro | Luxury modern real estate technology | Discover Your Perfect Property With AI Precision';
+    
+  const description = lang === 'ar'
+    ? 'إستيت برو، المنصة الرائدة في تكنولوجيا العقارات الفاخرة. اكتشف عقارك المثالي بدقة الذكاء الاصطناعي في مصر والشرق الأوسط. شراء، بيع، وتأجير العقارات.'
+    : 'Discover your perfect property with EstatePro. Luxury modern real estate technology driven by AI precision in Egypt and the MENA region. Buy, sell, and rent luxury homes.';
+
+  document.title = title;
+  
+  const updateMeta = (selector, content) => {
+    const el = document.querySelector(selector);
+    if (el) el.setAttribute('content', content);
+  };
+
+  updateMeta('meta[name="description"]', description);
+  updateMeta('meta[property="og:title"]', title);
+  updateMeta('meta[property="og:description"]', description);
+  updateMeta('meta[property="twitter:title"]', title);
+  updateMeta('meta[property="twitter:description"]', description);
 };
 
 i18n

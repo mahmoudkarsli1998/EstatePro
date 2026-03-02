@@ -17,9 +17,11 @@ const EntityImage = ({
 }) => {
   const [hasError, setHasError] = useState(false);
   
+  const srcString = typeof src === 'string' ? src : (src?.url || src?.path || src?.thumbnail || '');
+  
   const imageUrl = hasError 
     ? getPlaceholderImage(type) 
-    : (src ? getImageWithFallback(src, type) : getPlaceholderImage(type));
+    : (srcString ? getImageWithFallback(srcString, type) : getPlaceholderImage(type));
 
   return (
     <img

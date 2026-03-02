@@ -90,11 +90,18 @@ const Units = () => {
         (unit, term) => {
             const termLower = term.toLowerCase();
             const projName = getProjectName(unit.project || unit.projectId).toLowerCase();
+            
+            // Check if tags match
+            const tagsMatch = Array.isArray(unit.images) && unit.images.some(img => 
+               img && Array.isArray(img.tags) && img.tags.some(tag => tag.toLowerCase().includes(termLower))
+            );
+
             return (
                 unit.number?.toLowerCase().includes(termLower) || 
                 unit.titleEn?.toLowerCase().includes(termLower) ||
                 unit.type?.toLowerCase().includes(termLower) ||
-                projName.includes(termLower)
+                projName.includes(termLower) ||
+                tagsMatch
             );
         }
     );
