@@ -22,9 +22,24 @@ export const crmService = {
       }
       return normalized;
   },
-  createLead: (data) => apiClient.post('/leads', data), // Public endpoint uses same path usually, or check /public? Prompt says POST /leads
+  createLead: (data) => {
+    const payload = { ...data };
+    if (payload.interestedProject === '') delete payload.interestedProject;
+    if (payload.interestedUnit === '') delete payload.interestedUnit;
+    if (payload.assignedAgentId === '') delete payload.assignedAgentId;
+    return apiClient.post('/leads', payload);
+  },
+  scoreLead: (id) => apiClient.post(`/ai-features/score-lead/${id}`),
+  matchUnits: (id) => apiClient.post(`/ai-features/match-units/${id}`),
+  optimizeFollowUp: (id) => apiClient.post(`/ai-features/followup/${id}`),
   getLeadById: (id) => apiClient.get(`/leads/${id}`),
-  updateLead: (id, data) => apiClient.patch(`/leads/${id}`, data),
+  updateLead: (id, data) => {
+    const payload = { ...data };
+    if (payload.interestedProject === '') delete payload.interestedProject;
+    if (payload.interestedUnit === '') delete payload.interestedUnit;
+    if (payload.assignedAgentId === '') delete payload.assignedAgentId;
+    return apiClient.patch(`/leads/${id}`, payload);
+  },
   deleteLead: (id) => apiClient.delete(`/leads/${id}`),
   updateLeadStatus: (id, status) => apiClient.patch(`/leads/${id}/status`, { status }),
   assignAgent: (id, agentId) => apiClient.patch(`/leads/${id}/assign`, { agentId }),

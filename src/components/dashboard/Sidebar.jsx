@@ -45,7 +45,10 @@ const Sidebar = ({ isOpen, onClose }) => {
     }`}>
       <div className="p-6 border-b border-slate-200 dark:border-white/10 flex justify-between items-center">
         <Link to="/" className="text-2xl font-bold font-heading text-primary block">
-          Estate<span className="text-slate-900 dark:text-white">Pro</span>
+          <div className="flex items-center gap-2">
+            <img src="/assets/logoep-nobg.png" alt="EstatePro Logo" className="w-8 h-8 object-contain" />
+            <span>Estate<span className="text-slate-900 dark:text-white">Pro</span></span>
+          </div>
           <span className="text-xs text-gray-400 block font-sans font-normal mt-1">
             {user?.role === 'admin' ? 'Admin Panel' : 
              user?.role === 'manager' ? 'Manager Panel' : 

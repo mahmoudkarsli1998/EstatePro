@@ -296,6 +296,24 @@ const UnitDetail = () => {
                 </div>
               )}
 
+              {/* AI Image Tags Section */}
+              {unit.images && unit.images.some(img => img && img.tags && img.tags.length > 0) && (
+                <div className="mt-6 pt-6 border-t border-border/20">
+                  <h4 className="text-md font-bold mb-3 text-textDark dark:text-white flex items-center gap-2">
+                     🤖 AI Detected Tags
+                  </h4>
+                  <div className="flex flex-wrap gap-2">
+                    {Array.from(new Set(
+                       unit.images.filter(img => img && img.tags).flatMap(img => img.tags)
+                    )).map((tag, idx) => (
+                      <span key={`ai-tag-${idx}`} className="px-3 py-1 rounded-full bg-indigo-500/10 text-sm text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 capitalize flex items-center gap-1">
+                        # {tag.trim()}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Nearby Facilities Section */}
               {(unit.features?.nearbyFacilities?.length > 0 || unit.nearbyFacilities?.length > 0) && (
                 <div className="mt-6 pt-6 border-t border-border/20">

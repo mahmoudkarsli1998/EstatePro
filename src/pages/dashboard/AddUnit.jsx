@@ -409,14 +409,14 @@ const AddUnit = () => {
               const filesToUpload = pendingUploads.map(p => p.file);
               const uploadedResults = await uploadService.uploadMultiple(filesToUpload);
               
-              // Create map: blobUrl -> serverFilename
+              // Create map: blobUrl -> server object
               const urlMap = {};
               pendingUploads.forEach((p, idx) => {
-                  urlMap[p.url] = uploadedResults[idx].url || uploadedResults[idx]; // specific to uploadService return format
+                  urlMap[p.url] = uploadedResults[idx]; 
               });
               
-              // Replace blob URLs in the final list with server filenames
-              finalImages = finalImages.map(img => (img.startsWith('blob:') && urlMap[img]) ? urlMap[img] : img);
+              // Replace blob URLs in the final list with server objects
+              finalImages = finalImages.map(img => (typeof img === 'string' && img.startsWith('blob:') && urlMap[img]) ? urlMap[img] : img);
               
           } catch (uploadErr) {
               console.error("Image upload failed:", uploadErr);

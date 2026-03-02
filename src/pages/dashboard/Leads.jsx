@@ -139,6 +139,8 @@ const Leads = () => {
     const [selectedLead, setSelectedLead] = useState(null);
     const [isFollowUpModalOpen, setIsFollowUpModalOpen] = useState(false);
     const [followUpNote, setFollowUpNote] = useState('');
+    const [matchedUnitsData, setMatchedUnitsData] = useState(null);
+    const [isMatchingUnits, setIsMatchingUnits] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
     const dropdownRef = useRef(null);
 
@@ -371,10 +373,52 @@ const Leads = () => {
             }
             
             setFollowUpNote('');
+            
+            toast.info(t('optimizingFollowUp', '🤖 AI is analyzing next best action...'));
+            await crmService.optimizeFollowUp(leadId);
+            toast.success(t('followUpAddedSuccess', 'Follow-up saved & optimized!'));
+            
             await refresh();
-            toast.success(t('followUpAddedSuccess', 'Follow-up added successfully'));
+            const updated = await crmService.getLeadById(leadId);
+            if (updated) setSelectedLead({ ...updated, id: updated.id || updated._id });
         } catch (error) {
             console.error('Error adding follow-up:', error);
+            toast.error(t('errorAddingFollowup', 'Failed to save follow-up'));
+        }
+    };
+
+    const handleScoreLead = async (leadId) => {
+        try {
+            const res = await crmService.scoreLead(leadId);
+            toast.success(`AI Scored: ${res?.aiData?.score || res?.lead?.aiScore}/100`);
+            await refresh();
+        } catch (error) {
+            console.error('Scoring error:', error);
+            toast.error('Failed to generate AI score');
+        }
+    };
+
+    const handleMatchUnits = async (leadId) => {
+        try {
+            setIsMatchingUnits(true);
+            toast.info(t('matchingUnits', 'Finding best matching units...'));
+            const res = await crmService.matchUnits(leadId);
+            
+            if (res?.aiData?.ranked_units && res?.availableUnits) {
+                const combined = res.aiData.ranked_units.map(ranked => {
+                    const unitDetails = res.availableUnits.find(u => u.id === ranked.unit_id) || {};
+                    return { ...ranked, ...unitDetails };
+                });
+                setMatchedUnitsData(combined);
+                toast.success('Found matching units!');
+            } else {
+                toast.error('No matching units found');
+            }
+        } catch (error) {
+            console.error('Matching error:', error);
+            toast.error('Failed to match units');
+        } finally {
+            setIsMatchingUnits(false);
         }
     };
 
@@ -402,10 +446,13 @@ const Leads = () => {
     const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
     const [leadToAssign, setLeadToAssign] = useState(null);
     const [activeAssignId, setActiveAssignId] = useState(null); // Added state for active assignment
+    const [isAssigningWithAI, setIsAssigningWithAI] = useState(false);
+    const [aiAssignFeedback, setAiAssignFeedback] = useState(null);
 
     const openAssignModal = (lead) => {
         setLeadToAssign(lead);
         setActiveAssignId(lead.assignedAgent?.id || lead.assignedAgent?._id || null); // Initialize activeAssignId
+        setAiAssignFeedback(null);
         setIsAssignModalOpen(true);
     };
 
@@ -413,6 +460,34 @@ const Leads = () => {
         setIsAssignModalOpen(false);
         setLeadToAssign(null);
         setActiveAssignId(null);
+        setAiAssignFeedback(null);
+    };
+
+    const handleSmartAssign = async () => {
+        if (!leadToAssign) return;
+        try {
+            setIsAssigningWithAI(true);
+            setAiAssignFeedback(null);
+            toast.info('🤖 AI is finding the best agent...');
+            
+            const res = await crmService.assignLead(leadToAssign.id || leadToAssign._id);
+            
+            if (res?.aiData?.assigned_agent_id) {
+                setActiveAssignId(res.aiData.assigned_agent_id);
+                setAiAssignFeedback({
+                    reasoning: res.aiData.reasoning,
+                    confidence: res.aiData.confidence_score
+                });
+                toast.success('AI Suggestion loaded!');
+            } else {
+                toast.error('AI could not determine best agent');
+            }
+        } catch (error) {
+            console.error('Smart Assign Error:', error);
+            toast.error('Failed to get AI assignment recommendation');
+        } finally {
+            setIsAssigningWithAI(false);
+        }
     };
 
 
@@ -503,9 +578,20 @@ const Leads = () => {
                                         <h3 className="font-bold text-lg text-textDark dark:text-white">{lead.name}</h3>
                                         <p className="text-xs text-gray-500 mt-0.5">{new Date(lead.createdAt).toLocaleDateString()}</p>
                                     </div>
-                                    <Badge variant={lead.status === 'new' ? 'primary' : lead.status === 'closed' ? 'success' : lead.status === 'lost' ? 'danger' : 'warning'} className="px-3 py-1 font-bold text-xs">
-                                        {t(lead.status) || lead.status}
-                                    </Badge>
+                                    <div className="flex flex-col items-end gap-1">
+                                        <Badge variant={lead.status === 'new' ? 'primary' : lead.status === 'closed' ? 'success' : lead.status === 'lost' ? 'danger' : 'warning'} className="px-3 py-1 font-bold text-xs">
+                                            {t(lead.status) || lead.status}
+                                        </Badge>
+                                        {lead.aiScore ? (
+                                            <Badge variant={lead.aiPriority === 'High' ? 'success' : lead.aiPriority === 'Medium' ? 'warning' : 'primary'} className="px-2 py-0.5 font-bold text-[10px]" title={lead.aiReason}>
+                                                AI: {lead.aiScore}
+                                            </Badge>
+                                        ) : (
+                                            <button onClick={() => handleScoreLead(lead.id)} className="text-[10px] text-primary hover:underline font-bold">
+                                                ★ Score
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                                 
                                 {/* Contact Info */}
@@ -611,6 +697,7 @@ const Leads = () => {
                                     <th className="px-3 py-4 text-start w-[18%]">{t('name')}</th>
                                     {!isSales && <th className="px-3 py-4 text-start w-[16%]">{t('contact')}</th>}
                                     <th className="px-3 py-4 text-start w-[10%]">{t('status')}</th>
+                                    <th className="px-3 py-4 text-start w-[8%]">AI Score</th>
                                     <th className="px-3 py-4 text-start w-[14%]">{t('interest')}</th>
                                     {!isSales && <th className="px-3 py-4 text-start w-[16%]">{t('assignedTo')}</th>}
                                     <th className="px-3 py-4 text-start w-[14%]">{t('latestFollowUp')}</th>
@@ -650,6 +737,22 @@ const Leads = () => {
                                             <Badge variant={lead.status === 'new' ? 'primary' : lead.status === 'closed' ? 'success' : lead.status === 'lost' ? 'danger' : 'warning'} className="px-2 py-1 font-black uppercase text-[8px] shadow-sm tracking-wide">
                                                 {t(lead.status) || lead.status}
                                             </Badge>
+                                        </td>
+                                        <td className="px-3 py-4">
+                                            {lead.aiScore ? (
+                                                <div className="flex flex-col gap-1 items-start cursor-help" title={lead.aiReason}>
+                                                    <Badge variant={lead.aiPriority === 'High' ? 'success' : lead.aiPriority === 'Medium' ? 'warning' : 'primary'} className="px-2 py-1 font-black uppercase text-[8px] shadow-sm tracking-wider">
+                                                        {lead.aiScore}/100 - {lead.aiPriority}
+                                                    </Badge>
+                                                </div>
+                                            ) : (
+                                                <button 
+                                                    onClick={() => handleScoreLead(lead.id)}
+                                                    className="text-[9px] font-bold text-primary hover:text-white bg-primary/10 hover:bg-primary px-2 py-1 rounded transition-colors uppercase tracking-wider"
+                                                >
+                                                    Score Lead
+                                                </button>
+                                            )}
                                         </td>
                                         <td className="px-3 py-4">
                                             {(lead.interestedProject || lead.interestedUnit) ? (
@@ -850,13 +953,32 @@ const Leads = () => {
                 </div>
             )}
 
-            {/* Modal */}
             <Modal
                 isOpen={isModalOpen}
-                onClose={handleCloseModal}
+                onClose={() => {
+                    handleCloseModal();
+                    setMatchedUnitsData(null);
+                }}
                 title={editingItem ? t('editLead', 'Edit Lead') : t('addLead')}
+                maxWidth="max-w-4xl"
             >
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
                 <form onSubmit={handleSubmit} className="space-y-6 p-2">
+                    {editingItem && editingItem.aiScore && (
+                        <div className="bg-primary/5 border border-primary/20 rounded-2xl p-5 mb-6 flex flex-col gap-2 shadow-inner">
+                            <div className="flex justify-between items-center">
+                                <h4 className="font-black text-lg text-primary flex items-center gap-2">✨ AI Analysis</h4>
+                                <Badge variant={editingItem.aiPriority === 'High' ? 'success' : editingItem.aiPriority === 'Medium' ? 'warning' : 'primary'} className="px-3 py-1 font-black uppercase tracking-wider">
+                                    {editingItem.aiScore}/100 - {editingItem.aiPriority} Priority
+                                </Badge>
+                            </div>
+                            <p className="text-sm text-textDark dark:text-gray-300 font-medium italic">"{editingItem.aiReason}"</p>
+                            <span className="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1">
+                                Last Updated: {new Date(editingItem.aiLastUpdated).toLocaleString()}
+                            </span>
+                        </div>
+                    )}
                     <Input label={t('name')} name="name" value={formData.name} onChange={handleInputChange} required className="bg-white dark:bg-background/50 border-border rounded-2xl h-14" disabled={isSales} />
                     {!isSales && (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -933,6 +1055,69 @@ const Leads = () => {
                          <Button type="submit" className="h-12 bg-primary px-10 rounded-2xl shadow-xl shadow-primary/20 font-black tracking-widest uppercase text-xs !text-white">{editingItem ? t('update') : t('create')}</Button>
                     </div>
                 </form>
+                </div>
+
+                {/* AI Unit Matching Panel (Right Side) */}
+                {editingItem && (
+                    <div className="border-l border-border/20 pl-6 flex flex-col h-full overflow-y-auto max-h-[70vh] pr-2">
+                        <div className="flex justify-between items-center mb-4 pt-2">
+                            <h4 className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-500 uppercase tracking-widest text-sm flex items-center">
+                                <span className="mr-2 border border-primary/30 w-8 h-8 rounded-full flex items-center justify-center bg-primary/10">🤖</span>
+                                AI Unit Matches
+                            </h4>
+                            <Button 
+                                type="button" 
+                                onClick={() => handleMatchUnits(editingItem.id)} 
+                                disabled={isMatchingUnits}
+                                className="h-auto py-2 text-xs font-bold"
+                            >
+                                {isMatchingUnits ? 'Analyzing...' : 'Find Matches'}
+                            </Button>
+                        </div>
+                        
+                        {!matchedUnitsData ? (
+                           <div className="flex-1 flex flex-col items-center justify-center opacity-50 border border-dashed border-border/40 rounded-3xl p-6 text-center">
+                               <span className="text-4xl mb-3">🎯</span>
+                               <p className="text-sm font-bold">Use AI to scan inventory</p>
+                               <p className="text-xs mt-1">We'll pre-filter based on budget & project interest.</p>
+                           </div>
+                        ) : (
+                            <div className="space-y-3">
+                                {matchedUnitsData.map((unit, idx) => (
+                                    <div key={unit.unit_id} className={`p-4 rounded-2xl border ${idx === 0 ? 'border-primary/50 bg-primary/5 ring-1 ring-primary/20 shadow-md' : 'border-border/20 bg-background/50'}`}>
+                                        <div className="flex justify-between items-start mb-2">
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    {idx === 0 && <span className="text-[10px] bg-primary text-white px-2 py-0.5 rounded-full font-bold uppercase tracking-wider shadow">Top Match</span>}
+                                                    <h5 className="font-bold text-sm">{unit.type} - Unit {unit.id?.slice(-4)}</h5>
+                                                </div>
+                                                <div className="text-xs text-textLight mt-1 font-semibold">{unit.city} • {unit.bedrooms} Beds • {unit.area}m²</div>
+                                            </div>
+                                            <div className="text-right flex flex-col items-end">
+                                                <Badge variant={unit.match_score > 80 ? 'success' : 'warning'} className="font-black">
+                                                    {unit.match_score}% Match
+                                                </Badge>
+                                                <p className="font-black text-primary mt-1 text-sm">{unit.price?.toLocaleString()} EGP</p>
+                                            </div>
+                                        </div>
+                                        <button 
+                                            type="button" 
+                                            className="w-full mt-3 py-2 border border-primary/20 bg-primary/10 hover:bg-primary hover:text-white text-primary rounded-xl text-xs font-bold transition-all shadow-sm"
+                                            onClick={(e) => {
+                                                e.preventDefault();
+                                                handleInputChange({ target: { name: 'interestedUnit', value: unit.id } });
+                                                toast.success(`Unit ${unit.id?.slice(-4)} staged for assignment. Click Update Lead to save.`);
+                                            }}
+                                        >
+                                            Assign to Lead
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+                </div>
             </Modal>
 
             {/* Follow Up Modal */}
@@ -943,6 +1128,26 @@ const Leads = () => {
                 maxWidth="max-w-2xl"
             >
                 <div className="space-y-8 p-1">
+                    {/* AI Action Plan */}
+                    {selectedLead?.aiFollowupDate && (
+                        <div className="bg-primary/5 border border-primary/20 p-5 rounded-[2rem] mb-2 shadow-inner">
+                            <div className="flex justify-between items-center mb-3">
+                                <h4 className="font-black text-primary text-xs uppercase tracking-widest flex items-center gap-2">
+                                    <span className="text-lg">🤖</span> AI Action Plan
+                                </h4>
+                                <Badge variant={selectedLead.aiFollowupConfidence === 'High' ? 'success' : selectedLead.aiFollowupConfidence === 'Medium' ? 'warning' : 'primary'} className="text-[9px] uppercase font-black tracking-wider px-2 py-0.5">
+                                    {selectedLead.aiFollowupConfidence} Confidence
+                                </Badge>
+                            </div>
+                            <div className="flex flex-col gap-2">
+                                <span className="text-sm font-bold text-textDark dark:text-white">
+                                    Suggested Date: {new Date(selectedLead.aiFollowupDate).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                                </span>
+                                <p className="text-xs text-textLight dark:text-gray-300 italic leading-relaxed">"{selectedLead.aiFollowupReason}"</p>
+                            </div>
+                        </div>
+                    )}
+
                     {/* History */}
                     <div className="space-y-6">
                         <div className="flex items-center gap-4">
@@ -1054,11 +1259,36 @@ const Leads = () => {
                             exit={{ opacity: 0, scale: 0.95, y: 10 }}
                             className="relative w-full max-w-md bg-background dark:bg-[#0f172a] border border-border/20 dark:border-white/10 rounded-3xl shadow-2xl overflow-hidden z-20"
                         >
-                            <div className="p-8 pb-0">
-                                <h2 className="text-2xl font-black text-textDark dark:text-white mb-2">{t('assignAgent')}</h2>
+                            <div className="p-8 pb-4">
+                                <div className="flex justify-between items-start mb-2">
+                                    <h2 className="text-2xl font-black text-textDark dark:text-white">{t('assignAgent')}</h2>
+                                    <Button 
+                                        onClick={handleSmartAssign} 
+                                        disabled={isAssigningWithAI}
+                                        type="button"
+                                        className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary shadow-sm hover:!text-white font-bold h-9 px-4 rounded-xl text-xs transition-all"
+                                    >
+                                        {isAssigningWithAI ? 'Analyzing...' : '✨ Smart Assign'}
+                                    </Button>
+                                </div>
                                 <p className="text-sm text-textLight font-medium">
                                     {t('selectAgentToAssign', { name: leadToAssign?.name })}
                                 </p>
+                                
+                                {aiAssignFeedback && (
+                                    <div className="mt-4 p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-700 dark:text-indigo-300">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <span className="text-xl">🤖</span>
+                                            <span className="font-bold text-sm">AI Recommendation</span>
+                                            <Badge variant={aiAssignFeedback.confidence === 'High' ? 'success' : 'warning'} className="ml-auto text-[10px]">
+                                                {aiAssignFeedback.confidence} Confidence
+                                            </Badge>
+                                        </div>
+                                        <p className="text-xs font-medium leading-relaxed italic border-l-2 border-indigo-400/50 pl-3">
+                                            "{aiAssignFeedback.reasoning}"
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                             
                             <div className="p-4 max-h-[400px] overflow-y-auto custom-scrollbar my-4 space-y-1">
