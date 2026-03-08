@@ -59,7 +59,7 @@ const FilterSidebar = ({ filters, setFilters, isOpen, onClose }) => {
 
           {/* Search */}
           <div className="relative group">
-            <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-textLight group-focus-within:text-primary transition-colors" />
+            <Search size={18} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-primary group-focus-within:text-primary transition-colors" />
             <input
               type="text"
               name="search"
@@ -188,7 +188,7 @@ const FilterSidebar = ({ filters, setFilters, isOpen, onClose }) => {
             </Button>
             <button 
               onClick={handleReset}
-              className="w-full py-3 text-sm text-textLight hover:text-textDark transition-colors"
+              className="w-full py-3 text-sm text-textDark/70 hover:text-textDark transition-colors"
             >
               Reset All
             </button>

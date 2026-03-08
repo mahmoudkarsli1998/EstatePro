@@ -54,9 +54,6 @@ const Home = () => {
 
         <div className="container mx-auto px-4 md:px-6 relative z-10 text-center">
           <div ref={heroContentRef} className="max-w-5xl mx-auto">
-            <div className="stagger-item opacity-0 inline-block mb-6 px-6 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-white font-medium tracking-wide uppercase shadow-lg">
-              {t('futureOfLiving')}
-            </div>
             
             <h1 className="stagger-item opacity-0 text-5xl md:text-7xl font-bold font-heading mb-6 leading-tight text-white drop-shadow-2xl">
               {t('discoverYour')} <br />

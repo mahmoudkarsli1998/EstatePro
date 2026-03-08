@@ -158,7 +158,7 @@ const Navbar = () => {
              <div key={link.name}>
                  <Link
                    to={link.path}
-                   className="flex items-center justify-between text-textLight hover:text-primary dark:text-gray-300 dark:hover:text-white font-medium py-2 transition-colors"
+                   className="flex items-center justify-between text-textDark hover:text-primary dark:text-gray-200 dark:hover:text-white font-medium py-2 transition-colors"
                    onClick={(e) => {
                        if (link.hasDropdown) {
                            e.preventDefault();

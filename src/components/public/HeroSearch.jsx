@@ -597,8 +597,9 @@ const HeroSearch = () => {
             <div className="w-full md:w-auto">
               <Button 
                 onClick={() => handleSearch()}
-                className="w-full md:w-40 h-full justify-center font-bold text-white shadow-lg hover:shadow-xl transition-all"
+                className="w-full md:w-40 h-full justify-center font-bold text-white shadow-lg hover:shadow-xl transition-all gap-2"
               >
+                <Search size={18} />
                 {t('search', 'Search')}
               </Button>
             </div>

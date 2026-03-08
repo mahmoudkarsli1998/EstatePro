@@ -5,7 +5,7 @@ const Counter = ({ value, suffix = '' }) => {
   const ref = useRef(null);
   const motionValue = useMotionValue(0);
   const springValue = useSpring(motionValue, { damping: 50, stiffness: 100 });
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const isInView = useInView(ref, { once: true, margin: "-20px" });
 
   useEffect(() => {
     if (isInView) {
@@ -36,7 +36,7 @@ const StatItem = ({ number, label, suffix = '' }) => {
       >
         <Counter value={parseInt(number)} suffix={suffix} />
       </motion.div>
-      <div className="text-textLight dark:text-gray-400 font-medium uppercase tracking-wider text-sm">
+      <div className="text-textDark/80 dark:text-gray-400 font-medium uppercase tracking-wider text-sm">
         {label}
       </div>
     </div>
